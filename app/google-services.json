@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "148330591215",
+    "project_id": "mediline-3a455",
+    "storage_bucket": "mediline-3a455.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:148330591215:android:7c4be4d7fb6cdd6498bc1a",
+        "android_client_info": {
+          "package_name": "com.example.mediline"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmoYZ2rS8tCHGkWdenZ4d4NmSDyPbZyOM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
