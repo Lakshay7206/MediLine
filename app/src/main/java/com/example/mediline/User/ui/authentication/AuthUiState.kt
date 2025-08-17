@@ -10,5 +10,8 @@ data class AuthState(
     val otpSent: Boolean = false,
     val success: Boolean = false,
     val error: String? = null,
-    val activity: android.app.Activity? = null
+    val activity: android.app.Activity? = null,
+    val verificationId: String? = null,
+    val isNewUser: Boolean? = null
+
 )

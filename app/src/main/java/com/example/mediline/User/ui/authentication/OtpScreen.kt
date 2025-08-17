@@ -20,10 +20,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 
 
 @Composable
-fun OtpScreen(viewModel: AuthViewModel, onSuccess: () -> Unit) {
+fun OtpScreen( onSuccess: () -> Unit,navController: NavController,viewModel: AuthViewModel= hiltViewModel() ){
     val state = viewModel.uiState.collectAsState().value
     var otp by remember { mutableStateOf("") }
 

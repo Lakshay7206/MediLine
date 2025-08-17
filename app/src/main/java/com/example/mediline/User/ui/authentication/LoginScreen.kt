@@ -1,11 +1,15 @@
 package com.example.mediline.User.ui.authentication
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -18,12 +22,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 
+@SuppressLint("ContextCastToActivity")
 @Composable
-fun LoginScreen(viewModel: AuthViewModel, onOtpSent: () -> Unit,modifier: Modifier) {
+fun LoginScreen(onOtpSent: () -> Unit, navController: NavController, viewModel: AuthViewModel = hiltViewModel()) {
     val state = viewModel.uiState.collectAsState().value
+
     var phone by remember { mutableStateOf("") }
+    val activity = LocalContext.current as Activity
+    viewModel.setActivity(activity)
 
 
     Column(
@@ -36,6 +52,18 @@ fun LoginScreen(viewModel: AuthViewModel, onOtpSent: () -> Unit,modifier: Modifi
             value = phone,
             onValueChange = { phone = it },
             label = { Text("Phone Number (+91...)") }
+        )
+        ClickableText(
+            text = buildAnnotatedString {
+                append("Don't have an account? ")
+                withStyle(style = SpanStyle(color = Color.Blue, fontWeight = FontWeight.Bold)) {
+                    append("Sign Up")
+                }
+            },
+            onClick = { offset ->
+                // detect click on "Sign Up"
+                // (for now we just navigate directly)
+            }
         )
         Spacer(Modifier.height(16.dp))
         Button(

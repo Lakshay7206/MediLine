@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
+    id ("com.google.dagger.hilt.android")
+    kotlin("kapt") // for annotation processing
 }
 
 android {
@@ -41,13 +43,36 @@ android {
 }
 
 dependencies {
+    // Hilt core
+    implementation ("com.google.dagger:hilt-android:2.51.1")
+    kapt ("com.google.dagger:hilt-compiler:2.51.1")
+
+    // (Optional) Hilt + Navigation Compose
+    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
-//    implementation "androidx.lifecycle:lifecycle-viewmodel-compose"
+// Core navigation for Compose
+    implementation("androidx.navigation:navigation-compose:2.8.0")
+// (Optional) If you use ViewModels in navigation destinations
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
+// (Optional) If you use Hilt with Compose Navigation
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+//   implementation "androidx.lifecycle:lifecycle-viewmodel-compose"
 //    implementation "androidx.lifecycle:lifecycle-runtime-ktx"
 //    implementation "androidx.compose.material3:material3"
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    // (optional Realtime DB)
+    // implementation(libs.firebase.database)
 
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    kapt(libs.room.compiler)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
