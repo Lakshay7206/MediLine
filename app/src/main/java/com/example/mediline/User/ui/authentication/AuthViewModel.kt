@@ -1,89 +1,101 @@
 package com.example.mediline.User.ui.authentication
 
 import android.app.Activity
-import android.telephony.SignalStrengthUpdateRequest
-import android.util.Log.e
-import com.google.firebase.FirebaseException
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.Navigation
 import com.example.mediline.User.Screen
 import com.example.mediline.User.UiEvent
-import com.example.mediline.User.data.repo.AuthRepository
-import com.example.mediline.User.data.repo.UserRepository
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
-import com.google.rpc.context.AttributeContext
+import com.example.mediline.User.dl.CheckUserExistsUseCase
+import com.example.mediline.User.dl.CreateUserUseCase
+import com.example.mediline.User.dl.SendOtpUseCase
+import com.example.mediline.User.dl.User
+import com.example.mediline.User.dl.VerifyOtpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
+import org.checkerframework.checker.units.qual.A
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(private val userRepo: UserRepository,private val authRepo: AuthRepository) : ViewModel() {
+class AuthViewModel @Inject constructor(
+    private val sendOtpUseCase: SendOtpUseCase,
+    private val verifyOtpUseCase: VerifyOtpUseCase,
+    private val checkUserExistsUseCase: CheckUserExistsUseCase,
+    private val createUserUseCase: CreateUserUseCase
+) : ViewModel() {
 
+    private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
+    val uiState: StateFlow<AuthUiState> = _uiState
 
-
-    private val _uiState = MutableStateFlow(AuthState())
-    val uiState: StateFlow<AuthState> = _uiState
-    private val _uiEvent= MutableSharedFlow<UiEvent>()
-    val uiEvent= _uiEvent.asSharedFlow()
-
-    fun setActivity(activity: android.app.Activity) {
-        _uiState.value = _uiState.value.copy(activity = activity)
-    }
-
-    fun sendOtp(phone: String) {
+    fun sendOtp(phone: String,activity: Activity) {
         viewModelScope.launch {
-            _uiState.value = AuthState(loading = true)
-
-            val result = userRepo.sendOtp(phone,_uiState.value.activity!!)
-
-            result.onSuccess { verificationId ->
-                _uiState.value = AuthState(verificationId = verificationId)
-            }.onFailure { e ->
-                _uiState.value = AuthState(error = e.message)
-            }
+            _uiState.value = AuthUiState.Loading
+            val result = sendOtpUseCase(phone, activity)
+            _uiState.value = result.fold(
+                onSuccess = { verificationId -> AuthUiState.OtpSent(verificationId) },
+                onFailure = { error -> AuthUiState.Error(error.message ?: "Unknown error") }
+            )
         }
     }
 
-    fun verifyOtp(verificationId: String, otp: String, name: String) {
+    fun verifyOtp(verificationId: String, otp: String) {
         viewModelScope.launch {
-            _uiState.value = AuthState(loading = true)
-
-            val result = userRepo.verifyOtp(verificationId, otp, name)
-
-            result.onSuccess {
-                _uiState.value = AuthState(success = true)
-            }.onFailure { e ->
-                _uiState.value = AuthState(error = e.message)
-            }
+            _uiState.value = AuthUiState.Loading
+            val result = verifyOtpUseCase(verificationId, otp)
+            result.fold(
+                onSuccess = { uid ->
+                    checkUser(uid) // Next step
+                },
+                onFailure = { error ->
+                    _uiState.value = AuthUiState.Error(error.message ?: "Invalid OTP")
+                }
+            )
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-    fun NavigateSignUp(){
+    private fun checkUser(uid: String) {
         viewModelScope.launch {
-            _uiEvent.emit(UiEvent.Navigation(Screen.Signup.route))
+            val result = checkUserExistsUseCase(uid)
+            result.fold(
+                onSuccess = { exists ->
+                    if (exists) {
+                        _uiState.value = AuthUiState.UserExists(uid)
+                    } else {
+                        _uiState.value = AuthUiState.NewUser(uid)
+                    }
+                },
+                onFailure = { error ->
+                    _uiState.value = AuthUiState.Error(error.message ?: "Failed to check user")
+                }
+            )
         }
     }
 
+    fun createUser(user: User) {
+        viewModelScope.launch {
+            val result = createUserUseCase(user)
+            result.fold(
+                onSuccess = {
+                    _uiState.value = AuthUiState.UserCreated
+                },
+                onFailure = { error ->
+                    _uiState.value = AuthUiState.Error(error.message ?: "Failed to create user")
+                }
+            )
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
 
 

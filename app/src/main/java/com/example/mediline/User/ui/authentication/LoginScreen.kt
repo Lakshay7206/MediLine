@@ -7,14 +7,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,50 +37,40 @@ import androidx.navigation.NavHostController
 
 @SuppressLint("ContextCastToActivity")
 @Composable
-fun LoginScreen(onOtpSent: () -> Unit, navController: NavController, viewModel: AuthViewModel = hiltViewModel()) {
-    val state = viewModel.uiState.collectAsState().value
-
+fun LoginScreen(
+    uiState: AuthUiState,
+    onSendOtp: (String, Activity) -> Unit,
+    onNavigateOtp: (String) -> Unit
+) {
+    val context = LocalContext.current as Activity
     var phone by remember { mutableStateOf("") }
-    val activity = LocalContext.current as Activity
-    viewModel.setActivity(activity)
 
-
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("Login with Phone", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(16.dp))
+    Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center) {
         OutlinedTextField(
             value = phone,
             onValueChange = { phone = it },
-            label = { Text("Phone Number (+91...)") }
+            label = { Text("Enter phone number") },
+            modifier = Modifier.fillMaxWidth()
         )
-        ClickableText(
-            text = buildAnnotatedString {
-                append("Don't have an account? ")
-                withStyle(style = SpanStyle(color = Color.Blue, fontWeight = FontWeight.Bold)) {
-                    append("Sign Up")
-                }
-            },
-            onClick = { offset ->
-                // detect click on "Sign Up"
-                // (for now we just navigate directly)
-            }
-        )
+
         Spacer(Modifier.height(16.dp))
+
         Button(
-            onClick = {
-                viewModel.sendOtp(phone)
-//                onOtpSent()
-            },
-            enabled = !state.loading
+            onClick = { onSendOtp(phone, context) },
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(if (state.loading) "Sending..." else "Send OTP")
+            Text("Send OTP")
         }
-        state.error?.let {
-            Spacer(Modifier.height(8.dp))
-            Text(it, color = Color.Red)
+
+        when (uiState) {
+            is AuthUiState.Loading -> CircularProgressIndicator()
+            is AuthUiState.OtpSent -> {
+                LaunchedEffect(Unit) {
+                    onNavigateOtp(uiState.verificationId)
+                }
+            }
+            is AuthUiState.Error -> Text(uiState.message, color = Color.Red)
+            else -> {}
         }
     }
 }

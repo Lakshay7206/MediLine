@@ -12,7 +12,20 @@
           "package_name": "com.example.mediline"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "148330591215-2p296s89ntk02mssmumni3raj53uvuof.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mediline",
+            "certificate_hash": "5ca9aa7bbee68b843feef30afc220cc838680dc5"
+          }
+        },
+        {
+          "client_id": "148330591215-3m3n8r358bgv660qmbn8gba0e697m43t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAmoYZ2rS8tCHGkWdenZ4d4NmSDyPbZyOM"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "148330591215-3m3n8r358bgv660qmbn8gba0e697m43t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -25,35 +27,41 @@ import androidx.navigation.NavController
 
 
 @Composable
-fun OtpScreen( onSuccess: () -> Unit,navController: NavController,viewModel: AuthViewModel= hiltViewModel() ){
-    val state = viewModel.uiState.collectAsState().value
+fun OtpScreen(
+    uiState: AuthUiState,
+    onVerifyOtp: (String) -> Unit,
+    onUserExists: (String) -> Unit,
+    onNewUser: (String) -> Unit
+) {
     var otp by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("Enter OTP", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(16.dp))
+    Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center) {
         OutlinedTextField(
             value = otp,
             onValueChange = { otp = it },
-            label = { Text("OTP") }
+            label = { Text("Enter OTP") },
+            modifier = Modifier.fillMaxWidth()
         )
-        Spacer(Modifier.height(16.dp))
-        Button(
-            onClick = { viewModel.verifyOtp(otp) },
-            enabled = !state.loading
-        ) {
-            Text(if (state.loading) "Verifying..." else "Verify OTP")
-        }
-        state.error?.let {
-            Spacer(Modifier.height(8.dp))
-            Text(it, color = Color.Red)
-        }
-    }
 
-    if (state.success) {
-        LaunchedEffect(Unit) { onSuccess() }
+        Spacer(Modifier.height(16.dp))
+
+        Button(
+            onClick = { onVerifyOtp(otp) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Verify OTP")
+        }
+
+        when (uiState) {
+            is AuthUiState.Loading -> CircularProgressIndicator()
+            is AuthUiState.UserExists -> {
+                LaunchedEffect(Unit) { onUserExists(uiState.uid) }
+            }
+            is AuthUiState.NewUser -> {
+                LaunchedEffect(Unit) { onNewUser(uiState.uid) }
+            }
+            is AuthUiState.Error -> Text(uiState.message, color = Color.Red)
+            else -> {}
+        }
     }
 }

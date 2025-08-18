@@ -114,6 +114,7 @@ private val allSpecialties = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    uid: String,
     modifier: Modifier = Modifier,
     onSpecialtyClick: (Specialty) -> Unit = {}
 ) {
@@ -277,10 +278,3 @@ private fun SpecialtyCard(
 }
 
 // ---------- Preview ----------
-@Preview(showBackground = true)
-@Composable
-private fun HomeScreenPreview() {
-    MaterialTheme {
-        HomeScreen()
-    }
-}
