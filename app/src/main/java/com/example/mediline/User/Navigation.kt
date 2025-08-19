@@ -29,15 +29,11 @@ sealed class Screen(val route:String){
 }
 @Composable
 fun NavGraph(navController: NavHostController, authViewModel: AuthViewModel = hiltViewModel()) {
-    val uiState by authViewModel.uiState.collectAsState()
+
 
     NavHost(navController, startDestination = "login") {
         composable("login") {
             LoginScreen(
-                uiState = uiState,
-                onSendOtp = { phone, activity ->
-                    authViewModel.sendOtp(phone, activity)
-                },
                 onNavigateOtp = { verificationId ->
                     navController.navigate("otp/$verificationId")
                 }
@@ -47,10 +43,7 @@ fun NavGraph(navController: NavHostController, authViewModel: AuthViewModel = hi
         composable("otp/{verificationId}") { backStackEntry ->
             val verificationId = backStackEntry.arguments?.getString("verificationId") ?: ""
             OtpScreen(
-                uiState = uiState,
-                onVerifyOtp = { otp ->
-                    authViewModel.verifyOtp(verificationId, otp)
-                },
+                verificationId = verificationId,
                 onUserExists = { uid -> navController.navigate("home/$uid") },
                 onNewUser = { uid -> navController.navigate("signup/$uid") }
             )

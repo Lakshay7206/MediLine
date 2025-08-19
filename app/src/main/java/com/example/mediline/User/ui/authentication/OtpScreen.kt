@@ -28,12 +28,15 @@ import androidx.navigation.NavController
 
 @Composable
 fun OtpScreen(
-    uiState: AuthUiState,
-    onVerifyOtp: (String) -> Unit,
+    verificationId: String,
     onUserExists: (String) -> Unit,
-    onNewUser: (String) -> Unit
+    onNewUser: (String) -> Unit,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
+    val uiStateState = viewModel.uiState.collectAsState()
+    val uiState = uiStateState.value
     var otp by remember { mutableStateOf("") }
+
 
     Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center) {
         OutlinedTextField(
@@ -46,7 +49,10 @@ fun OtpScreen(
         Spacer(Modifier.height(16.dp))
 
         Button(
-            onClick = { onVerifyOtp(otp) },
+            onClick = { viewModel.verifyOtp(
+                verificationId = verificationId,
+                otp = otp
+            ) },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Verify OTP")

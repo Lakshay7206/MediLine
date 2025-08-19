@@ -34,14 +34,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 @SuppressLint("ContextCastToActivity")
 @Composable
 fun LoginScreen(
-    uiState: AuthUiState,
-    onSendOtp: (String, Activity) -> Unit,
-    onNavigateOtp: (String) -> Unit
+    onNavigateOtp: (String) -> Unit,
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
+    val uiState by authViewModel.uiState.collectAsState()
     val context = LocalContext.current as Activity
     var phone by remember { mutableStateOf("") }
 
@@ -56,20 +57,20 @@ fun LoginScreen(
         Spacer(Modifier.height(16.dp))
 
         Button(
-            onClick = { onSendOtp(phone, context) },
+            onClick = { authViewModel.sendOtp(phone, context) },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Send OTP")
         }
-
-        when (uiState) {
+        val state=uiState
+        when (state) {
             is AuthUiState.Loading -> CircularProgressIndicator()
             is AuthUiState.OtpSent -> {
                 LaunchedEffect(Unit) {
-                    onNavigateOtp(uiState.verificationId)
+                    onNavigateOtp(state.verificationId)
                 }
             }
-            is AuthUiState.Error -> Text(uiState.message, color = Color.Red)
+            is AuthUiState.Error -> Text(state.message, color = Color.Red)
             else -> {}
         }
     }

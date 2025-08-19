@@ -16,7 +16,7 @@ interface AuthRepository {
     suspend fun checkUserExists(uid: String): Result<Boolean>
     suspend fun createUser(user: User): Result<Unit>
 }
-sealed class OtpResult {
-    object AutoVerified : OtpResult()   // OTP auto-detected
-    data class CodeSent(val verificationId: String) : OtpResult()
-}
+//sealed class OtpResult {
+//    object AutoVerified : OtpResult()   // OTP auto-detected
+//    data class CodeSent(val verificationId: String) : OtpResult()
+//}
