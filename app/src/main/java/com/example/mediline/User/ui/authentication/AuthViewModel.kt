@@ -30,12 +30,19 @@ class AuthViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState
 
+    private val _formState= MutableStateFlow(AuthFormState())
+    val formState: StateFlow<AuthFormState> = _formState
+
+
     fun sendOtp(phone: String,activity: Activity) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
             val result = sendOtpUseCase(phone, activity)
             _uiState.value = result.fold(
-                onSuccess = { verificationId -> AuthUiState.OtpSent(verificationId) },
+                onSuccess = { verificationId ->
+                    _formState.value=formState.value.copy(verificationId = verificationId)
+                    AuthUiState.OtpSent(verificationId)
+                            },
                 onFailure = { error -> AuthUiState.Error(error.message ?: "Unknown error") }
             )
         }
@@ -47,7 +54,8 @@ class AuthViewModel @Inject constructor(
             val result = verifyOtpUseCase(verificationId, otp)
             result.fold(
                 onSuccess = { uid ->
-                    checkUser(uid) // Next step
+                    _formState.value=formState.value.copy(uid = uid)
+                    checkUser(uid)
                 },
                 onFailure = { error ->
                     _uiState.value = AuthUiState.Error(error.message ?: "Invalid OTP")
@@ -87,6 +95,21 @@ class AuthViewModel @Inject constructor(
             )
         }
     }
+
+
+    fun updatePhone(phone:String){
+
+            _formState.value=formState.value.copy(phone = phone)
+
+    }
+
+    fun updateOtp(otp:String){
+
+            _formState.value=formState.value.copy(otp = otp)
+
+
+    }
+
 }
 
 

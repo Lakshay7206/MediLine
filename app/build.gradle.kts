@@ -45,6 +45,7 @@ android {
 dependencies {
     // Hilt core
     implementation ("com.google.dagger:hilt-android:2.51.1")
+    implementation(libs.androidx.navigation.common.android)
     kapt ("com.google.dagger:hilt-compiler:2.51.1")
 
     // (Optional) Hilt + Navigation Compose

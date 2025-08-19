@@ -1,5 +1,6 @@
 package com.example.mediline.User.ui.authentication
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,30 +29,31 @@ import androidx.navigation.NavController
 
 @Composable
 fun OtpScreen(
-    verificationId: String,
-    onUserExists: (String) -> Unit,
-    onNewUser: (String) -> Unit,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel,
+    onUserExists: () -> Unit,
+    onNewUser: () -> Unit
+
 ) {
     val uiStateState = viewModel.uiState.collectAsState()
     val uiState = uiStateState.value
-    var otp by remember { mutableStateOf("") }
+     val formState by viewModel.formState.collectAsState()
 
 
     Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center) {
         OutlinedTextField(
-            value = otp,
-            onValueChange = { otp = it },
+            value = formState.otp,
+            onValueChange = { viewModel.updateOtp(it) },
             label = { Text("Enter OTP") },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(Modifier.height(16.dp))
+        Log.d("Logino", formState.phone)
 
         Button(
             onClick = { viewModel.verifyOtp(
-                verificationId = verificationId,
-                otp = otp
+                verificationId = formState.verificationId,
+                otp = formState.otp
             ) },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -61,10 +63,10 @@ fun OtpScreen(
         when (uiState) {
             is AuthUiState.Loading -> CircularProgressIndicator()
             is AuthUiState.UserExists -> {
-                LaunchedEffect(Unit) { onUserExists(uiState.uid) }
+                LaunchedEffect(Unit) { onUserExists() }
             }
             is AuthUiState.NewUser -> {
-                LaunchedEffect(Unit) { onNewUser(uiState.uid) }
+                LaunchedEffect(Unit) { onNewUser() }
             }
             is AuthUiState.Error -> Text(uiState.message, color = Color.Red)
             else -> {}
