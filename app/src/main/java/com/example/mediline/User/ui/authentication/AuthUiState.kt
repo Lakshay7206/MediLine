@@ -13,3 +13,10 @@ sealed class AuthUiState {
 
     data class Error(val message: String) : AuthUiState() // Any error state
 }
+
+data class AuthFormState(
+    val phone: String = "",
+    val uid: String = "",
+    val otp: String = "",
+    val verificationId: String = ""
+)

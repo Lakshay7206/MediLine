@@ -12,6 +12,7 @@ firebase-bom = "33.1.2"
 firebase-firestore = "24.11.1"
 room = "2.6.1"
 kotlinx-coroutines-play-services = "1.8.0"
+navigationCommonAndroid = "2.9.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,6 +40,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
 # Coroutines + Firebase
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines-play-services" }
+androidx-navigation-common-android = { group = "androidx.navigation", name = "navigation-common-android", version.ref = "navigationCommonAndroid" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

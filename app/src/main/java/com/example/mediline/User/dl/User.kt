@@ -5,7 +5,7 @@ import com.google.firebase.auth.PhoneAuthProvider
 
 data class User(
     val id: String = "",
-    val name: String = "",
+   // val name: String = "",
     val phone: String = "",
     val createdAt: Long = System.currentTimeMillis()
 )

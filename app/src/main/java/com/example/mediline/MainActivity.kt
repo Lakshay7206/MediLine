@@ -11,8 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavGraph
 import androidx.navigation.compose.rememberNavController
-import com.example.mediline.User.NavGraph
+import com.example.mediline.User.RootNavGraph
 import com.example.mediline.User.ui.authentication.AuthViewModel
 import com.example.mediline.User.ui.authentication.LoginScreen
 import com.example.mediline.User.ui.theme.MediLineTheme
@@ -27,8 +28,7 @@ class MainActivity : ComponentActivity() {
             MediLineTheme {
                 val navController = rememberNavController()
 
-                    NavGraph(navController = navController)
-
+                RootNavGraph(navController)
             }
         }
     }
