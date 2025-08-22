@@ -1,6 +1,11 @@
 package com.example.mediline.User.dl
 
 import android.app.Activity
+import com.example.mediline.User.data.model.AuthRepository
+import com.example.mediline.User.data.model.Form
+import com.example.mediline.User.data.model.FormRepository
+import com.example.mediline.User.data.model.PaymentRepository
+import com.example.mediline.User.data.model.User
 import javax.inject.Inject
 
 
@@ -37,3 +42,25 @@ class CreateUserUseCase @Inject constructor(
 }
 
 
+class AddFormUseCase @Inject constructor(
+    private val repository: FormRepository
+){
+    suspend operator fun invoke(form: Form): Result<String> {
+        return repository.addForm(form)
+    }    }
+
+class CreatePaymentOrderUseCase @Inject constructor(
+    private val paymentRepository: PaymentRepository
+) {
+    suspend operator fun invoke(amount: Int, currency: String = "INR"): Result<String> {
+        return paymentRepository.createOrder(amount, currency)
+    }
+}
+class VerifyPaymentUseCase @Inject constructor(
+    private val paymentRepository: PaymentRepository
+) {
+    suspend operator fun invoke(orderId: String, paymentId: String, signature: String): Result<Boolean> {
+        return paymentRepository.verifyPayment(orderId, paymentId, signature)
+
+    }
+}

@@ -1,16 +1,14 @@
 package com.example.mediline.User.data.repo
 
-import android.R.attr.phoneNumber
 import android.app.Activity
-import com.example.mediline.User.dl.AuthRepository
-import com.example.mediline.User.dl.User
+import com.example.mediline.User.data.model.AuthRepository
+import com.example.mediline.User.data.model.User
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume

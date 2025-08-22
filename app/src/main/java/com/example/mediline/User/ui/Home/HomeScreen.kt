@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,7 +36,7 @@ import androidx.compose.ui.unit.dp
 
 // ---------- Data ----------
 data class Specialty(
-    val id: String,
+    val id: Int,
     val name: String,
     val subtitle: String,
     val icon: ImageVector,
@@ -45,7 +46,7 @@ data class Specialty(
 
 private val allSpecialties = listOf(
     Specialty(
-        id = "cardio",
+        id = 1,
         name = "Cardiologist",
         subtitle = "Heart & blood vessels",
         icon = Icons.Filled.Face,
@@ -53,7 +54,7 @@ private val allSpecialties = listOf(
         endColor = Color(0xFF36D1DC)
     ),
     Specialty(
-        id = "neuro",
+        id = 2,
         name = "Neurologist",
         subtitle = "Brain & nerves",
         icon =  Icons.Filled.Face,
@@ -61,7 +62,7 @@ private val allSpecialties = listOf(
         endColor = Color(0xFFD04ED6)
     ),
     Specialty(
-        id = "uro",
+        id = 3,
         name = "Urologist",
         subtitle = "Urinary tract",
         icon =  Icons.Filled.Face,
@@ -69,7 +70,7 @@ private val allSpecialties = listOf(
         endColor = Color(0xFF0083B0)
     ),
     Specialty(
-        id = "ortho",
+        id =4,
         name = "Orthopedic",
         subtitle = "Bones & joints",
         icon =  Icons.Filled.Face,
@@ -77,7 +78,7 @@ private val allSpecialties = listOf(
         endColor = Color(0xFF38EF7D)
     ),
     Specialty(
-        id = "derma",
+        id = 5,
         name = "Dermatologist",
         subtitle = "Skin & hair",
         icon =  Icons.Filled.Face,
@@ -85,7 +86,7 @@ private val allSpecialties = listOf(
         endColor = Color(0xFFFFC371)
     ),
     Specialty(
-        id = "pedia",
+        id = 6,
         name = "Pediatrician",
         subtitle = "Children's health",
         icon =  Icons.Filled.Face,
@@ -93,7 +94,7 @@ private val allSpecialties = listOf(
         endColor = Color(0xFF5B86E5)
     ),
     Specialty(
-        id = "gyno",
+        id =7,
         name = "Gynecologist",
         subtitle = "Women’s health",
         icon = Icons.Filled.Face,
@@ -101,7 +102,7 @@ private val allSpecialties = listOf(
         endColor = Color(0xFFFFD200)
     ),
     Specialty(
-        id = "general",
+        id = 8,
         name = "General Physician",
         subtitle = "Primary care",
         icon =  Icons.Filled.Face,
@@ -278,3 +279,4 @@ private fun SpecialtyCard(
 }
 
 // ---------- Preview ----------
+

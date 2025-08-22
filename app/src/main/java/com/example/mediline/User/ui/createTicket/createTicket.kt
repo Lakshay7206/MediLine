@@ -10,7 +10,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +27,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 @Composable
@@ -31,7 +36,8 @@ fun RegistrationScreen(
     doctorName: String,
     department: String,
     registrationFee: Double,
-    onRegisterClick: () -> Unit
+    //onRegisterClick: () -> Unit,
+    viewModel: CreateTicketViewModel = hiltViewModel()
 ) {
     Column(
         modifier = Modifier
@@ -40,7 +46,7 @@ fun RegistrationScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
+        val uiState by viewModel.uiState.collectAsState()
         Text(
             text = "Registration",
             style = MaterialTheme.typography.headlineMedium,
@@ -69,36 +75,58 @@ fun RegistrationScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = uiState.name,
+            onValueChange = {viewModel.updateName(it)},
             label = { Text("Patient Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            label = { Text("Patient Age") },
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = uiState.address,
+            onValueChange = {viewModel.updateAddress(it)},
+            label = { Text("Address") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = uiState.phone,
+            onValueChange = {viewModel.updatePhone(it)},
             label = { Text("Contact Number") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
         )
 
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(
+            value = uiState.age.toString(),
+            onValueChange = {viewModel.updateAge(it)},
+            label = { Text("Age") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+        )
+
+
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        GenderDropdown(
+            selectedSex = uiState.sex,
+            onSexSelected = { viewModel.updateSex(it) }
+        )
+
+
+
         Spacer(modifier = Modifier.height(20.dp))
 
+
         Button(
-            onClick = { onRegisterClick() },
+            onClick = {viewModel.addFormFromState()},
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -108,6 +136,49 @@ fun RegistrationScreen(
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GenderDropdown(
+    selectedSex: Sex,
+    onSexSelected: (Sex) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        OutlinedTextField(
+            value = selectedSex.name,
+            onValueChange = {}, // read-only
+            readOnly = true,
+            label = { Text("Gender") },
+            modifier = Modifier
+                .menuAnchor() // important for dropdown positioning
+                .fillMaxWidth(),
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            Sex.entries.forEach { sex ->
+                DropdownMenuItem(
+                    text = { Text(sex.name) },
+                    onClick = {
+                        onSexSelected(sex)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun RegistrationScreenPreview() {
@@ -115,6 +186,6 @@ fun RegistrationScreenPreview() {
         doctorName = "Dr. John Doe",
         department = "Cardiology",
         registrationFee = 100.0,
-        onRegisterClick = {}
+
     )
 }

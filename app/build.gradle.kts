@@ -43,6 +43,7 @@ android {
 }
 
 dependencies {
+    implementation("com.razorpay:checkout:1.6.33")
     // Hilt core
     implementation ("com.google.dagger:hilt-android:2.51.1")
     implementation(libs.androidx.navigation.common.android)

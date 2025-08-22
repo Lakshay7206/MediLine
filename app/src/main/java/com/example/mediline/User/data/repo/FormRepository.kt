@@ -1,12 +1,10 @@
 package com.example.mediline.User.data.repo
 
-import com.example.mediline.User.dl.Form
-import com.example.mediline.User.dl.FormRepository
+import com.example.mediline.User.data.model.Form
+import com.example.mediline.User.data.model.FormRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
-import kotlin.coroutines.resume
 
 class FormRepositoryImpl(private val firestore: FirebaseFirestore,
                          private val auth: FirebaseAuth

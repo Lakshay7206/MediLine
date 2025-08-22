@@ -1,7 +1,6 @@
-package com.example.mediline.User.dl
+package com.example.mediline.User.data.model
 
 import android.app.Activity
-import com.google.firebase.auth.PhoneAuthProvider
 
 data class User(
     val id: String = "",
