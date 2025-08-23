@@ -1,22 +1,25 @@
 package com.example.mediline.User
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
 import com.example.mediline.User.ui.Home.HomeScreen
+import com.example.mediline.User.ui.Queue.QueueScreen
 import com.example.mediline.User.ui.authentication.AuthViewModel
 import com.example.mediline.User.ui.authentication.LoginScreen
 import com.example.mediline.User.ui.authentication.OtpScreen
 
 import com.example.mediline.User.ui.authentication.SignupScreen
+import com.example.mediline.User.ui.createTicket.RegistrationScreen
+import com.example.mediline.User.ui.viewTicket.ViewTicketsScreen
 
 
 sealed class Screen(val route:String){
@@ -25,7 +28,12 @@ sealed class Screen(val route:String){
     object Otp: Screen("otp")
     object Home: Screen("home")
     object Queue: Screen("queue")
-
+    object CreateTicket: Screen("createTicket/{departmentId}") {
+        fun createRoute(departmentId: String) = "createTicket/$departmentId"
+    }
+    object ViewTicket: Screen("viewTicket/{departmentId}") {
+        fun createRoute(departmentId: String) = "viewTicket/$departmentId"
+    }
 }
 @Composable
 fun RootNavGraph(navController: NavHostController) {
@@ -88,19 +96,70 @@ viewModel,
         }
     }
 }
-
 fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
     navigation(
         startDestination = "home",
         route = "home_main"
     ) {
-        composable("home") {
-            HomeScreen()
+        composable("home") { HomeScreen(
+            onSpecialtyClick ={}
+        ) }
 
+        composable(
+            "queue/{departmentId}",
+            arguments = listOf(navArgument("departmentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val deptId = backStackEntry.arguments?.getString("departmentId")!!
+            QueueScreen(
+                deptId,
+                { rootNavController.navigate("createTicket/$deptId") },
+                { rootNavController.navigate("viewTicket/$deptId") }
+            )
+        }
 
+        composable(
+            "createTicket/{departmentId}",
+            arguments = listOf(navArgument("departmentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val deptId = backStackEntry.arguments?.getString("departmentId")!!
+            RegistrationScreen(deptId,"","",0.0)
+        }
+
+        composable(
+            "viewTicket/{departmentId}",
+            arguments = listOf(navArgument("departmentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val deptId = backStackEntry.arguments?.getString("departmentId")!!
+            ViewTicketsScreen(deptId)
         }
     }
 }
+
+//fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
+//    navigation(
+//        startDestination = "home",
+//        route = "home_main"
+//    ) {
+//        composable("home") {
+//            HomeScreen()
+//        }
+//        composable("queue",
+//                arguments = listOf(navArgument("departmentId") { type = NavType.StringType })) { backStackEntry ->
+//              val deptId = backStackEntry.arguments?.getString("departmentId")!!
+//
+//            QueueScreen(deptId,{rootNavController.navigate("createTicket/${deptId}")},{rootNavController.navigate(
+//                "viewTicket/${deptId}")})
+//        }
+//        composable("createTicket",listOf(navArgument("departmentId") { type = NavType.StringType })) {backStackEntry ->
+//            val deptId = backStackEntry.arguments?.getString("departmentId")!!
+//            RegistrationScreen(deptId,"","",0.0)
+//        }
+//        composable("viewTicket",listOf(navArgument("departmentId") { type = NavType.StringType })) {
+//            ViewTicketsScreen()
+//        }
+//
+//    }
+
 
 //@SuppressLint("UnrememberedGetBackStackEntry")
 //@Composable

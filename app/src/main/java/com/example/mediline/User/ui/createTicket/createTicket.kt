@@ -33,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun RegistrationScreen(
+    deptId: String,
     doctorName: String,
     department: String,
     registrationFee: Double,
@@ -183,6 +184,7 @@ fun GenderDropdown(
 @Composable
 fun RegistrationScreenPreview() {
     RegistrationScreen(
+        deptId = "cardiology",
         doctorName = "Dr. John Doe",
         department = "Cardiology",
         registrationFee = 100.0,

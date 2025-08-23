@@ -44,8 +44,11 @@ import com.example.mediline.User.data.model.Department
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+
     onDepartmentClick: (Department) -> Unit,
     viewModel: DepartmentViewModel = hiltViewModel()
+
+
 ) {
     val departments by viewModel.departments.collectAsState()
 

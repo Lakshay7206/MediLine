@@ -7,6 +7,7 @@ import com.example.mediline.User.data.model.DepartmentRepository
 import com.example.mediline.User.data.model.Form
 import com.example.mediline.User.data.model.FormRepository
 import com.example.mediline.User.data.model.PaymentRepository
+import com.example.mediline.User.data.model.QueueRepository
 import com.example.mediline.User.data.model.User
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -72,6 +73,7 @@ class VerifyPaymentUseCase @Inject constructor(
     }
 }
 
+
     class CreateDepartmentUseCase @Inject constructor(
         private val repository: DepartmentRepository
     )
@@ -89,4 +91,12 @@ class VerifyPaymentUseCase @Inject constructor(
             return repository.getDepartmentById(id)
         }
     }
+
+class GetQueueLengthUseCase @Inject constructor(
+    private val repository: QueueRepository
+) {
+    suspend operator fun invoke(deptId: String): Result<Int> {
+        return repository.getQueue(deptId)
+    }
+}
 

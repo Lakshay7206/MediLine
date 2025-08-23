@@ -4,20 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavGraph
 import androidx.navigation.compose.rememberNavController
 import com.example.mediline.User.RootNavGraph
-import com.example.mediline.User.ui.authentication.AuthViewModel
-import com.example.mediline.User.ui.authentication.LoginScreen
-import com.example.mediline.User.ui.createTicket.RegistrationScreen
-import com.example.mediline.User.ui.payment.PaymentScreen
 import com.example.mediline.User.ui.theme.MediLineTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,11 +16,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MediLineTheme {
-//                val navController = rememberNavController()
-//
-//                RootNavGraph(navController)
-               // RegistrationScreen("abc","abc",123.0)
-                PaymentScreen()
+                val navController = rememberNavController()
+                RootNavGraph(navController)
+
             }
         }
     }

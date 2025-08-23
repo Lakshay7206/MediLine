@@ -27,10 +27,11 @@ class CreateTicketViewModel @Inject constructor(
             phone = currentState.phone,
             age = currentState.age,
             sex = currentState.sex,
-            departmentId = 123,
+            departmentId ="1",
             userId = "",
             opdNo = "123",
-            timeStamp = System.currentTimeMillis()
+            timeStamp = System.currentTimeMillis(),
+
         )
         addForm(form)
     }
