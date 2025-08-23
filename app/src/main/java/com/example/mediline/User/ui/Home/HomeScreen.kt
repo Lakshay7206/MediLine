@@ -5,12 +5,15 @@ package com.example.mediline.User.ui.Home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Face
 //import androidx.compose.material.icons.filled.Female
 //import androidx.compose.material.icons.filled.LocalHospital
@@ -33,250 +36,106 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.mediline.User.data.model.Department
 
-// ---------- Data ----------
-data class Specialty(
-    val id: Int,
-    val name: String,
-    val subtitle: String,
-    val icon: ImageVector,
-    val startColor: Color,
-    val endColor: Color
-)
 
-private val allSpecialties = listOf(
-    Specialty(
-        id = 1,
-        name = "Cardiologist",
-        subtitle = "Heart & blood vessels",
-        icon = Icons.Filled.Face,
-        startColor = Color(0xFF5B86E5),
-        endColor = Color(0xFF36D1DC)
-    ),
-    Specialty(
-        id = 2,
-        name = "Neurologist",
-        subtitle = "Brain & nerves",
-        icon =  Icons.Filled.Face,
-        startColor = Color(0xFF834D9B),
-        endColor = Color(0xFFD04ED6)
-    ),
-    Specialty(
-        id = 3,
-        name = "Urologist",
-        subtitle = "Urinary tract",
-        icon =  Icons.Filled.Face,
-        startColor = Color(0xFF00B4DB),
-        endColor = Color(0xFF0083B0)
-    ),
-    Specialty(
-        id =4,
-        name = "Orthopedic",
-        subtitle = "Bones & joints",
-        icon =  Icons.Filled.Face,
-        startColor = Color(0xFF11998E),
-        endColor = Color(0xFF38EF7D)
-    ),
-    Specialty(
-        id = 5,
-        name = "Dermatologist",
-        subtitle = "Skin & hair",
-        icon =  Icons.Filled.Face,
-        startColor = Color(0xFFFF5F6D),
-        endColor = Color(0xFFFFC371)
-    ),
-    Specialty(
-        id = 6,
-        name = "Pediatrician",
-        subtitle = "Children's health",
-        icon =  Icons.Filled.Face,
-        startColor = Color(0xFF36D1DC),
-        endColor = Color(0xFF5B86E5)
-    ),
-    Specialty(
-        id =7,
-        name = "Gynecologist",
-        subtitle = "Women’s health",
-        icon = Icons.Filled.Face,
-        startColor = Color(0xFFF7971E),
-        endColor = Color(0xFFFFD200)
-    ),
-    Specialty(
-        id = 8,
-        name = "General Physician",
-        subtitle = "Primary care",
-        icon =  Icons.Filled.Face,
-        startColor = Color(0xFF00C9FF),
-        endColor = Color(0xFF92FE9D)
-    )
-)
 
-// ---------- UI ----------
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-
-    modifier: Modifier = Modifier,
-    onSpecialtyClick: (Specialty) -> Unit = {}
+    onDepartmentClick: (Department) -> Unit,
+    viewModel: DepartmentViewModel = hiltViewModel()
 ) {
-    var query by remember { mutableStateOf("") }
-    var selectedTag by remember { mutableStateOf<String?>(null) }
-
-    val filtered = remember(query, selectedTag) {
-        allSpecialties.filter { s ->
-            val inSearch = s.name.contains(query, ignoreCase = true) ||
-                    s.subtitle.contains(query, ignoreCase = true)
-            val inTag = selectedTag?.let { s.name.contains(it, ignoreCase = true) } ?: true
-            inSearch && inTag
-        }
-    }
+    val departments by viewModel.departments.collectAsState()
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Find a Doctor", fontWeight = FontWeight.SemiBold) }
+            TopAppBar(
+                title = { Text("Departments") }
             )
         }
-    ) { inner ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(inner)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            // Search
-            OutlinedTextField(
-                value = query,
-                onValueChange = { query = it },
-                placeholder = { Text("Search cardiologist, skin…") },
-                singleLine = true,
+    ) { padding ->
+        if (departments.isEmpty()) {
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                leadingIcon = {
-                    Icon(
-                        imageVector =  Icons.Filled.Face,
-                        contentDescription = null
-                    )
-                },
-                shape = RoundedCornerShape(16.dp)
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            // Quick filter chips (optional)
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
             ) {
-                val tags = listOf("Cardio", "Neuro", "Uro", "Skin")
-                tags.forEach { tag ->
-                    FilterChip(
-                        selected = selectedTag == tag,
-                        onClick = {
-                            selectedTag = if (selectedTag == tag) null else tag
-                        },
-                        label = { Text(tag) }
-                    )
-                }
+                CircularProgressIndicator()
             }
-
-            Spacer(Modifier.height(12.dp))
-
-            // Grid of specialties
+        } else {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentPadding = PaddingValues(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize()
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(filtered, key = { it.id }) { spec ->
-                    SpecialtyCard(spec) { onSpecialtyClick(spec) }
+                items(departments) { department ->
+                    DepartmentCard(
+                        department = department,
+                        modifier = Modifier,
+                        onClick = { onDepartmentClick(department) }
+                    )
                 }
             }
         }
     }
 }
 
+
+
+
 @Composable
-private fun SpecialtyCard(
-    specialty: Specialty,
+fun DepartmentCard(
+    department: Department,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     ElevatedCard(
         onClick = onClick,
         shape = RoundedCornerShape(18.dp),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .height(150.dp)
+            .height(140.dp)
     ) {
-        // Gradient header
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
                         listOf(
-                            specialty.startColor.copy(alpha = 0.20f),
-                            specialty.endColor.copy(alpha = 0.06f)
+                            Color(0xFF6A11CB).copy(alpha = 0.15f),
+                            Color(0xFF2575FC).copy(alpha = 0.05f)
                         )
                     )
                 )
                 .padding(14.dp)
         ) {
-            // Icon bubble
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(
-                        Brush.linearGradient(
-                            listOf(specialty.startColor, specialty.endColor)
-                        )
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = specialty.icon,
-                    contentDescription = null,
-                    tint = Color.White
-                )
-            }
-
             Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
+                modifier = Modifier.align(Alignment.CenterStart)
             ) {
                 Text(
-                    text = specialty.name,
+                    text = department.name,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(6.dp))
                 Text(
-                    text = specialty.subtitle,
+                    text = department.description.ifBlank { "No description" },
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
-
-            // Decorative gradient bar
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .height(6.dp)
-                    .width(54.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(specialty.startColor, specialty.endColor)
-                        )
-                    )
-                    .alpha(0.9f)
-            )
         }
     }
 }
 
-// ---------- Preview ----------
 

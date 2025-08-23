@@ -2,10 +2,13 @@ package com.example.mediline.User.dl
 
 import android.app.Activity
 import com.example.mediline.User.data.model.AuthRepository
+import com.example.mediline.User.data.model.Department
+import com.example.mediline.User.data.model.DepartmentRepository
 import com.example.mediline.User.data.model.Form
 import com.example.mediline.User.data.model.FormRepository
 import com.example.mediline.User.data.model.PaymentRepository
 import com.example.mediline.User.data.model.User
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 
@@ -59,8 +62,31 @@ class CreatePaymentOrderUseCase @Inject constructor(
 class VerifyPaymentUseCase @Inject constructor(
     private val paymentRepository: PaymentRepository
 ) {
-    suspend operator fun invoke(orderId: String, paymentId: String, signature: String): Result<Boolean> {
+    suspend operator fun invoke(
+        orderId: String,
+        paymentId: String,
+        signature: String
+    ): Result<Boolean> {
         return paymentRepository.verifyPayment(orderId, paymentId, signature)
 
     }
 }
+
+    class CreateDepartmentUseCase @Inject constructor(
+        private val repository: DepartmentRepository
+    )
+    {
+        operator fun invoke(): Flow<List<Department>>{
+            return repository.getDepartments()
+        }
+    }
+
+    class CreateDepartmentIdUseCase @Inject constructor(
+        private val repository: DepartmentRepository
+    )
+    {
+        suspend operator fun invoke(id: String): Department?{
+            return repository.getDepartmentById(id)
+        }
+    }
+
