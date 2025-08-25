@@ -83,7 +83,7 @@ class VerifyPaymentUseCase @Inject constructor(
         }
     }
 
-    class CreateDepartmentIdUseCase @Inject constructor(
+    class GetDepartmentIdUseCase @Inject constructor(
         private val repository: DepartmentRepository
     )
     {

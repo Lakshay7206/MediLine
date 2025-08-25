@@ -3,8 +3,10 @@ package com.example.mediline.User.ui.createTicket
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mediline.User.data.model.Department
 import com.example.mediline.User.dl.AddFormUseCase
 import com.example.mediline.User.data.model.Form
+import com.example.mediline.User.dl.GetDepartmentIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,11 +16,22 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateTicketViewModel @Inject constructor(
-    private val createTicketUseCase: AddFormUseCase
+    private val createTicketUseCase: AddFormUseCase,
+    private val getDepartmentByIdUseCase: GetDepartmentIdUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateTicketUiState())
     val uiState: StateFlow<CreateTicketUiState> = _uiState
+
+    private val _department = MutableStateFlow<Department?>(null)
+    val department: StateFlow<Department?> = _department
+
+    fun loadDepartment(id: String) {
+        viewModelScope.launch {
+            val dept = getDepartmentByIdUseCase(id)
+            _department.value = dept
+        }
+    }
     fun addFormFromState(){
         val currentState = uiState.value
         val form = Form(

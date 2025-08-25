@@ -45,7 +45,7 @@ import com.example.mediline.User.data.model.Department
 @Composable
 fun HomeScreen(
 
-    onDepartmentClick: (Department) -> Unit,
+    onDepartmentClick: (String) -> Unit,
     viewModel: DepartmentViewModel = hiltViewModel()
 
 
@@ -82,7 +82,7 @@ fun HomeScreen(
                     DepartmentCard(
                         department = department,
                         modifier = Modifier,
-                        onClick = { onDepartmentClick(department) }
+                        onClick = { onDepartmentClick(department.id) }
                     )
                 }
             }

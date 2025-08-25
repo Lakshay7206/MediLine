@@ -5,11 +5,11 @@ import kotlinx.coroutines.flow.Flow
 data class Department(
 
 
-    val name: String,
-    val description: String ,
-    val doctor: String,
-    val fees: Int,
-    val id: String
+    val name: String="",
+    val description: String="",
+    val doctor: String="",
+    val fees: Int=0,
+    val id: String=""
 
 )
 

@@ -1,6 +1,7 @@
 package com.example.mediline.User.ui.Queue
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,10 +34,11 @@ import com.example.mediline.User.data.model.Department
 @Composable
 fun QueueScreen(
     departmentId: String,
-    navigateToCreateTicket: () -> Unit,
-    navigateToViewTicket: () -> Unit,
+    navigateToCreateTicket: (String) -> Unit,
+    navigateToViewTicket: (String) -> Unit,
     viewModel: QueueViewModel = hiltViewModel()
 ) {
+    Log.d("QueueScreen", "departmentId: $departmentId")
     val queueState by viewModel.queueState.collectAsState()
 
     LaunchedEffect(departmentId) {
@@ -120,7 +122,7 @@ fun QueueScreen(
 
                 // Quick Actions
                 Button(
-                    onClick = navigateToCreateTicket,
+                    onClick = { navigateToCreateTicket(departmentId) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -128,7 +130,7 @@ fun QueueScreen(
                 }
 
                 OutlinedButton(
-                    onClick = navigateToViewTicket,
+                    onClick ={ navigateToCreateTicket(departmentId) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp),

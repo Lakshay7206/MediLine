@@ -34,12 +34,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun RegistrationScreen(
     deptId: String,
-    doctorName: String,
-    department: String,
-    registrationFee: Double,
-    //onRegisterClick: () -> Unit,
     viewModel: CreateTicketViewModel = hiltViewModel()
 ) {
+
+    LaunchedEffect(deptId) {
+        viewModel.loadDepartment(deptId)
+    }
+    val department = viewModel.department.collectAsState().value
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,11 +63,11 @@ fun RegistrationScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Doctor: $doctorName", style = MaterialTheme.typography.titleMedium)
-                Text(text = "Department: $department", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "Doctor: ${department?.doctor} ", style = MaterialTheme.typography.titleMedium)
+                Text(text = "Department: ${department?.name}", style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Registration Fee: ₹$registrationFee",
+                    text = "Registration Fee: ₹${department?.fees}",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -133,7 +134,7 @@ fun RegistrationScreen(
                 .height(50.dp),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text(text = "Proceed to Pay ₹$registrationFee")
+            Text(text = "Proceed to Pay ₹${department?.fees}")
         }
     }
 }
@@ -184,10 +185,7 @@ fun GenderDropdown(
 @Composable
 fun RegistrationScreenPreview() {
     RegistrationScreen(
-        deptId = "cardiology",
-        doctorName = "Dr. John Doe",
-        department = "Cardiology",
-        registrationFee = 100.0,
+        deptId = "cardiology"
 
     )
 }
