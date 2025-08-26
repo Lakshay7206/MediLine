@@ -9,7 +9,9 @@ import com.example.mediline.User.data.model.FormRepository
 import com.example.mediline.User.data.model.PaymentRepository
 import com.example.mediline.User.data.model.QueueRepository
 import com.example.mediline.User.data.model.User
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -17,7 +19,7 @@ class SendOtpUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
     suspend operator fun invoke(phone: String, activity: Activity): Result<String> {
-        return repository.sendOtp(phone, activity)
+        return withContext(Dispatchers.IO){ repository.sendOtp(phone, activity) }
     }
 }
 
@@ -25,7 +27,7 @@ class VerifyOtpUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
     suspend operator fun invoke(verificationId: String, otp: String): Result<String> {
-        return repository.verifyOtp(verificationId, otp)
+        return withContext(Dispatchers.IO){ repository.verifyOtp(verificationId, otp) }
     }
 }
 
@@ -33,7 +35,7 @@ class CheckUserExistsUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
     suspend operator fun invoke(uid: String): Result<Boolean> {
-        return repository.checkUserExists(uid)
+        return withContext(Dispatchers.IO){ repository.checkUserExists(uid) }
     }
 }
 
@@ -41,7 +43,7 @@ class CreateUserUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
     suspend operator fun invoke(user: User): Result<Unit> {
-        return repository.createUser(user)
+        return withContext(Dispatchers.IO){ repository.createUser(user) }
     }
 }
 
@@ -50,36 +52,17 @@ class AddFormUseCase @Inject constructor(
     private val repository: FormRepository
 ){
     suspend operator fun invoke(form: Form): Result<String> {
-        return repository.addForm(form)
+        return withContext(Dispatchers.IO){ repository.addForm(form) }
     }    }
 
-class CreatePaymentOrderUseCase @Inject constructor(
-    private val paymentRepository: PaymentRepository
-) {
-    suspend operator fun invoke(amount: Int, currency: String = "INR"): Result<String> {
-        return paymentRepository.createOrder(amount, currency)
-    }
-}
-class VerifyPaymentUseCase @Inject constructor(
-    private val paymentRepository: PaymentRepository
-) {
-    suspend operator fun invoke(
-        orderId: String,
-        paymentId: String,
-        signature: String
-    ): Result<Boolean> {
-        return paymentRepository.verifyPayment(orderId, paymentId, signature)
-
-    }
-}
 
 
     class CreateDepartmentUseCase @Inject constructor(
         private val repository: DepartmentRepository
     )
     {
-        operator fun invoke(): Flow<List<Department>>{
-            return repository.getDepartments()
+        suspend operator fun invoke(): Flow<List<Department>>{
+            return withContext(Dispatchers.IO){ repository.getDepartments() }
         }
     }
 
@@ -88,7 +71,7 @@ class VerifyPaymentUseCase @Inject constructor(
     )
     {
         suspend operator fun invoke(id: String): Department?{
-            return repository.getDepartmentById(id)
+            return withContext(Dispatchers.IO){ repository.getDepartmentById(id) }
         }
     }
 
@@ -96,7 +79,17 @@ class GetQueueLengthUseCase @Inject constructor(
     private val repository: QueueRepository
 ) {
     suspend operator fun invoke(deptId: String): Result<Int> {
-        return repository.getQueue(deptId)
+        return withContext(Dispatchers.IO){repository.getQueue(deptId)}
     }
+}
+
+
+class CreateOrderUseCase @Inject constructor(private val repo: PaymentRepository) {
+    suspend operator fun invoke(amount: Int, currency: String) = withContext(Dispatchers.IO){repo.createOrder(amount, currency)}
+}
+
+class VerifyPaymentUseCase @Inject constructor(private val repo: PaymentRepository) {
+    suspend operator fun invoke(orderId: String, paymentId: String, signature: String) =
+        withContext(Dispatchers.IO){repo.verifyPayment(orderId, paymentId, signature)}
 }
 

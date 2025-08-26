@@ -127,6 +127,7 @@ fun RegistrationScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
 
+
         Button(
             onClick = {viewModel.addFormFromState()},
             modifier = Modifier
@@ -136,6 +137,7 @@ fun RegistrationScreen(
         ) {
             Text(text = "Proceed to Pay ₹${department?.fees}")
         }
+
     }
 }
 @OptIn(ExperimentalMaterial3Api::class)
