@@ -101,8 +101,9 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
         startDestination = "home",
         route = "home_main"
     ) {
+
         composable("home") { HomeScreen(
-            onSpecialtyClick ={}
+            {}
         ) }
 
         composable(
@@ -134,6 +135,7 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
         }
     }
 }
+
 
 //fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
 //    navigation(

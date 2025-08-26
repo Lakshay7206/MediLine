@@ -50,8 +50,16 @@ object AppModule {
 
     @Provides
     @Singleton
+
     fun provideQueueRepository(
         db: FirebaseFirestore
     ): QueueRepository = QueueRepositoryImpl(db)
+
+
+    @Provides
+    @Singleton
+    fun provideDepartmentIdRepository(
+        db: FirebaseFirestore
+    ): DepartmentRepository = DepartmentRepositoryImpl(db)
 
 }
