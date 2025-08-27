@@ -1,5 +1,6 @@
 package com.example.mediline.User.ui.createTicket
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -21,6 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -34,12 +36,31 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun RegistrationScreen(
     deptId: String,
-    doctorName: String,
-    department: String,
-    registrationFee: Double,
-    //onRegisterClick: () -> Unit,
+    navigateToPayment:()->Unit,
     viewModel: CreateTicketViewModel = hiltViewModel()
 ) {
+
+    LaunchedEffect(deptId) {
+        viewModel.loadDepartment(deptId)
+    }
+    val department = viewModel.department.collectAsState().value
+    val context= LocalContext.current
+
+    LaunchedEffect(viewModel) {
+        viewModel.eventFlow.collect { event ->
+            when(event) {
+                is UiEvent.NavigateToPayment -> {
+                    // Navigate to payment screen
+                    navigateToPayment()
+                }
+                is UiEvent.ShowError -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+
+
+            }
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,11 +83,11 @@ fun RegistrationScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Doctor: $doctorName", style = MaterialTheme.typography.titleMedium)
-                Text(text = "Department: $department", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "Doctor: ${department?.doctor} ", style = MaterialTheme.typography.titleMedium)
+                Text(text = "Department: ${department?.name}", style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Registration Fee: ₹$registrationFee",
+                    text = "Registration Fee: ₹${department?.fees}",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -126,6 +147,7 @@ fun RegistrationScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
 
+
         Button(
             onClick = {viewModel.addFormFromState()},
             modifier = Modifier
@@ -133,8 +155,9 @@ fun RegistrationScreen(
                 .height(50.dp),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text(text = "Proceed to Pay ₹$registrationFee")
+            Text(text = "Proceed to Pay ₹${department?.fees}")
         }
+
     }
 }
 @OptIn(ExperimentalMaterial3Api::class)
@@ -180,14 +203,11 @@ fun GenderDropdown(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun RegistrationScreenPreview() {
-    RegistrationScreen(
-        deptId = "cardiology",
-        doctorName = "Dr. John Doe",
-        department = "Cardiology",
-        registrationFee = 100.0,
-
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun RegistrationScreenPreview() {
+//    RegistrationScreen(
+//        deptId = "cardiology"
+//
+//    )
+//}

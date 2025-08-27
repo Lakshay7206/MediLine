@@ -3,22 +3,41 @@ package com.example.mediline.User.ui.createTicket
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mediline.User.data.model.Department
 import com.example.mediline.User.dl.AddFormUseCase
 import com.example.mediline.User.data.model.Form
+import com.example.mediline.User.dl.GetDepartmentIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
 class CreateTicketViewModel @Inject constructor(
-    private val createTicketUseCase: AddFormUseCase
+    private val createTicketUseCase: AddFormUseCase,
+    private val getDepartmentByIdUseCase: GetDepartmentIdUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateTicketUiState())
     val uiState: StateFlow<CreateTicketUiState> = _uiState
+
+    private val _department = MutableStateFlow<Department?>(null)
+    val department: StateFlow<Department?> = _department
+
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
+
+    fun loadDepartment(id: String) {
+        viewModelScope.launch {
+            val dept = getDepartmentByIdUseCase(id)
+            _department.value = dept
+        }
+    }
     fun addFormFromState(){
         val currentState = uiState.value
         val form = Form(
@@ -41,7 +60,8 @@ class CreateTicketViewModel @Inject constructor(
             val result = createTicketUseCase(form)
             result.onSuccess { id ->
                 Log.d("AddForm", "Form added with ID: $id")
-                // handle success (maybe update a success state)
+                _eventFlow.emit(UiEvent.NavigateToPayment(id))
+
             }.onFailure { error ->
                 Log.d("AddForm", "Error adding form: $error")
                 // handle error (update error state)
@@ -70,3 +90,7 @@ class CreateTicketViewModel @Inject constructor(
     }
 }
 
+sealed class UiEvent {
+    data class NavigateToPayment(val formId: String) : UiEvent()
+    data class ShowError(val message: String) : UiEvent()
+}

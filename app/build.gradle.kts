@@ -43,10 +43,22 @@ android {
 }
 
 dependencies {
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+// Converter (Gson for JSON)
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+// OkHttp (for networking)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+// Coroutines support
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     implementation("com.razorpay:checkout:1.6.33")
     // Hilt core
     implementation ("com.google.dagger:hilt-android:2.51.1")
     implementation(libs.androidx.navigation.common.android)
+    implementation(libs.billing)
     kapt ("com.google.dagger:hilt-compiler:2.51.1")
 
     // (Optional) Hilt + Navigation Compose

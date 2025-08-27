@@ -22,7 +22,9 @@ class DepartmentRepositoryImpl @Inject constructor(
             }
 
             val list = snapshot?.documents?.mapNotNull { doc ->
-                doc.toObject(Department::class.java)
+                doc.toObject(Department::class.java)?.copy(
+                    id = doc.id  // ✅ override with Firestore docId
+                )
             } ?: emptyList()
 
             trySend(list)
@@ -32,7 +34,7 @@ class DepartmentRepositoryImpl @Inject constructor(
 
     override suspend fun getDepartmentById(id: String): Department? {
         val snap = db.collection("departments").document(id).get().await()
-        return snap.toObject(Department::class.java)
+        return snap.toObject(Department::class.java)?.copy( id = snap.id )
     }
 }
 

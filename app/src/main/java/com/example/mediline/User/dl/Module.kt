@@ -1,6 +1,7 @@
 package com.example.mediline.User.dl
 
 
+import com.example.mediline.User.data.PaymentApi
 import com.example.mediline.User.data.model.AuthRepository
 import com.example.mediline.User.data.model.DepartmentRepository
 import com.example.mediline.User.data.model.FormRepository
@@ -17,6 +18,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 
@@ -39,8 +44,6 @@ object AppModule {
     fun provideFormRepository(firestore: FirebaseFirestore,auth: FirebaseAuth): FormRepository =
         FormRepositoryImpl(firestore, auth)
 
-    @Provides @Singleton
-    fun providePaymentRepository(): PaymentRepository = PaymentRepositoryImpl()
 
     @Provides
     @Singleton
@@ -50,16 +53,45 @@ object AppModule {
 
     @Provides
     @Singleton
-
     fun provideQueueRepository(
         db: FirebaseFirestore
     ): QueueRepository = QueueRepositoryImpl(db)
 
 
+
+
+
     @Provides
     @Singleton
-    fun provideDepartmentIdRepository(
-        db: FirebaseFirestore
-    ): DepartmentRepository = DepartmentRepositoryImpl(db)
+    fun provideOkHttpClient(): OkHttpClient {
+        val logging = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+        return OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(client: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://6d943c3bd39d.ngrok-free.app/") // 🔥 use your backend URL
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun providePaymentApi(retrofit: Retrofit): PaymentApi =
+        retrofit.create(PaymentApi::class.java)
+
+    @Provides
+    @Singleton
+    fun providePaymentRepository(api: PaymentApi): PaymentRepository =
+        PaymentRepositoryImpl(api)
+
+
 
 }

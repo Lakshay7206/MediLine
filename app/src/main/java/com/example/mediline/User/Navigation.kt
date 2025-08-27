@@ -1,5 +1,6 @@
 package com.example.mediline.User
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,6 +20,7 @@ import com.example.mediline.User.ui.authentication.OtpScreen
 
 import com.example.mediline.User.ui.authentication.SignupScreen
 import com.example.mediline.User.ui.createTicket.RegistrationScreen
+import com.example.mediline.User.ui.payment.PaymentGatewayScreen
 import com.example.mediline.User.ui.viewTicket.ViewTicketsScreen
 
 
@@ -27,13 +29,17 @@ sealed class Screen(val route:String){
     object Signup: Screen("signup")
     object Otp: Screen("otp")
     object Home: Screen("home")
-    object Queue: Screen("queue")
+    object Queue: Screen("queue/{departmentId}"){
+        fun createRoute(departmentId: String) = "queue/$departmentId"
+    }
     object CreateTicket: Screen("createTicket/{departmentId}") {
         fun createRoute(departmentId: String) = "createTicket/$departmentId"
     }
     object ViewTicket: Screen("viewTicket/{departmentId}") {
         fun createRoute(departmentId: String) = "viewTicket/$departmentId"
     }
+
+    object PaymentGateway: Screen("paymentGateway")
 }
 @Composable
 fun RootNavGraph(navController: NavHostController) {
@@ -71,11 +77,11 @@ viewModel,
             OtpScreen(
                 viewModel  ,
                 onUserExists = {
-                    // ✅ Jump to home graph
-                    rootNavController.navigate("home") {
+                    rootNavController.navigate("home_main") {
                         popUpTo("auth") { inclusive = true }
                     }
                 },
+
                 onNewUser = { rootNavController.navigate("signup") }
             )
         }
@@ -88,7 +94,7 @@ viewModel,
             SignupScreen(
                 viewModel  ,
                 navigateHome = {
-                    rootNavController.navigate("home") {
+                    rootNavController.navigate("home_main") {
                         popUpTo("auth") { inclusive = true }
                     }
                 }
@@ -101,10 +107,13 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
         startDestination = "home",
         route = "home_main"
     ) {
-
-        composable("home") { HomeScreen(
-            {}
-        ) }
+        composable("home") {
+            HomeScreen(
+                onDepartmentClick = { deptId->
+                    rootNavController.navigate("queue/${deptId}")
+                }
+            )
+        }
 
         composable(
             "queue/{departmentId}",
@@ -123,7 +132,7 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
             arguments = listOf(navArgument("departmentId") { type = NavType.StringType })
         ) { backStackEntry ->
             val deptId = backStackEntry.arguments?.getString("departmentId")!!
-            RegistrationScreen(deptId,"","",0.0)
+            RegistrationScreen(deptId, { rootNavController.navigate("paymentGateway") })
         }
 
         composable(
@@ -133,9 +142,13 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
             val deptId = backStackEntry.arguments?.getString("departmentId")!!
             ViewTicketsScreen(deptId)
         }
+
+        composable("paymentGateway"){
+            PaymentGatewayScreen()
+
+        }
     }
 }
-
 
 //fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
 //    navigation(
