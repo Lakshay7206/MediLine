@@ -1,5 +1,6 @@
 package com.example.mediline.User
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,6 +20,7 @@ import com.example.mediline.User.ui.authentication.OtpScreen
 
 import com.example.mediline.User.ui.authentication.SignupScreen
 import com.example.mediline.User.ui.createTicket.RegistrationScreen
+import com.example.mediline.User.ui.payment.PaymentGatewayScreen
 import com.example.mediline.User.ui.viewTicket.ViewTicketsScreen
 
 
@@ -36,6 +38,8 @@ sealed class Screen(val route:String){
     object ViewTicket: Screen("viewTicket/{departmentId}") {
         fun createRoute(departmentId: String) = "viewTicket/$departmentId"
     }
+
+    object PaymentGateway: Screen("paymentGateway")
 }
 @Composable
 fun RootNavGraph(navController: NavHostController) {
@@ -128,7 +132,7 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
             arguments = listOf(navArgument("departmentId") { type = NavType.StringType })
         ) { backStackEntry ->
             val deptId = backStackEntry.arguments?.getString("departmentId")!!
-            RegistrationScreen(deptId)
+            RegistrationScreen(deptId, { rootNavController.navigate("paymentGateway") })
         }
 
         composable(
@@ -137,6 +141,11 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
         ) { backStackEntry ->
             val deptId = backStackEntry.arguments?.getString("departmentId")!!
             ViewTicketsScreen(deptId)
+        }
+
+        composable("paymentGateway"){
+            PaymentGatewayScreen()
+
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.mediline.User.ui.createTicket
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -21,6 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -34,6 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun RegistrationScreen(
     deptId: String,
+    navigateToPayment:()->Unit,
     viewModel: CreateTicketViewModel = hiltViewModel()
 ) {
 
@@ -41,6 +44,23 @@ fun RegistrationScreen(
         viewModel.loadDepartment(deptId)
     }
     val department = viewModel.department.collectAsState().value
+    val context= LocalContext.current
+
+    LaunchedEffect(viewModel) {
+        viewModel.eventFlow.collect { event ->
+            when(event) {
+                is UiEvent.NavigateToPayment -> {
+                    // Navigate to payment screen
+                    navigateToPayment()
+                }
+                is UiEvent.ShowError -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+
+
+            }
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -183,11 +203,11 @@ fun GenderDropdown(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun RegistrationScreenPreview() {
-    RegistrationScreen(
-        deptId = "cardiology"
-
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun RegistrationScreenPreview() {
+//    RegistrationScreen(
+//        deptId = "cardiology"
+//
+//    )
+//}

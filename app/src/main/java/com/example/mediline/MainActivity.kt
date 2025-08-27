@@ -34,8 +34,8 @@ class MainActivity : ComponentActivity() , PaymentResultWithDataListener{
         setContent {
             MediLineTheme {
                 val navController = rememberNavController()
-//                RootNavGraph(navController)
-               PaymentGatewayScreen(activity = this)
+               //RootNavGraph(navController)
+               PaymentGatewayScreen()
 
 
             }

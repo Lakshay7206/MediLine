@@ -65,7 +65,7 @@ import org.json.JSONObject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentGatewayScreen(
-    activity : Activity,
+//    activity : Activity,
     gateways: List<String> = listOf("Razorpay", "Paytm", "UPI"),
     amount: Int = 100, // Example amount
     currency: String = "INR",
@@ -136,6 +136,7 @@ fun PaymentGatewayScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
             val context = LocalContext.current
+            val activity = context as? Activity
 
 
             when (paymentState) {
@@ -184,7 +185,9 @@ fun PaymentGatewayScreen(
                         }
 
                         try {
-                            checkout.open(activity, options) // Needs Activity context
+                            activity?.let {
+                                checkout.open(it, options)
+                            }// Needs Activity context
                         } catch (e: Exception) {
                             viewModel.markPaymentFailed(e.message ?: "Payment failed")
                         }
