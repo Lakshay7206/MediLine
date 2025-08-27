@@ -1,6 +1,7 @@
 package com.example.mediline.User
 
-import android.app.Activity
+
+import TicketScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,7 +22,6 @@ import com.example.mediline.User.ui.authentication.OtpScreen
 import com.example.mediline.User.ui.authentication.SignupScreen
 import com.example.mediline.User.ui.createTicket.RegistrationScreen
 import com.example.mediline.User.ui.payment.PaymentGatewayScreen
-import com.example.mediline.User.ui.viewTicket.ViewTicketsScreen
 
 
 sealed class Screen(val route:String){
@@ -140,7 +140,7 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
             arguments = listOf(navArgument("departmentId") { type = NavType.StringType })
         ) { backStackEntry ->
             val deptId = backStackEntry.arguments?.getString("departmentId")!!
-            ViewTicketsScreen(deptId)
+           TicketScreen()
         }
 
         composable("paymentGateway"){

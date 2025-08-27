@@ -7,11 +7,13 @@ import com.example.mediline.User.data.model.DepartmentRepository
 import com.example.mediline.User.data.model.FormRepository
 import com.example.mediline.User.data.model.PaymentRepository
 import com.example.mediline.User.data.model.QueueRepository
+import com.example.mediline.User.data.model.TicketRepository
 import com.example.mediline.User.data.repo.AuthRepositoryImpl
 import com.example.mediline.User.data.repo.DepartmentRepositoryImpl
 import com.example.mediline.User.data.repo.FormRepositoryImpl
 import com.example.mediline.User.data.repo.PaymentRepositoryImpl
 import com.example.mediline.User.data.repo.QueueRepositoryImpl
+import com.example.mediline.User.data.repo.TicketRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -94,4 +96,27 @@ object AppModule {
 
 
 
-}
+    @Provides
+    @Singleton
+    fun provideTicketRepository(
+        db: FirebaseFirestore,
+        auth: FirebaseAuth
+    ): TicketRepository =TicketRepositoryImpl(
+            db,
+            auth
+        )
+
+
+
+    @Provides
+    @Singleton
+    fun provideGetTicketsUseCase(
+        repository: TicketRepository
+    ): GetTicketsUseCase {
+        return GetTicketsUseCase(repository)
+    }
+
+
+    }
+
+

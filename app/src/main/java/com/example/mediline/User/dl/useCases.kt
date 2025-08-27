@@ -8,6 +8,7 @@ import com.example.mediline.User.data.model.Form
 import com.example.mediline.User.data.model.FormRepository
 import com.example.mediline.User.data.model.PaymentRepository
 import com.example.mediline.User.data.model.QueueRepository
+import com.example.mediline.User.data.model.TicketRepository
 import com.example.mediline.User.data.model.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -84,12 +85,22 @@ class GetQueueLengthUseCase @Inject constructor(
 }
 
 
+
 class CreateOrderUseCase @Inject constructor(private val repo: PaymentRepository) {
     suspend operator fun invoke(amount: Int, currency: String) = withContext(Dispatchers.IO){repo.createOrder(amount, currency)}
 }
 
 class VerifyPaymentUseCase @Inject constructor(private val repo: PaymentRepository) {
     suspend operator fun invoke(orderId: String, paymentId: String, signature: String) =
-        withContext(Dispatchers.IO){repo.verifyPayment(orderId, paymentId, signature)}
+        withContext(Dispatchers.IO) { repo.verifyPayment(orderId, paymentId, signature) }
 }
+
+
+class GetTicketsUseCase @Inject constructor(
+    private val repository: TicketRepository
+) {
+    suspend operator fun invoke(): Result<List<Form>> {
+        return repository.getTickets()
+    }}
+
 
