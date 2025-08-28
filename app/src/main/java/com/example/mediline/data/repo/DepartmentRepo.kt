@@ -1,9 +1,9 @@
-package com.example.mediline.User.data.repo
+package com.example.mediline.data.repo
 
 import com.google.firebase.firestore.FirebaseFirestore
 import javax.inject.Inject
-import com.example.mediline.User.data.model.Department
-import com.example.mediline.User.data.model.DepartmentRepository
+import com.example.mediline.data.model.Department
+import com.example.mediline.data.model.DepartmentRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

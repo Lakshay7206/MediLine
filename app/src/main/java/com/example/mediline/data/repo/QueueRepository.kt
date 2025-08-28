@@ -1,6 +1,6 @@
-package com.example.mediline.User.data.repo
+package com.example.mediline.data.repo
 
-import com.example.mediline.User.data.model.QueueRepository
+import com.example.mediline.data.model.QueueRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 

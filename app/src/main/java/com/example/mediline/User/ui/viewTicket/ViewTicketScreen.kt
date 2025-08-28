@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.mediline.User.data.model.Form
+import com.example.mediline.data.model.Form
 import com.example.mediline.User.ui.viewTicket.TicketUiState
 import com.example.mediline.User.ui.viewTicket.ViewTicketViewModel
 

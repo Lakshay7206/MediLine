@@ -1,8 +1,8 @@
-package com.example.mediline.User.data.repo
+package com.example.mediline.data.repo
 
 import android.app.Activity
-import com.example.mediline.User.data.model.AuthRepository
-import com.example.mediline.User.data.model.User
+import com.example.mediline.data.model.AuthRepository
+import com.example.mediline.data.model.User
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential

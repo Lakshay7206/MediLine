@@ -1,7 +1,7 @@
-package com.example.mediline.User.data.repo
+package com.example.mediline.data.repo
 
-import com.example.mediline.User.data.model.Form
-import com.example.mediline.User.data.model.FormRepository
+import com.example.mediline.data.model.Form
+import com.example.mediline.data.model.FormRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -28,14 +28,30 @@ class FormRepositoryImpl(
                 // Update today's counter
                 transaction.update(deptRef, "todayCounter", newCounter)
 
-                // Create form with ticketNumber and userId
+//                // Create form with ticketNumber and userId
+//                val formWithTicket = form.copy(
+//                    userId = currentUser.uid,
+//                    ticketNumber = newCounter,
+//                    timeStamp = System.currentTimeMillis()
+//
+//                )
+//                firestore.collection("forms").add(formWithTicket)
+
+                val docRef = firestore.collection("forms").document()
+                val ticketId = docRef.id
+
+                // Create form with ticketNumber, userId, ticketId
                 val formWithTicket = form.copy(
                     userId = currentUser.uid,
                     ticketNumber = newCounter,
+                    id = ticketId,            // 👈 include ticketId in Form
                     timeStamp = System.currentTimeMillis()
                 )
-                firestore.collection("forms").add(formWithTicket)
-//
+
+                // Write form inside transaction
+                transaction.set(docRef, formWithTicket)
+
+////
                 // Add form to "forms" collection
 //                transaction.set(firestore.collection("forms").document(), formWithTicket)
 

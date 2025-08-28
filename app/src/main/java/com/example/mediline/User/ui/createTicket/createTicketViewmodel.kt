@@ -3,10 +3,10 @@ package com.example.mediline.User.ui.createTicket
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mediline.User.data.model.Department
-import com.example.mediline.User.dl.AddFormUseCase
-import com.example.mediline.User.data.model.Form
-import com.example.mediline.User.dl.GetDepartmentIdUseCase
+import com.example.mediline.data.model.Department
+import com.example.mediline.dl.AddFormUseCase
+import com.example.mediline.data.model.Form
+import com.example.mediline.dl.GetDepartmentIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,15 +1,18 @@
-package com.example.mediline.User.dl
+package com.example.mediline.dl
 
 import android.app.Activity
-import com.example.mediline.User.data.model.AuthRepository
-import com.example.mediline.User.data.model.Department
-import com.example.mediline.User.data.model.DepartmentRepository
-import com.example.mediline.User.data.model.Form
-import com.example.mediline.User.data.model.FormRepository
-import com.example.mediline.User.data.model.PaymentRepository
-import com.example.mediline.User.data.model.QueueRepository
-import com.example.mediline.User.data.model.TicketRepository
-import com.example.mediline.User.data.model.User
+import com.example.mediline.data.model.AuthRepository
+import com.example.mediline.data.model.Department
+import com.example.mediline.data.model.DepartmentRepository
+import com.example.mediline.data.model.Form
+import com.example.mediline.data.model.FormRepository
+import com.example.mediline.data.model.PaymentRepository
+import com.example.mediline.data.model.PaymentStatus
+import com.example.mediline.data.model.QueueRepository
+import com.example.mediline.data.model.TicketRepository
+import com.example.mediline.data.model.TicketStatus
+import com.example.mediline.data.model.User
+import com.example.mediline.data.repo.AdminTicketRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -104,3 +107,28 @@ class GetTicketsUseCase @Inject constructor(
     }}
 
 
+class UpdateTicketStatusUseCase @Inject constructor(
+    private val repository: AdminTicketRepository
+
+){
+    suspend operator fun invoke(ticketId: String, status: TicketStatus): Result<Unit> {
+        return repository.updateTicketStatus(ticketId, status)
+    }
+
+}
+class GetAllTicketsUseCase @Inject constructor(
+    private val repository: AdminTicketRepository
+){
+    suspend operator fun invoke(): Result<List<Form>> {
+        return repository.getAllTickets()
+    }
+
+}
+
+class UpdatePaymentStatusUseCase @Inject constructor(
+    private val repository: AdminTicketRepository
+){
+    suspend operator fun invoke(ticketId: String, status: PaymentStatus): Result<Unit> {
+        return repository.updatePaymentStatus(ticketId, status)
+    }
+}

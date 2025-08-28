@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
+import com.example.mediline.Admin.ui.home.TicketManagementScreen
 import com.example.mediline.User.RootNavGraph
 import com.example.mediline.User.ui.payment.PaymentGatewayScreen
 
@@ -36,7 +37,8 @@ class MainActivity : ComponentActivity() , PaymentResultWithDataListener{
                 val navController = rememberNavController()
                //RootNavGraph(navController)
                //PaymentGatewayScreen()
-                Vi
+                TicketManagementScreen({},{})
+
 
 
             }

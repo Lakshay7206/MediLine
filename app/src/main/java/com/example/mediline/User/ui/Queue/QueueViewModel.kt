@@ -1,11 +1,9 @@
 package com.example.mediline.User.ui.Queue
 
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mediline.User.data.model.QueueRepository
-import com.example.mediline.User.dl.GetQueueLengthUseCase
+import com.example.mediline.dl.GetQueueLengthUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow

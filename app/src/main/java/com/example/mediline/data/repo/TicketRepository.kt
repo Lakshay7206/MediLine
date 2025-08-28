@@ -1,23 +1,13 @@
-package com.example.mediline.User.data.repo
+package com.example.mediline.data.repo
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
-import com.example.mediline.User.data.model.Form
-import com.example.mediline.User.data.model.TicketRepository
-import com.example.mediline.User.data.model.TicketStatus
-import com.example.mediline.User.ui.createTicket.Sex
+import com.example.mediline.data.model.Form
+import com.example.mediline.data.model.TicketRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import java.time.LocalDateTime
-import javax.inject.Inject
-import com.example.mediline.User.data.model.FormEntity
-import com.example.mediline.User.data.model.PaymentStatus
-import com.example.mediline.User.data.model.toDomain
+import com.example.mediline.data.model.FormEntity
+import com.example.mediline.data.model.toDomain
 import com.google.firebase.firestore.toObjects
 
 class TicketRepositoryImpl(

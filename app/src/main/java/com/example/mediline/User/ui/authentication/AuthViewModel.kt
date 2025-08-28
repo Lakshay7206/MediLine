@@ -3,11 +3,11 @@ package com.example.mediline.User.ui.authentication
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mediline.User.dl.CheckUserExistsUseCase
-import com.example.mediline.User.dl.CreateUserUseCase
-import com.example.mediline.User.dl.SendOtpUseCase
-import com.example.mediline.User.data.model.User
-import com.example.mediline.User.dl.VerifyOtpUseCase
+import com.example.mediline.dl.CheckUserExistsUseCase
+import com.example.mediline.dl.CreateUserUseCase
+import com.example.mediline.dl.SendOtpUseCase
+import com.example.mediline.data.model.User
+import com.example.mediline.dl.VerifyOtpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

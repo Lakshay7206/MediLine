@@ -2,8 +2,8 @@ package com.example.mediline.User.ui.viewTicket
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mediline.User.data.model.TicketStatus
-import com.example.mediline.User.dl.GetTicketsUseCase
+import com.example.mediline.data.model.TicketStatus
+import com.example.mediline.dl.GetTicketsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import kotlinx.coroutines.flow.MutableStateFlow

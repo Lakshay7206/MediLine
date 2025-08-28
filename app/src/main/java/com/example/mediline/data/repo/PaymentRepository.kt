@@ -1,14 +1,10 @@
-package com.example.mediline.User.data.repo
+package com.example.mediline.data.repo
 
-import com.example.mediline.User.data.PaymentApi
-import com.example.mediline.User.data.model.CreateOrderRequest
-import com.example.mediline.User.data.model.CreateOrderResponse
-import com.example.mediline.User.data.model.PaymentRepository
-import com.example.mediline.User.data.model.VerifyPaymentRequest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.net.HttpURLConnection
-import java.net.URL
+import com.example.mediline.data.PaymentApi
+import com.example.mediline.data.model.CreateOrderRequest
+import com.example.mediline.data.model.CreateOrderResponse
+import com.example.mediline.data.model.PaymentRepository
+import com.example.mediline.data.model.VerifyPaymentRequest
 import javax.inject.Inject
 
 

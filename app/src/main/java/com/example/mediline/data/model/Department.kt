@@ -1,4 +1,4 @@
-package com.example.mediline.User.data.model
+package com.example.mediline.data.model
 
 import kotlinx.coroutines.flow.Flow
 

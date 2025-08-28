@@ -1,8 +1,9 @@
-package com.example.mediline.User.data.model
+package com.example.mediline.data.model
 
 import com.example.mediline.User.ui.createTicket.Sex
 
 data class Form (
+    val id: String = "",
     val departmentId: String,
     val userId: String ="",
     val opdNo: String,
@@ -13,19 +14,21 @@ data class Form (
     val sex: Sex,
     val timeStamp: Long,
     val ticketNumber:Long=0,
-    val paymentStatus: PaymentStatus=PaymentStatus.Unpaid,
-    val ticketStatus: TicketStatus= TicketStatus.Open
+    val paymentStatus: PaymentStatus=PaymentStatus.UNPAID,
+    val ticketStatus: TicketStatus= TicketStatus.ACTIVE
     //val bloodGroup: String,
 
 )
 enum class TicketStatus{
-    Closed,
-    Waiting,
-    Open
+   ACTIVE,
+    CLOSED,
+    CANCELLED,
+    SKIPPED,
+    NULL
 }
 enum class PaymentStatus{
     Paid,
-    Unpaid,
+    UNPAID,
     Failed
 
 }

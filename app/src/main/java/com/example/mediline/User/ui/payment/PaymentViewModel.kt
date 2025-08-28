@@ -1,19 +1,14 @@
 package com.example.mediline.User.ui.payment
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mediline.User.dl.CreateOrderUseCase
+import com.example.mediline.dl.CreateOrderUseCase
 
-import com.example.mediline.User.dl.VerifyPaymentUseCase
-import com.example.mediline.User.ui.authentication.LoginScreen
-import com.razorpay.PaymentData
+import com.example.mediline.dl.VerifyPaymentUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.Dispatcher
 import javax.inject.Inject
 
 enum class PaymentGateway { RAZORPAY, PAYTM, STRIPE }

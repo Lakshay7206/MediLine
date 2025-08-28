@@ -1,10 +1,10 @@
-package com.example.mediline.User.data
+package com.example.mediline.data
 
 // data/remote/PaymentApi.kt
-import com.example.mediline.User.data.model.CreateOrderRequest
-import com.example.mediline.User.data.model.CreateOrderResponse
-import com.example.mediline.User.data.model.VerifyPaymentRequest
-import com.example.mediline.User.data.model.VerifyPaymentResponse
+import com.example.mediline.data.model.CreateOrderRequest
+import com.example.mediline.data.model.CreateOrderResponse
+import com.example.mediline.data.model.VerifyPaymentRequest
+import com.example.mediline.data.model.VerifyPaymentResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 

@@ -1,6 +1,5 @@
-package com.example.mediline.User.data.model
+package com.example.mediline.data.model
 
-import android.util.Log
 import com.example.mediline.User.ui.createTicket.Sex
 data class FormEntity(
 
@@ -34,9 +33,8 @@ fun FormEntity.toDomain(): Form {
         timeStamp = timeStamp,
         ticketNumber = ticketNumber,
         paymentStatus = enumPayment,
-        ticketStatus = enumTicket
-
-
+        ticketStatus = enumTicket,
+        departmentId = ""
     )
 }
 

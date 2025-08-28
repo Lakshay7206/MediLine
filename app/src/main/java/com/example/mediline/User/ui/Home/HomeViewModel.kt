@@ -3,16 +3,12 @@ package com.example.mediline.User.ui.Home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mediline.User.data.model.Department
-import com.example.mediline.User.data.model.DepartmentRepository
-import com.example.mediline.User.dl.CreateDepartmentUseCase
-import com.example.mediline.User.dl.VerifyPaymentUseCase
+import com.example.mediline.data.model.Department
+import com.example.mediline.dl.CreateDepartmentUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

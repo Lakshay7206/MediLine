@@ -1,19 +1,21 @@
-package com.example.mediline.User.dl
+package com.example.mediline.dl
 
 
-import com.example.mediline.User.data.PaymentApi
-import com.example.mediline.User.data.model.AuthRepository
-import com.example.mediline.User.data.model.DepartmentRepository
-import com.example.mediline.User.data.model.FormRepository
-import com.example.mediline.User.data.model.PaymentRepository
-import com.example.mediline.User.data.model.QueueRepository
-import com.example.mediline.User.data.model.TicketRepository
-import com.example.mediline.User.data.repo.AuthRepositoryImpl
-import com.example.mediline.User.data.repo.DepartmentRepositoryImpl
-import com.example.mediline.User.data.repo.FormRepositoryImpl
-import com.example.mediline.User.data.repo.PaymentRepositoryImpl
-import com.example.mediline.User.data.repo.QueueRepositoryImpl
-import com.example.mediline.User.data.repo.TicketRepositoryImpl
+import com.example.mediline.data.PaymentApi
+import com.example.mediline.data.model.AuthRepository
+import com.example.mediline.data.model.DepartmentRepository
+import com.example.mediline.data.model.FormRepository
+import com.example.mediline.data.model.PaymentRepository
+import com.example.mediline.data.model.QueueRepository
+import com.example.mediline.data.model.TicketRepository
+import com.example.mediline.data.repo.AdminTicketRepository
+import com.example.mediline.data.repo.AdminTicketRepositoryImpl
+import com.example.mediline.data.repo.AuthRepositoryImpl
+import com.example.mediline.data.repo.DepartmentRepositoryImpl
+import com.example.mediline.data.repo.FormRepositoryImpl
+import com.example.mediline.data.repo.PaymentRepositoryImpl
+import com.example.mediline.data.repo.QueueRepositoryImpl
+import com.example.mediline.data.repo.TicketRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -106,17 +108,14 @@ object AppModule {
             auth
         )
 
+@Provides
+@Singleton
+fun provideAdminTicketRepository(
+    db: FirebaseFirestore
+): AdminTicketRepository= AdminTicketRepositoryImpl(db)
 
 
-    @Provides
-    @Singleton
-    fun provideGetTicketsUseCase(
-        repository: TicketRepository
-    ): GetTicketsUseCase {
-        return GetTicketsUseCase(repository)
-    }
 
-
-    }
+}
 
 

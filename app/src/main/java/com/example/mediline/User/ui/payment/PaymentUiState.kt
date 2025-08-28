@@ -1,6 +1,6 @@
 package com.example.mediline.User.ui.payment
 
-import com.example.mediline.User.data.model.CreateOrderResponse
+import com.example.mediline.data.model.CreateOrderResponse
 
 sealed class PaymentState{
     object Loading: PaymentState()
