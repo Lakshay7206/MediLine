@@ -27,8 +27,7 @@ class TicketRepositoryImpl(
 
         Log.d("TicketRepo","$snapshot")
 
-
-        val entities: List<FormEntity> = snapshot.toObjects()
+        val entities = snapshot.toObjects(FormEntity::class.java)
 
 //        val validEntities = entities.filter {
 //            try {
@@ -45,7 +44,7 @@ class TicketRepositoryImpl(
 //        }
 
 
-        val tickets = entities.map { it.toDomain() }
+      val tickets = entities.map { it.toDomain() }
 
         Result.success(tickets)
     } catch (e: Exception) {

@@ -1,5 +1,6 @@
 package com.example.mediline.data.repo
 
+import android.util.Log
 import com.example.mediline.data.model.Form
 import com.example.mediline.data.model.FormEntity
 import com.example.mediline.data.model.PaymentStatus
@@ -7,9 +8,6 @@ import com.example.mediline.data.model.TicketStatus
 import com.example.mediline.data.model.toDomain
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
-import java.time.Instant.now
-import java.util.Calendar
-import java.util.TimeZone
 
 interface AdminTicketRepository {
 
@@ -17,7 +15,7 @@ interface AdminTicketRepository {
     suspend fun getAllTickets(): Result<List<Form>>
 
     // Update ticket status (Active, Skipped, Cancelled, Closed)
-    suspend fun updateTicketStatus(ticketId: String, status: TicketStatus): Result<Unit>
+    suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit>
 
     // Update payment status (Paid, Unpaid, Failed)
     suspend fun updatePaymentStatus(ticketId: String, status: PaymentStatus): Result<Unit>
@@ -37,28 +35,40 @@ class AdminTicketRepositoryImpl(
 
         return try {
 
-
-
             val snapshot = ticketCollection
 //                .whereGreaterThanOrEqualTo("timestamp", startOfDay)
 //                .whereLessThan("timestamp", endOfDay)
                 .get()
                 .await()
+
             val tickets = snapshot.documents.mapNotNull { it.toObject(FormEntity::class.java)?.toDomain() }
             Result.success(tickets)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-
-    override suspend fun updateTicketStatus(ticketId: String, status: TicketStatus): Result<Unit> {
+    override suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit> {
         return try {
-            ticketCollection.document(ticketId).update("ticketStatus", status.name).await()
+            ticketCollection
+                .document(docId)
+                .update("ticketStatus", newStatus.name)
+                .await()
+            Log.d("AdminTicketRepository", "Ticket status updated successfully")
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
+
+//    override suspend fun updateTicketStatus(ticketId: String, status: TicketStatus): Result<Unit> {
+//        return try {
+//            ticketCollection.document(ticketId).update("ticketStatus", status.name).await()
+//            Result.success(Unit)
+//        } catch (e: Exception) {
+//            Result.failure(e)
+//        }
+//    }
 
     override suspend fun updatePaymentStatus(ticketId: String, status: PaymentStatus): Result<Unit> {
         return try {

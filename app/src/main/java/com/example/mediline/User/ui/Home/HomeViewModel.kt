@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mediline.data.model.Department
+import com.example.mediline.data.room.DepartmentEntity
 import com.example.mediline.dl.CreateDepartmentUseCase
+import com.example.mediline.dl.GetDepartmentsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,11 +16,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DepartmentViewModel @Inject constructor(
-    private val getDepartmentsUseCase: CreateDepartmentUseCase
+    private val getDepartmentsUseCase: GetDepartmentsUseCase
 ) : ViewModel() {
 
-    private val _departments = MutableStateFlow<List<Department>>(emptyList())
-    val departments: StateFlow<List<Department>> = _departments
+    private val _departments = MutableStateFlow<List<DepartmentEntity>>(emptyList())
+    val departments: StateFlow<List<DepartmentEntity>> = _departments
 
     init {
         viewModelScope.launch {

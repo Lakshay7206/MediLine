@@ -1,5 +1,6 @@
 package com.example.mediline.User.ui.createTicket
 
+import com.example.mediline.data.model.Department
 
 
 data class CreateTicketUiState(
@@ -7,7 +8,8 @@ data class CreateTicketUiState(
     val address: String="",
     val phone: String="",
     val age: Int=0,
-    val sex:Sex=Sex.Male
+    val sex:Sex=Sex.Male,
+    val departmentId: String=""
 )
 
 enum class Sex {

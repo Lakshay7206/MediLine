@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,7 +43,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mediline.data.model.Form
 import com.example.mediline.data.model.TicketStatus
 
@@ -79,8 +77,8 @@ fun TicketManagementScreen(
 
             // 🔎 FILTER BAR
             FilterSection(
-                filters = uiState.filters,
-                onFilterChange = { viewModel.updateFilters(it) }
+                filters = uiState.filter,
+                onFilterChange = { viewModel.setFilter(it) }
             )
 
             // 📋 TICKET LIST
@@ -90,10 +88,10 @@ fun TicketManagementScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                items(tickets) { ticket ->
+                items(uiState.filteredTickets) { ticket ->
                     TicketCard(
                         ticket = ticket,
-                        onSkip = { viewModel.skipTicket(ticket.id) },
+                        onSkip = { viewModel.skipTicket(ticket.id,) },
                         onCancel = { viewModel.cancelTicket(ticket.id) },
                         onComplete = { viewModel.completeTicket(ticket.id) },
                         onReassign = { viewModel.reassignTicket(ticket.id) },
@@ -147,24 +145,24 @@ fun FilterSection(
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
         // Department filter using Chips
-        Text("Department", style = MaterialTheme.typography.labelMedium)
+        Text("DepartmentId", style = MaterialTheme.typography.labelMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("All", "Cardiology", "Dentistry", "Ortho").forEach { department ->
+            listOf("0","1","2","3").forEach { deptId ->
+                val label = deptId
                 FilterChip(
-                    selected = filters.department == department,
-                    onClick = { onFilterChange(filters.copy(department = department)) },
-                    label = { Text(department) }
+                    selected = filters.departmentId == deptId,
+                    onClick = { onFilterChange(filters.copy(departmentId = deptId)) },
+                    label = { Text(label) }
                 )
             }
         }
 
-        // Ticket number filter
         Text("Ticket Number", style = MaterialTheme.typography.labelMedium)
         OutlinedTextField(
-            value = filters.ticketNumber?.toString() ?: "",
+            value = filters.todayCounter?.toString() ?: "",
             onValueChange = { input ->
                 val value = input.toIntOrNull()
-                onFilterChange(filters.copy(ticketNumber = value))
+                onFilterChange(filters.copy(todayCounter = value))
             },
             label = { Text("Enter Ticket No") },
             singleLine = true,
@@ -201,8 +199,8 @@ fun TicketCard(
 
             Spacer(Modifier.height(4.dp))
             Text("Patient: ${ticket.name}")
-           // Text("Doctor: ${ticket.} (${ticket.department})")
-            //Text("Queue No: ${ticket.}")
+            Text("Id: ${ticket.id} ")
+            Text("Queue No: ${ticket.ticketNumber}")
 
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -211,9 +209,10 @@ fun TicketCard(
                     ActionButton("Cancel", onCancel, Color.Red)
                     ActionButton("Complete", onComplete, Color.Green)
                 }
-                if (ticket.ticketStatus == TicketStatus.CANCELLED) {
+                if (ticket.ticketStatus == TicketStatus.CANCELLED || ticket.ticketStatus == TicketStatus.SKIPPED ) {
                     ActionButton("Re-assign", onReassign, Color.Blue)
                 }
+
             }
         }
     }
@@ -226,6 +225,7 @@ fun StatusChip(status: TicketStatus) {
         TicketStatus.SKIPPED -> Color(0xFF9C27B0)  // Purple
         TicketStatus.NULL -> Color.LightGray       // Default
         TicketStatus.CANCELLED -> Color.DarkGray
+        TicketStatus.EXPIRED -> Color.Blue
     }
 
     Box(

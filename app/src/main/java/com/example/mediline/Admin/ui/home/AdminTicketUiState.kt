@@ -6,18 +6,18 @@ import com.example.mediline.data.model.TicketStatus
 
 // UI state for Admin Ticket Screen
 data class AdminTicketUiState(
-    var tickets: List<Form> = emptyList(),
-    var loading: Boolean = false,
-    val filters: TicketFilters = TicketFilters(), // currently applied filters
-    val selectedFilter: TicketFilters = TicketFilters() // for when admin selects new filters before applying
+    val tickets: List<Form> = emptyList(),
+    val filteredTickets: List<Form> = tickets, // filtered tickets
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val filter: TicketFilters = TicketFilters()
 )
 
 // Represents all available filters
 data class TicketFilters(
-    val ticketNumber: Int? = null,
-    val department: String? = null,
-    val status: TicketStatus? = null,        // Active, Closed, Skipped, etc.
+    val todayCounter: Int? = null,
+    val ticketStatus: TicketStatus? = null,        // Active, Closed, Skipped, etc.
     val paymentStatus: PaymentStatus? = null,// Paid, Unpaid, Failed
-    val departmentId: Int? = null,        // e.g. "cardiology"
-    val searchQuery: String = ""             // search by name, opdNo, etc.
+    val departmentId: String = "",
+    val searchQuery: String = ""           // search by name, opdNo, etc.
 )

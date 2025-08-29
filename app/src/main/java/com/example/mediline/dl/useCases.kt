@@ -1,6 +1,7 @@
 package com.example.mediline.dl
 
 import android.app.Activity
+import com.example.mediline.data.model.AdminFormRepository
 import com.example.mediline.data.model.AuthRepository
 import com.example.mediline.data.model.Department
 import com.example.mediline.data.model.DepartmentRepository
@@ -13,8 +14,10 @@ import com.example.mediline.data.model.TicketRepository
 import com.example.mediline.data.model.TicketStatus
 import com.example.mediline.data.model.User
 import com.example.mediline.data.repo.AdminTicketRepository
+import com.example.mediline.data.room.DepartmentEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -59,25 +62,28 @@ class AddFormUseCase @Inject constructor(
         return withContext(Dispatchers.IO){ repository.addForm(form) }
     }    }
 
-
-
-    class CreateDepartmentUseCase @Inject constructor(
-        private val repository: DepartmentRepository
-    )
-    {
-        suspend operator fun invoke(): Flow<List<Department>>{
-            return withContext(Dispatchers.IO){ repository.getDepartments() }
-        }
+class SyncDepartmentsUseCase @Inject constructor(private val repository: DepartmentRepository) {
+    suspend operator fun invoke() {
+        repository.syncDepartments()
     }
+}
+class GetDepartmentByIdUseCase @Inject constructor(private val repository: DepartmentRepository) {
+    operator fun invoke(id: String): Flow<DepartmentEntity?> = repository.getDepartments()
+        .map { list -> list.find { it.id == id } }
+}
 
-    class GetDepartmentIdUseCase @Inject constructor(
-        private val repository: DepartmentRepository
-    )
-    {
-        suspend operator fun invoke(id: String): Department?{
-            return withContext(Dispatchers.IO){ repository.getDepartmentById(id) }
-        }
+
+class CreateDepartmentUseCase @Inject constructor(private val repository: DepartmentRepository) {
+    suspend operator fun invoke(department: DepartmentEntity) {
+        repository.createDepartment(department)
     }
+}
+
+
+class GetDepartmentsUseCase @Inject constructor(private val repository: DepartmentRepository) {
+    operator fun invoke(): Flow<List<DepartmentEntity>> = repository.getDepartments()
+}
+
 
 class GetQueueLengthUseCase @Inject constructor(
     private val repository: QueueRepository
@@ -132,3 +138,13 @@ class UpdatePaymentStatusUseCase @Inject constructor(
         return repository.updatePaymentStatus(ticketId, status)
     }
 }
+
+
+class AdminAddFormUseCase @Inject constructor(
+    private val repository: AdminFormRepository
+) {
+    suspend operator fun invoke(form: Form, userId: String?): Result<String> {
+        return repository.addTicketForUser(form, userId)
+    }
+}
+

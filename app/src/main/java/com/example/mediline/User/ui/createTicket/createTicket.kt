@@ -45,6 +45,7 @@ fun RegistrationScreen(
     }
     val department = viewModel.department.collectAsState().value
     val context= LocalContext.current
+    viewModel.updateDeptId(deptId)
 
     LaunchedEffect(viewModel) {
         viewModel.eventFlow.collect { event ->

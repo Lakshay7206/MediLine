@@ -128,7 +128,7 @@ fun QueueScreen(
                 }
 
                 OutlinedButton(
-                    onClick ={ navigateToCreateTicket(departmentId) },
+                    onClick ={ navigateToViewTicket(departmentId) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp),

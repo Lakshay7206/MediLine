@@ -25,8 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.mediline.data.model.Department
-
+import com.example.mediline.data.room.DepartmentEntity
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,7 +82,7 @@ fun HomeScreen(
 
 @Composable
 fun DepartmentCard(
-    department: Department,
+    department: DepartmentEntity,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {

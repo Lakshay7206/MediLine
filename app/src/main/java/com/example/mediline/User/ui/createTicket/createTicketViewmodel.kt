@@ -3,10 +3,14 @@ package com.example.mediline.User.ui.createTicket
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mediline.data.model.Department
+import com.example.mediline.data.model.CreatorRole
 import com.example.mediline.dl.AddFormUseCase
 import com.example.mediline.data.model.Form
-import com.example.mediline.dl.GetDepartmentIdUseCase
+import com.example.mediline.data.model.PaymentStatus
+import com.example.mediline.data.model.TicketStatus
+import com.example.mediline.data.room.DepartmentEntity
+import com.example.mediline.dl.GetDepartmentByIdUseCase
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,14 +23,14 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateTicketViewModel @Inject constructor(
     private val createTicketUseCase: AddFormUseCase,
-    private val getDepartmentByIdUseCase: GetDepartmentIdUseCase
+    private val getDepartmentByIdUseCase: GetDepartmentByIdUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateTicketUiState())
     val uiState: StateFlow<CreateTicketUiState> = _uiState
 
-    private val _department = MutableStateFlow<Department?>(null)
-    val department: StateFlow<Department?> = _department
+    private val _department = MutableStateFlow<DepartmentEntity?>(null)
+    val department: StateFlow<DepartmentEntity?> = _department
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -34,10 +38,12 @@ class CreateTicketViewModel @Inject constructor(
 
     fun loadDepartment(id: String) {
         viewModelScope.launch {
-            val dept = getDepartmentByIdUseCase(id)
-            _department.value = dept
+            getDepartmentByIdUseCase(id).collect { dept ->
+                _department.value = dept
+            }
         }
     }
+
     fun addFormFromState(){
         val currentState = uiState.value
         val form = Form(
@@ -46,10 +52,14 @@ class CreateTicketViewModel @Inject constructor(
             phone = currentState.phone,
             age = currentState.age,
             sex = currentState.sex,
-            departmentId ="1",
             userId = "",
             opdNo = "123",
             timeStamp = System.currentTimeMillis(),
+            paymentStatus = PaymentStatus.UNPAID,
+            ticketStatus = TicketStatus.ACTIVE,
+            departmentId =currentState.departmentId,
+            createdBy = "",
+            creatorRole = CreatorRole.USER
 
         )
         addForm(form)
@@ -87,6 +97,10 @@ class CreateTicketViewModel @Inject constructor(
 
     fun updateSex(sex: Sex) {
         _uiState.value = _uiState.value.copy(sex = sex)
+    }
+
+    fun updateDeptId(deptId: String) {
+        _uiState.value = _uiState.value.copy(departmentId = deptId)
     }
 }
 

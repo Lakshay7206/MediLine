@@ -2,7 +2,9 @@ package com.example.mediline.data.repo
 
 import android.app.Activity
 import com.example.mediline.data.model.AuthRepository
+import com.example.mediline.data.model.CreatorRole
 import com.example.mediline.data.model.User
+import com.example.mediline.data.model.UserEntity
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
@@ -97,19 +99,31 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth,
         }
 
     }
-    override suspend fun createUser(user: User): Result<Unit> {
-        return suspendCancellableCoroutine { continuation ->
-            firestore.collection("users")
-                .document(user.id)
-                .set(user)
-                .addOnSuccessListener {
-                    continuation.resume(Result.success(Unit))
-                }
-                .addOnFailureListener { e ->
-                    continuation.resume(Result.failure(e))
-                }
+        override suspend fun createUser(user: User): Result<Unit> {
+            // Convert domain User → Firebase-friendly UserEntity
+            val entity = UserEntity(
+                id = user.id,
+                phone = user.phone,
+                createdAt = user.createdAt,
+               // role = user.role.name // Enum → String
+                role ="USER"
+            )
+
+            return suspendCancellableCoroutine { continuation ->
+                firestore.collection("users")
+                    .document(user.id)
+                    .set(entity)
+                    .addOnSuccessListener {
+                        continuation.resume(Result.success(Unit))
+
+                    }
+                    .addOnFailureListener { e ->
+                        continuation.resume(Result.failure(e))
+                    }
+            }
+
         }
-    }
+
 
 
 }

@@ -1,6 +1,8 @@
 package com.example.mediline.dl
 
 
+import android.content.Context
+import androidx.room.Room
 import com.example.mediline.data.PaymentApi
 import com.example.mediline.data.model.AuthRepository
 import com.example.mediline.data.model.DepartmentRepository
@@ -16,11 +18,15 @@ import com.example.mediline.data.repo.FormRepositoryImpl
 import com.example.mediline.data.repo.PaymentRepositoryImpl
 import com.example.mediline.data.repo.QueueRepositoryImpl
 import com.example.mediline.data.repo.TicketRepositoryImpl
+import com.example.mediline.data.room.AppDatabase
+import com.example.mediline.data.room.DepartmentDao
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -40,6 +46,19 @@ object AppModule {
     @Provides @Singleton
     fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 
+    @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "app_database"
+        ).build()
+    }
+
+    @Provides
+    fun provideDepartmentDao(db: AppDatabase): DepartmentDao = db.departmentDao()
+
     @Provides @Singleton
     fun provideAuthRepository(auth: FirebaseAuth, firestore: FirebaseFirestore): AuthRepository =
         AuthRepositoryImpl(auth, firestore)
@@ -52,8 +71,12 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDepartmentRepository(
-        db: FirebaseFirestore
-    ): DepartmentRepository = DepartmentRepositoryImpl(db)
+        db: FirebaseFirestore,
+        departmentDao: DepartmentDao
+    ): DepartmentRepository = DepartmentRepositoryImpl(
+        db,
+        departmentDao = departmentDao
+    )
 
     @Provides
     @Singleton
@@ -115,6 +138,14 @@ fun provideAdminTicketRepository(
 ): AdminTicketRepository= AdminTicketRepositoryImpl(db)
 
 
+
+@Provides
+@Singleton
+fun provideAdminFormRepository(
+    db: FirebaseFirestore,
+    auth: FirebaseAuth
+): com.example.mediline.data.model.AdminFormRepository =
+    com.example.mediline.data.repo.AdminFormRepositoryImpl(db, auth)
 
 }
 
