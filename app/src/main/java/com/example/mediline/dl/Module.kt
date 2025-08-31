@@ -58,14 +58,19 @@ object AppModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(
-            context,
+            context.applicationContext,
             AppDatabase::class.java,
             "app_database"
         ).build()
     }
 
     @Provides
-    fun provideDepartmentDao(db: AppDatabase): DepartmentDao = db.departmentDao()
+    @Singleton
+    fun provideDepartmentDao(appDatabase: AppDatabase): DepartmentDao {
+        return appDatabase.departmentDao() // Assumes AppDatabase has abstract fun departmentDao()
+    }
+
+
 
     @Provides
     @Singleton

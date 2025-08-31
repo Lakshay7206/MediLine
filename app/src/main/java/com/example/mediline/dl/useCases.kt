@@ -64,11 +64,7 @@ class AddFormUseCase @Inject constructor(
         return withContext(Dispatchers.IO){ repository.addForm(form) }
     }    }
 
-class SyncDepartmentsUseCase @Inject constructor(private val repository: DepartmentRepository) {
-    suspend operator fun invoke() {
-        repository.syncDepartments()
-    }
-}
+
 class GetDepartmentByIdUseCase @Inject constructor(private val repository: DepartmentRepository) {
     operator fun invoke(id: String): Flow<DepartmentEntity?> = repository.getDepartments()
         .map { list -> list.find { it.id == id } }
@@ -81,11 +77,29 @@ class CreateDepartmentUseCase @Inject constructor(private val repository: Depart
     }
 }
 
-
-class GetDepartmentsUseCase @Inject constructor(private val repository: DepartmentRepository) {
-    operator fun invoke(): Flow<List<DepartmentEntity>> = repository.getDepartments()
+class GetDepartmentsUseCase @Inject constructor(
+    private val repository: DepartmentRepository
+) {
+    operator fun invoke(): Flow<List<DepartmentEntity>> {
+        return repository.getDepartments()
+    }
 }
 
+
+
+class UpdateDepartmentUseCase @Inject constructor(private val repository: DepartmentRepository) {
+    suspend operator fun invoke(department: DepartmentEntity): Result<Unit> =
+        repository.updateDepartment(department)
+}
+
+class DeleteDepartmentUseCase @Inject constructor(private val repository: DepartmentRepository) {
+    suspend operator fun invoke(departmentId: String): Result<Unit> =
+        repository.deleteDepartment(departmentId)
+}
+
+class SyncDepartmentsUseCase @Inject constructor(private val repository: DepartmentRepository) {
+    suspend operator fun invoke(): Result<Unit> = repository.syncDepartmentsFromFirestore()
+}
 
 class GetQueueLengthUseCase @Inject constructor(
     private val repository: QueueRepository
@@ -173,3 +187,4 @@ class LoginAdminUseCase @Inject constructor(
         return repository.loginAdmin(email, password)
     }
 }
+

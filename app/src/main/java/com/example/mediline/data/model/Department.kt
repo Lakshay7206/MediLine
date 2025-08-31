@@ -14,8 +14,10 @@ data class Department(
 
 interface DepartmentRepository {
     fun getDepartments(): Flow<List<DepartmentEntity>>
-    suspend fun createDepartment(department: DepartmentEntity)
-    suspend fun syncDepartments()
+    suspend fun createDepartment(department: DepartmentEntity): Result<String>
+    suspend fun updateDepartment(department: DepartmentEntity): Result<Unit>
+    suspend fun deleteDepartment(departmentId: String): Result<Unit>
+    suspend fun syncDepartmentsFromFirestore(): Result<Unit>
     suspend fun getDepartmentById(id: String): Flow<DepartmentEntity?>
 }
 //interface DepartmentRepository {

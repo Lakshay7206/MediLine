@@ -63,8 +63,9 @@ fun NavGraphBuilder.authNavGraph(rootNavController: NavHostController) {
             }
             val viewModel: AuthViewModel = hiltViewModel(parentEntry)
             LoginScreen(
-viewModel,
                 onNavigateOtp = { rootNavController.navigate("otp") },
+
+
 
             )
         }
@@ -82,7 +83,8 @@ viewModel,
                     }
                 },
 
-                onNewUser = { rootNavController.navigate("signup") }
+                onNewUser = { rootNavController.navigate("signup") },
+                onResendOtp = { /*TODO*/ }
             )
         }
         composable("signup") { backStackEntry ->
