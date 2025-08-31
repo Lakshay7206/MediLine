@@ -9,13 +9,13 @@ import com.example.mediline.data.model.Form
 import com.example.mediline.data.model.FormRepository
 import com.example.mediline.data.model.PaymentRepository
 import com.example.mediline.data.model.PaymentStatus
-import com.example.mediline.data.model.QueueRepository
 import com.example.mediline.data.model.TicketRepository
 import com.example.mediline.data.model.TicketStatus
 import com.example.mediline.data.model.User
 import com.example.mediline.data.repo.AdminAuthRepository
 import com.example.mediline.data.repo.AdminRepository
 import com.example.mediline.data.repo.AdminTicketRepository
+import com.example.mediline.data.repo.QueueRepository
 import com.example.mediline.data.room.DepartmentEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -87,13 +87,13 @@ class GetDepartmentsUseCase @Inject constructor(private val repository: Departme
 }
 
 
-class GetQueueLengthUseCase @Inject constructor(
-    private val repository: QueueRepository
-) {
-    suspend operator fun invoke(deptId: String): Result<Int> {
-        return withContext(Dispatchers.IO){repository.getQueue(deptId)}
-    }
-}
+//class GetQueueLengthUseCase @Inject constructor(
+//    private val repository: QueueRepository
+//) {
+//    suspend operator fun invoke(deptId: String): Result<Int> {
+//        return withContext(Dispatchers.IO){repository.getQueue(deptId)}
+//    }
+//}
 
 
 
@@ -171,5 +171,13 @@ class LoginAdminUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(email: String, password: String): Result<Unit> {
         return repository.loginAdmin(email, password)
+    }
+}
+
+class GetTodaysTicketsUseCase @Inject constructor(
+    private val repository: QueueRepository
+) {
+    operator fun invoke(departmentId: String): Flow<List<Form>> {
+        return repository.getTodaysTickets(departmentId)
     }
 }

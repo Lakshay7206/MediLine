@@ -14,6 +14,8 @@ import com.example.mediline.Admin.ui.auth.AdminLoginScreen
 
 import com.example.mediline.Admin.ui.home.TicketManagementScreen
 import com.example.mediline.User.RootNavGraph
+import com.example.mediline.User.ui.Queue.QueueScreen
+import com.example.mediline.User.ui.createTicket.RegistrationScreen
 import com.example.mediline.User.ui.payment.PaymentGatewayScreen
 
 import com.example.mediline.User.ui.payment.PaymentGatewayScreen
@@ -41,10 +43,12 @@ class MainActivity : ComponentActivity() , PaymentResultWithDataListener{
                 val navController = rememberNavController()
               // RootNavGraph(navController)
                // InviteAdminScreen()
-                AdminLoginScreen({Log.d("TAG", "onCreate:successful")})
+                //AdminLoginScreen({Log.d("TAG", "onCreate:successful")})
                //PaymentGatewayScreen()
                // TicketManagementScreen({},{})
                // AdminCreateTicketScreen()
+              //  QueueScreen("1",{},{})
+                RegistrationScreen("1",{})
 
 
 

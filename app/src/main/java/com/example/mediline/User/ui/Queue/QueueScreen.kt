@@ -2,12 +2,20 @@ package com.example.mediline.User.ui.Queue
 
 
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -28,121 +36,214 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.flowlayout.FlowRow
 
 @Composable
 fun QueueScreen(
     departmentId: String,
-    navigateToCreateTicket: (String) -> Unit,
-    navigateToViewTicket: (String) -> Unit,
+    navigateToCreateTicket: () -> Unit,
+    navigateToViewTicket: () -> Unit,
     viewModel: QueueViewModel = hiltViewModel()
 ) {
-    Log.d("QueueScreen", "departmentId: $departmentId")
-    val queueState by viewModel.queueState.collectAsState()
-
+    val uiState by viewModel.uiState.collectAsState()
     LaunchedEffect(departmentId) {
-        viewModel.observeQueue(departmentId)
+        viewModel.loadTodaysTickets(departmentId)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        when (queueState) {
-            is QueueUiState.Loading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+    when (uiState) {
+        is QueueUiState.Loading -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
-
-            is QueueUiState.Error -> {
-                val error = (queueState as QueueUiState.Error).message
-                Text(
-                    text = "Error: $error",
-                    color = Color.Red,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+        }
+        is QueueUiState.Error -> {
+            val message = (uiState as QueueUiState.Error).message
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(message, color = Color.Red, fontWeight = FontWeight.Bold)
+                Log.d("QueueScreen", "Error: $message")
             }
-
-            is QueueUiState.Success -> {
-                val queueNumber = (queueState as QueueUiState.Success).queueNumber
-
-                // Current Number Card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(4.dp)
+        }
+        is QueueUiState.Success -> {
+            val state = uiState as QueueUiState.Success
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                // --- Top Summary Cards ---
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text("Now Serving", fontSize = 18.sp, fontWeight = FontWeight.Medium)
-                        Text(
-                            "$queueNumber",
-                            fontSize = 48.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1976D2)
-                        )
-                        Text("Estimated wait: ~${queueNumber * 2} min", fontSize = 14.sp, color = Color.Gray) // simple estimate
-                        LinearProgressIndicator(
-                            progress = (queueNumber % 10) / 10f,
+                    BigSummaryCard("Now Treating", state.currentNumber, Color(0xFFFFC107))
+                    BigSummaryCard("Total Patients", state.totalPatients, Color(0xFF64B5F6))
+                    BigSummaryCard(
+                        "Patients Ahead of You",
+                        (state.totalPatients - state.currentNumber).coerceAtLeast(0),
+                        Color(0xFF81C784)
+                    )
+                }
+
+                // --- Queue Grid ---
+                FlowRow(
+                    mainAxisSpacing = 6.dp,
+                    crossAxisSpacing = 6.dp,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    state.ticketBoxes.forEach { box ->
+                        Box(
+                            contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                        )
+                                .size(40.dp)
+                                .background(box.color, RoundedCornerShape(8.dp))
+                        ) {
+                            Text(
+                                "${box.ticketNumber}",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
                     }
                 }
 
-                Spacer(Modifier.height(24.dp))
-
-                // Total Patients Card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(4.dp)
+                // --- Quick Actions ---
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    Button(
+                        onClick = navigateToCreateTicket,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp)
                     ) {
-                        Text("Total patients", fontSize = 18.sp, fontWeight = FontWeight.Medium)
-                        Text(
-                            "$queueNumber", // Example: total > current
-                            fontSize = 48.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1976D2)
-                        )
+                        Text("Book Appointment", fontSize = 16.sp)
                     }
-                }
 
-                Spacer(Modifier.height(24.dp))
-
-                // Quick Actions
-                Button(
-                    onClick = { navigateToCreateTicket(departmentId) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Book Appointment")
-                }
-
-                OutlinedButton(
-                    onClick ={ navigateToViewTicket(departmentId) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("View My Tickets")
+                    OutlinedButton(
+                        onClick = navigateToViewTicket,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Text("View My Tickets", fontSize = 16.sp)
+                    }
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+
+//@Composable
+//fun QueueScreen(
+//    navigateToCreateTicket: () -> Unit,
+//    navigateToViewTicket: () -> Unit,
+//    viewModel: QueueViewModel=hiltViewModel()
+//) {
+//    val uistate by viewModel.uiState.collectAsState()
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(16.dp),
+//        verticalArrangement = Arrangement.spacedBy(24.dp)
+//    ) {
+//        // --- Top Summary Cards ---
+//        Column(
+//            verticalArrangement = Arrangement.spacedBy(16.dp),
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            BigSummaryCard("Now Treating", currentNumber, Color(0xFFFFC107))
+//            BigSummaryCard("Total Patients", totalPatients, Color(0xFF64B5F6))
+//            BigSummaryCard(
+//                "Patients Ahead of You",
+//                (totalPatients - currentNumber).coerceAtLeast(0),
+//                Color(0xFF81C784)
+//            )
+//        }
+//
+//
+//        // --- Queue Grid ---
+//        FlowRow(
+//            mainAxisSpacing = 6.dp,
+//            crossAxisSpacing = 6.dp,
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            for (i in 1..totalPatients) {
+//                val color = when {
+//                    i < currentNumber -> Color(0xFF81C784)  // treated
+//                    i == currentNumber -> Color(0xFFFFC107) // currently treating
+//                    else -> Color(0xFF64B5F6)               // waiting
+//                }
+//
+//                Box(
+//                    contentAlignment = Alignment.Center,
+//                    modifier = Modifier
+//                        .size(40.dp)
+//                        .background(color, RoundedCornerShape(8.dp))
+//                ) {
+//                    Text(
+//                        "$i",
+//                        fontSize = 14.sp,
+//                        fontWeight = FontWeight.Bold,
+//                        color = Color.White
+//                    )
+//                }
+//            }
+//        }
+//        // --- Quick Actions ---
+//        Column(
+//            verticalArrangement = Arrangement.spacedBy(12.dp),
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            Button(
+//                onClick = navigateToCreateTicket,
+//                modifier = Modifier.fillMaxWidth(),
+//                shape = RoundedCornerShape(16.dp)
+//            ) {
+//                Text("Book Appointment", fontSize = 16.sp)
+//            }
+//
+//            OutlinedButton(
+//                onClick = navigateToViewTicket,
+//                modifier = Modifier.fillMaxWidth(),
+//                shape = RoundedCornerShape(16.dp)
+//            ) {
+//                Text("View My Tickets", fontSize = 16.sp)
+//            }
+//        }
+//
+//    }
+//
+//}
+//
 @Composable
-fun QueueScreenPreview() {
-    QueueScreen("1", {}, {})
+fun BigSummaryCard(title: String, value: Int, color: Color) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp),
+        colors = CardDefaults.cardColors(containerColor = color),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(title, fontSize = 16.sp, color = Color.White)
+            Text(value.toString(), fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        }
+    }
 }
+
+//@Preview
+//@Composable
+//fun PreviewQueueScreen() {
+//    QueueScreen(
+//
+//        navigateToCreateTicket = {},
+//        navigateToViewTicket = {}
+//    )
+//}
