@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.example.mediline.Admin.ui.AdminCreateTicket.AdminCreateTicketScreen
+import com.example.mediline.Admin.ui.auth.AdminLoginScreen
 
 import com.example.mediline.Admin.ui.home.TicketManagementScreen
 import com.example.mediline.User.RootNavGraph
@@ -19,6 +20,7 @@ import com.example.mediline.User.ui.payment.PaymentGatewayScreen
 
 import com.example.mediline.User.ui.payment.PaymentViewModel
 import com.example.mediline.User.ui.theme.MediLineTheme
+import com.example.mediline.superAdmin.InviteAdminScreen
 
 import com.razorpay.PaymentResultListener
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +39,9 @@ class MainActivity : ComponentActivity() , PaymentResultWithDataListener{
         setContent {
             MediLineTheme {
                 val navController = rememberNavController()
-               RootNavGraph(navController)
+              // RootNavGraph(navController)
+               // InviteAdminScreen()
+                AdminLoginScreen({Log.d("TAG", "onCreate:successful")})
                //PaymentGatewayScreen()
                // TicketManagementScreen({},{})
                // AdminCreateTicketScreen()

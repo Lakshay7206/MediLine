@@ -1,6 +1,6 @@
 package com.example.mediline.data.repo
 
-import com.example.mediline.data.PaymentApi
+import com.example.mediline.data.api.PaymentApi
 import com.example.mediline.data.model.CreateOrderRequest
 import com.example.mediline.data.model.CreateOrderResponse
 import com.example.mediline.data.model.PaymentRepository

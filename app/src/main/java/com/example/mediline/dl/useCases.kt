@@ -13,6 +13,8 @@ import com.example.mediline.data.model.QueueRepository
 import com.example.mediline.data.model.TicketRepository
 import com.example.mediline.data.model.TicketStatus
 import com.example.mediline.data.model.User
+import com.example.mediline.data.repo.AdminAuthRepository
+import com.example.mediline.data.repo.AdminRepository
 import com.example.mediline.data.repo.AdminTicketRepository
 import com.example.mediline.data.room.DepartmentEntity
 import kotlinx.coroutines.Dispatchers
@@ -148,3 +150,26 @@ class AdminAddFormUseCase @Inject constructor(
     }
 }
 
+class InviteAdminUseCase @Inject constructor(
+    private val repository: AdminRepository
+) {
+    suspend operator fun invoke(email: String): Result<Unit> {
+        return repository.sendInvite(email)
+    }
+}
+
+class AcceptInviteUseCase @Inject constructor(
+    private val repository: AdminRepository
+) {
+    suspend operator fun invoke(token: String, password: String): Result<Unit> {
+        return repository.acceptInvite(token, password)
+    }
+}
+
+class LoginAdminUseCase @Inject constructor(
+    private val repository: AdminAuthRepository
+) {
+    suspend operator fun invoke(email: String, password: String): Result<Unit> {
+        return repository.loginAdmin(email, password)
+    }
+}

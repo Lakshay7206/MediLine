@@ -1,6 +1,5 @@
-package com.example.mediline.data
+package com.example.mediline.data.api
 
-// data/remote/PaymentApi.kt
 import com.example.mediline.data.model.CreateOrderRequest
 import com.example.mediline.data.model.CreateOrderResponse
 import com.example.mediline.data.model.VerifyPaymentRequest

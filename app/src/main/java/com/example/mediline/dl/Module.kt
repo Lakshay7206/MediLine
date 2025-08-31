@@ -3,18 +3,24 @@ package com.example.mediline.dl
 
 import android.content.Context
 import androidx.room.Room
-import com.example.mediline.data.PaymentApi
+import com.example.mediline.data.api.BackendApi
+import com.example.mediline.data.api.PaymentApi
 import com.example.mediline.data.model.AuthRepository
 import com.example.mediline.data.model.DepartmentRepository
 import com.example.mediline.data.model.FormRepository
 import com.example.mediline.data.model.PaymentRepository
 import com.example.mediline.data.model.QueueRepository
 import com.example.mediline.data.model.TicketRepository
+import com.example.mediline.data.repo.AdminAuthRepository
+import com.example.mediline.data.repo.AdminAuthRepositoryImpl
+import com.example.mediline.data.repo.AdminRepository
+import com.example.mediline.data.repo.AdminRepositoryImpl
 import com.example.mediline.data.repo.AdminTicketRepository
 import com.example.mediline.data.repo.AdminTicketRepositoryImpl
 import com.example.mediline.data.repo.AuthRepositoryImpl
 import com.example.mediline.data.repo.DepartmentRepositoryImpl
 import com.example.mediline.data.repo.FormRepositoryImpl
+
 import com.example.mediline.data.repo.PaymentRepositoryImpl
 import com.example.mediline.data.repo.QueueRepositoryImpl
 import com.example.mediline.data.repo.TicketRepositoryImpl
@@ -40,10 +46,12 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 
     @Provides
@@ -59,12 +67,14 @@ object AppModule {
     @Provides
     fun provideDepartmentDao(db: AppDatabase): DepartmentDao = db.departmentDao()
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     fun provideAuthRepository(auth: FirebaseAuth, firestore: FirebaseFirestore): AuthRepository =
         AuthRepositoryImpl(auth, firestore)
 
-    @Provides @Singleton
-    fun provideFormRepository(firestore: FirebaseFirestore,auth: FirebaseAuth): FormRepository =
+    @Provides
+    @Singleton
+    fun provideFormRepository(firestore: FirebaseFirestore, auth: FirebaseAuth): FormRepository =
         FormRepositoryImpl(firestore, auth)
 
 
@@ -85,9 +95,6 @@ object AppModule {
     ): QueueRepository = QueueRepositoryImpl(db)
 
 
-
-
-
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
@@ -103,7 +110,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://6d943c3bd39d.ngrok-free.app/") // 🔥 use your backend URL
+            .baseUrl("https://7d64c14f5b47.ngrok-free.app/") // 🔥 use your backend URL
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -120,33 +127,45 @@ object AppModule {
         PaymentRepositoryImpl(api)
 
 
-
     @Provides
     @Singleton
     fun provideTicketRepository(
         db: FirebaseFirestore,
         auth: FirebaseAuth
-    ): TicketRepository =TicketRepositoryImpl(
-            db,
-            auth
-        )
+    ): TicketRepository = TicketRepositoryImpl(
+        db,
+        auth
+    )
 
-@Provides
-@Singleton
-fun provideAdminTicketRepository(
-    db: FirebaseFirestore
-): AdminTicketRepository= AdminTicketRepositoryImpl(db)
+    @Provides
+    @Singleton
+    fun provideAdminTicketRepository(
+        db: FirebaseFirestore
+    ): AdminTicketRepository = AdminTicketRepositoryImpl(db)
 
 
+    @Provides
+    @Singleton
+    fun provideAdminFormRepository(
+        db: FirebaseFirestore,
+        auth: FirebaseAuth
+    ): com.example.mediline.data.model.AdminFormRepository =
+        com.example.mediline.data.repo.AdminFormRepositoryImpl(db, auth)
 
-@Provides
-@Singleton
-fun provideAdminFormRepository(
-    db: FirebaseFirestore,
-    auth: FirebaseAuth
-): com.example.mediline.data.model.AdminFormRepository =
-    com.example.mediline.data.repo.AdminFormRepositoryImpl(db, auth)
+    @Provides
+    @Singleton
+    fun provideBackendApi(retrofit: Retrofit): BackendApi = retrofit.create(BackendApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideAdminRepository(backendApi: BackendApi): AdminRepository =
+        AdminRepositoryImpl(backendApi)
+
+
+    @Provides
+    @Singleton
+    fun provideAdminAuthRepository(
+        auth: FirebaseAuth
+    ): AdminAuthRepository = AdminAuthRepositoryImpl(auth)
 
 }
-
-
