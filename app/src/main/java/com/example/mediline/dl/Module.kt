@@ -18,6 +18,9 @@ import com.example.mediline.data.repo.AdminTicketRepository
 import com.example.mediline.data.repo.AdminTicketRepositoryImpl
 import com.example.mediline.data.repo.AuthRepositoryImpl
 import com.example.mediline.data.repo.DepartmentRepositoryImpl
+import com.example.mediline.data.repo.DownloadTicketRepo
+import com.example.mediline.data.repo.DownloadTicketRepoImpl
+
 import com.example.mediline.data.repo.FormRepositoryImpl
 
 import com.example.mediline.data.repo.PaymentRepositoryImpl
@@ -168,4 +171,8 @@ object AppModule {
         db: FirebaseFirestore
     ): QueueRepository = QueueRepositoryImpl(db)
 
+
+    @Provides
+    @Singleton
+    fun provideDownloadTicketRepo(): DownloadTicketRepo= DownloadTicketRepoImpl()
 }

@@ -1,5 +1,6 @@
 package com.example.mediline
 
+import TicketScreen
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
@@ -16,6 +17,7 @@ import com.example.mediline.Admin.ui.auth.AdminLoginScreen
 
 import com.example.mediline.Admin.ui.home.TicketManagementScreen
 import com.example.mediline.User.RootNavGraph
+import com.example.mediline.User.Screen
 import com.example.mediline.User.ui.Queue.QueueScreen
 import com.example.mediline.User.ui.authentication.AuthViewModel
 import com.example.mediline.User.ui.authentication.LoginScreen
@@ -54,6 +56,7 @@ class MainActivity : ComponentActivity() , PaymentResultWithDataListener{
                // TicketManagementScreen({},{})
                // AdminCreateTicketScreen()
               //  QueueScreen("1",{},{})
+                TicketScreen()
 
 
 

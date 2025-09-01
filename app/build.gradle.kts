@@ -41,61 +41,67 @@ android {
         compose = true
     }
 }
-
 dependencies {
-    implementation("com.google.accompanist:accompanist-flowlayout:0.36.0")
-    // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-// Converter (Gson for JSON)
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-// OkHttp (for networking)
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-// Coroutines support
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-    implementation("com.razorpay:checkout:1.6.33")
-    // Hilt core
-    implementation ("com.google.dagger:hilt-android:2.51.1")
+    // Compose BOM
+    implementation(platform(libs.androidx.compose.bom))
+
+    // Compose UI
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.activity.compose)
+
+    // Material3
+    implementation(libs.androidx.material3)
+
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.8.0")
     implementation(libs.androidx.navigation.common.android)
-    implementation(libs.billing)
-    kapt ("com.google.dagger:hilt-compiler:2.51.1")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0") // optional Hilt + Nav Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3") // optional ViewModel in Nav
 
-    // (Optional) Hilt + Navigation Compose
-    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
+    // Firebase
+    implementation(platform(libs.firebase.bom))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
-// Core navigation for Compose
-    implementation("androidx.navigation:navigation-compose:2.8.0")
-// (Optional) If you use ViewModels in navigation destinations
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
-// (Optional) If you use Hilt with Compose Navigation
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-//   implementation "androidx.lifecycle:lifecycle-viewmodel-compose"
-//    implementation "androidx.lifecycle:lifecycle-runtime-ktx"
-//    implementation "androidx.compose.material3:material3"
-    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
-    // (optional Realtime DB)
+    // Optional Realtime DB
     // implementation(libs.firebase.database)
+
+    // Networking
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+
+    // Accompanist
+    implementation("com.google.accompanist:accompanist-flowlayout:0.36.0")
+
+    // Razorpay
+    implementation("com.razorpay:checkout:1.6.33")
+
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    kapt("com.google.dagger:hilt-compiler:2.51.1")
 
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
 
-    // Coroutines
+    // Coroutines Play Services
     implementation(libs.kotlinx.coroutines.play.services)
+
+    // AndroidX Core & Lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -104,3 +110,68 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
+
+//
+//dependencies {
+//
+//    implementation("com.google.accompanist:accompanist-flowlayout:0.36.0")
+//    // Retrofit
+//    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+//// Converter (Gson for JSON)
+//    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+//// OkHttp (for networking)
+//    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+//    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+//// Coroutines support
+//
+//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+//    implementation("com.razorpay:checkout:1.6.33")
+//    // Hilt core
+//    implementation ("com.google.dagger:hilt-android:2.51.1")
+//    implementation(libs.androidx.navigation.common.android)
+//    implementation(libs.billing)
+//    kapt ("com.google.dagger:hilt-compiler:2.51.1")
+//
+//    // (Optional) Hilt + Navigation Compose
+//    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
+//    implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
+//    implementation("com.google.firebase:firebase-analytics")
+//    implementation("com.google.firebase:firebase-auth")
+//// Core navigation for Compose
+//    implementation("androidx.navigation:navigation-compose:2.8.0")
+//// (Optional) If you use ViewModels in navigation destinations
+//    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
+//// (Optional) If you use Hilt with Compose Navigation
+//    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+////   implementation "androidx.lifecycle:lifecycle-viewmodel-compose"
+////    implementation "androidx.lifecycle:lifecycle-runtime-ktx"
+////    implementation "androidx.compose.material3:material3"
+//    implementation(platform(libs.firebase.bom))
+//    implementation(libs.firebase.firestore)
+//    // (optional Realtime DB)
+//    // implementation(libs.firebase.database)
+//
+//    // Room
+//    implementation(libs.room.runtime)
+//    implementation(libs.room.ktx)
+//    kapt(libs.room.compiler)
+//
+//    // Coroutines
+//    implementation(libs.kotlinx.coroutines.play.services)
+//    implementation(libs.androidx.core.ktx)
+//    implementation(libs.androidx.lifecycle.runtime.ktx)
+//    implementation(libs.androidx.activity.compose)
+//    implementation(platform(libs.androidx.compose.bom))
+//    implementation(libs.androidx.ui)
+//    implementation(libs.androidx.ui.graphics)
+//    implementation(libs.androidx.ui.tooling.preview)
+//    implementation(libs.androidx.material3)
+//    testImplementation(libs.junit)
+//    androidTestImplementation(libs.androidx.junit)
+//    androidTestImplementation(libs.androidx.espresso.core)
+//    androidTestImplementation(platform(libs.androidx.compose.bom))
+//    androidTestImplementation(libs.androidx.ui.test.junit4)
+//    debugImplementation(libs.androidx.ui.tooling)
+//    debugImplementation(libs.androidx.ui.test.manifest)
+//}

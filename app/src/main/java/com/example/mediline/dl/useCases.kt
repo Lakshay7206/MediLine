@@ -1,6 +1,7 @@
 package com.example.mediline.dl
 
 import android.app.Activity
+import android.content.Context
 import com.example.mediline.data.model.AdminFormRepository
 import com.example.mediline.data.model.AuthRepository
 import com.example.mediline.data.model.Department
@@ -15,12 +16,14 @@ import com.example.mediline.data.model.User
 import com.example.mediline.data.repo.AdminAuthRepository
 import com.example.mediline.data.repo.AdminRepository
 import com.example.mediline.data.repo.AdminTicketRepository
+import com.example.mediline.data.repo.DownloadTicketRepo
 import com.example.mediline.data.repo.QueueRepository
 import com.example.mediline.data.room.DepartmentEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 
@@ -179,5 +182,13 @@ class GetTodaysTicketsUseCase @Inject constructor(
 ) {
     operator fun invoke(departmentId: String): Flow<List<Form>> {
         return repository.getTodaysTickets(departmentId)
+    }
+}
+
+class  generatePdfUseCase @Inject constructor(
+    private val repository: DownloadTicketRepo
+){
+    operator fun invoke(context: Context, ticket:Form): File {
+        return repository.generateTicketPdf(context,ticket)
     }
 }
