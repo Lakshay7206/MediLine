@@ -43,6 +43,13 @@ android {
 }
 dependencies {
 
+    implementation("androidx.compose.material:material-icons-extended:<version>")
+
+
+    implementation (platform("androidx.compose:compose-bom:2025.01.00") )// or your version
+    implementation ("androidx.compose.material:material-icons-extended")
+
+
     // Compose BOM
     implementation(platform(libs.androidx.compose.bom))
 

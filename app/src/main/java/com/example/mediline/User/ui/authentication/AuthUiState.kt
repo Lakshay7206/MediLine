@@ -1,5 +1,7 @@
 package com.example.mediline.User.ui.authentication
 
+import com.google.firebase.auth.PhoneAuthProvider
+
 
 sealed class AuthUiState {
     object Idle : AuthUiState() // Initial state
@@ -18,5 +20,8 @@ data class AuthFormState(
     val phone: String = "",
     val uid: String = "",
     val otp: String = "",
-    val verificationId: String = ""
+    val verificationId: String = "",
+    var cooldownSeconds: Int = 0,
+    var resendAttempts: Int = 0,
+    var resendToken: PhoneAuthProvider.ForceResendingToken? = null
 )

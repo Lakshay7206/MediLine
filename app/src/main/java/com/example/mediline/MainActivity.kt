@@ -56,7 +56,8 @@ class MainActivity : ComponentActivity() , PaymentResultWithDataListener{
                // TicketManagementScreen({},{})
                // AdminCreateTicketScreen()
               //  QueueScreen("1",{},{})
-                TicketScreen()
+              //  TicketScreen()
+                AdminCreateTicketScreen()
 
 
 

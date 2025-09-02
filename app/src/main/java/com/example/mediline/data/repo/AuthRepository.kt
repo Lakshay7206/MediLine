@@ -1,8 +1,6 @@
 package com.example.mediline.data.repo
 
 import android.app.Activity
-import com.example.mediline.data.model.AuthRepository
-import com.example.mediline.data.model.CreatorRole
 import com.example.mediline.data.model.User
 import com.example.mediline.data.model.UserEntity
 import com.google.firebase.FirebaseException
@@ -15,26 +13,84 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 
+data class OtpData(
+    val verificationId: String,
+    val resendToken: PhoneAuthProvider.ForceResendingToken? = null
+)
+
+interface AuthRepository {
+    suspend fun sendOtp(phone: String,activity: Activity): Result<OtpData>
+    suspend fun verifyOtp(verificationId: String, otp: String): Result<String> // returns uid
+    suspend fun checkUserExists(uid: String): Result<Boolean>
+    suspend fun createUser(user: User): Result<Unit>
+
+    suspend fun resendOtp(phone: String,activity: Activity,resendToken: PhoneAuthProvider.ForceResendingToken): Result<OtpData>
+}
 
 class AuthRepositoryImpl(private val auth: FirebaseAuth,
                          private val firestore: FirebaseFirestore,
 
 ): AuthRepository{
-    override suspend fun sendOtp(phone: String, activity: Activity): Result<String> {
+//    override suspend fun sendOtp(phone: String, activity: Activity): Result<String> {
+//        return try {
+//            suspendCancellableCoroutine { cont ->
+//
+//                val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+//                    override fun onVerificationCompleted(credential: PhoneAuthCredential) {
+//                        // Auto-retrieval of OTP (rare, but possible)
+//                        if (cont.isActive) {
+//                            cont.resume(Result.success("AUTO_VERIFIED"))
+//                        }
+//                    }
+//
+//                    override fun onVerificationFailed(p0: FirebaseException) {
+//                        if (cont.isActive) {
+//                            cont.resume(Result.failure(p0))
+//                        }
+//                    }
+//
+//                    override fun onCodeSent(
+//                        verificationId: String,
+//                        token: PhoneAuthProvider.ForceResendingToken
+//                    ) {
+//                        if (cont.isActive) {
+//                            // return verificationId so it can be used later in verifyOtp()
+//                            cont.resume(Result.success(verificationId))
+//                        }
+//                    }
+//                }
+//
+//                val options = PhoneAuthOptions.newBuilder(auth)
+//                    .setPhoneNumber(phone)
+//                    .setTimeout(60L, TimeUnit.SECONDS)
+//                    .setActivity(activity)
+//                    .setCallbacks(callbacks)
+//                    .build()
+//                PhoneAuthProvider.verifyPhoneNumber(options)
+//
+//
+//            }
+//        }catch(e: Exception){
+//            Result.failure(e)
+//
+//        }
+//
+//    }
+
+    override suspend fun sendOtp(phone: String, activity: Activity): Result<OtpData> {
         return try {
             suspendCancellableCoroutine { cont ->
 
                 val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                        // Auto-retrieval of OTP (rare, but possible)
                         if (cont.isActive) {
-                            cont.resume(Result.success("AUTO_VERIFIED"))
+                            cont.resume(Result.success(OtpData("AUTO_VERIFIED", null)))
                         }
                     }
 
-                    override fun onVerificationFailed(p0: FirebaseException) {
+                    override fun onVerificationFailed(e: FirebaseException) {
                         if (cont.isActive) {
-                            cont.resume(Result.failure(p0))
+                            cont.resume(Result.failure(e))
                         }
                     }
 
@@ -43,8 +99,8 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth,
                         token: PhoneAuthProvider.ForceResendingToken
                     ) {
                         if (cont.isActive) {
-                            // return verificationId so it can be used later in verifyOtp()
-                            cont.resume(Result.success(verificationId))
+                            // 🔑 return both verificationId + resendToken
+                            cont.resume(Result.success(OtpData(verificationId, token)))
                         }
                     }
                 }
@@ -55,16 +111,61 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth,
                     .setActivity(activity)
                     .setCallbacks(callbacks)
                     .build()
+
                 PhoneAuthProvider.verifyPhoneNumber(options)
-
-
             }
-        }catch(e: Exception){
+        } catch (e: Exception) {
             Result.failure(e)
-
         }
-
     }
+
+
+    override suspend fun resendOtp(
+        phone: String,
+        activity: Activity,
+        resendToken: PhoneAuthProvider.ForceResendingToken
+    ): Result<OtpData> {
+        return try {
+            suspendCancellableCoroutine { cont ->
+
+                val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                    override fun onVerificationCompleted(credential: PhoneAuthCredential) {
+                        if (cont.isActive) {
+                            cont.resume(Result.success(OtpData("AUTO_VERIFIED", null)))
+                        }
+                    }
+
+                    override fun onVerificationFailed(e: FirebaseException) {
+                        if (cont.isActive) {
+                            cont.resume(Result.failure(e))
+                        }
+                    }
+
+                    override fun onCodeSent(
+                        verificationId: String,
+                        token: PhoneAuthProvider.ForceResendingToken
+                    ) {
+                        if (cont.isActive) {
+                            cont.resume(Result.success(OtpData(verificationId, token)))
+                        }
+                    }
+                }
+
+                val options = PhoneAuthOptions.newBuilder(auth)
+                    .setPhoneNumber(phone)
+                    .setTimeout(60L, TimeUnit.SECONDS)
+                    .setActivity(activity)
+                    .setCallbacks(callbacks)
+                    .setForceResendingToken(resendToken) // 🔑 important
+                    .build()
+
+                PhoneAuthProvider.verifyPhoneNumber(options)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun verifyOtp(verificationId: String, otp: String): Result<String> {
         return suspendCancellableCoroutine { continuation ->
             val credential: PhoneAuthCredential =

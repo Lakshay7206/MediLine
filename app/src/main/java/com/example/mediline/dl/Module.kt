@@ -5,7 +5,6 @@ import android.content.Context
 import androidx.room.Room
 import com.example.mediline.data.api.BackendApi
 import com.example.mediline.data.api.PaymentApi
-import com.example.mediline.data.model.AuthRepository
 import com.example.mediline.data.model.DepartmentRepository
 import com.example.mediline.data.model.FormRepository
 import com.example.mediline.data.model.PaymentRepository
@@ -16,6 +15,7 @@ import com.example.mediline.data.repo.AdminRepository
 import com.example.mediline.data.repo.AdminRepositoryImpl
 import com.example.mediline.data.repo.AdminTicketRepository
 import com.example.mediline.data.repo.AdminTicketRepositoryImpl
+import com.example.mediline.data.repo.AuthRepository
 import com.example.mediline.data.repo.AuthRepositoryImpl
 import com.example.mediline.data.repo.DepartmentRepositoryImpl
 import com.example.mediline.data.repo.DownloadTicketRepo
