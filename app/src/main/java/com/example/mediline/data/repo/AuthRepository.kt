@@ -28,13 +28,13 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth,
                     override fun onVerificationCompleted(credential: PhoneAuthCredential) {
                         // Auto-retrieval of OTP (rare, but possible)
                         if (cont.isActive) {
-                            cont.resume(Result.success("AUTO_VERIFIED")) { cause, _, _ -> }
+                            cont.resume(Result.success("AUTO_VERIFIED"))
                         }
                     }
 
                     override fun onVerificationFailed(p0: FirebaseException) {
                         if (cont.isActive) {
-                            cont.resume(Result.failure(p0)) { cause, _, _ -> }
+                            cont.resume(Result.failure(p0))
                         }
                     }
 
@@ -44,7 +44,7 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth,
                     ) {
                         if (cont.isActive) {
                             // return verificationId so it can be used later in verifyOtp()
-                            cont.resume(Result.success(verificationId)) { cause, _, _ -> }
+                            cont.resume(Result.success(verificationId))
                         }
                     }
                 }

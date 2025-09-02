@@ -9,8 +9,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mediline.data.model.Form
 import com.example.mediline.User.ui.viewTicket.TicketUiState
 import com.example.mediline.User.ui.viewTicket.ViewTicketViewModel
@@ -20,7 +22,6 @@ import com.example.mediline.User.ui.viewTicket.ViewTicketViewModel
 
 @Composable
 fun TicketScreen(
-
     viewModel: ViewTicketViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -40,11 +41,13 @@ fun TicketScreen(
 
         is TicketUiState.Success -> {
             val successState = state as TicketUiState.Success
+            val context= LocalContext.current
 
             LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+
                 // Use `items` to iterate through the list of active tickets
                 items(successState.activeTickets) { form ->
-                    TicketCard(ticket = form, isActive = true)
+                    ViewTicketCard(ticket = form, isActive = true, {viewModel.createAndDownloadTicketFile(context,form)})
                     Spacer(Modifier.height(16.dp))
                 }
 
@@ -58,7 +61,7 @@ fun TicketScreen(
 
                 // Display the history tickets
                 items(successState.history) { form ->
-                    TicketCard(ticket = form, isActive = false)
+                    ViewTicketCard(ticket = form, isActive = false,{viewModel.createAndDownloadTicketFile(context,form)})
                     Spacer(Modifier.height(8.dp))
                 }
             }
@@ -67,7 +70,7 @@ fun TicketScreen(
 }
 
 @Composable
-fun TicketCard(ticket: Form, isActive: Boolean) {
+fun ViewTicketCard(ticket: Form, isActive: Boolean,generatePdf:()->Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(6.dp),
@@ -86,6 +89,12 @@ fun TicketCard(ticket: Form, isActive: Boolean) {
             Text("Date: ${java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a").format(ticket.timeStamp)}")
             if (isActive) {
                 Text("Status: Active", color = Color.Green, style = MaterialTheme.typography.bodyMedium)
+            }
+            Button(
+               onClick = generatePdf
+
+            ){
+                Text("download")
             }
         }
     }

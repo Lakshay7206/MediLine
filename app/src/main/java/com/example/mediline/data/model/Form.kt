@@ -4,20 +4,20 @@ import com.example.mediline.User.ui.createTicket.Sex
 
 data class Form (
     val id: String ="",
-    val departmentId: String,
-    val userId: String,
-    val opdNo: String,
-    val name: String,
-    val address: String,
-    val phone: String,
-    val age: Int,
-    val sex: Sex?,
-    val timeStamp: Long,
+    val departmentId: String="",
+    val userId: String="",
+    val opdNo: String="",
+    val name: String="",
+    val address: String="",
+    val phone: String="",
+    val age: Int=0,
+    val sex: Sex?=Sex.Other,
+    val timeStamp: Long= 0,
     val ticketNumber: Long =0,
-    val paymentStatus: PaymentStatus,
-    val ticketStatus: TicketStatus,
-    val createdBy: String,     // UID of creator (admin or same as userId)
-    val creatorRole: CreatorRole,   // "admin" or "user"
+    val paymentStatus: PaymentStatus=PaymentStatus.UNPAID,
+    val ticketStatus: TicketStatus=TicketStatus.ACTIVE,
+    val createdBy: String="",     // UID of creator (admin or same as userId)
+    val creatorRole: CreatorRole=CreatorRole.NULL,   // "admin" or "user"
     //val bloodGroup: String,
 
 )
@@ -28,12 +28,14 @@ enum class CreatorRole{
     NULL
 }
 enum class TicketStatus{
+
    ACTIVE,
     CLOSED,
     EXPIRED,
     CANCELLED,
     SKIPPED,
-    NULL
+    NULL,
+    SERVING
 }
 enum class PaymentStatus{
     Paid,

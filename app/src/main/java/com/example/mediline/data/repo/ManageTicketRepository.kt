@@ -37,7 +37,7 @@ class AdminTicketRepositoryImpl(
 
             val snapshot = ticketCollection
 //                .whereGreaterThanOrEqualTo("timestamp", startOfDay)
-//                .whereLessThan("timestamp", endOfDay)
+//             .whereLessThan("timestamp", endOfDay)
                 .get()
                 .await()
 
@@ -47,28 +47,58 @@ class AdminTicketRepositoryImpl(
             Result.failure(e)
         }
     }
-    override suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit> {
-        return try {
-            ticketCollection
-                .document(docId)
-                .update("ticketStatus", newStatus.name)
-                .await()
-            Log.d("AdminTicketRepository", "Ticket status updated successfully")
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-
-//    override suspend fun updateTicketStatus(ticketId: String, status: TicketStatus): Result<Unit> {
+//    override suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit> {
 //        return try {
-//            ticketCollection.document(ticketId).update("ticketStatus", status.name).await()
+//            ticketCollection
+//                .document(docId)
+//                .update("ticketStatus", newStatus.name)
+//                .await()
+//            Log.d("AdminTicketRepository", "Ticket status updated successfully")
 //            Result.success(Unit)
 //        } catch (e: Exception) {
 //            Result.failure(e)
 //        }
 //    }
+
+
+
+
+    override suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit> {
+            return try {
+                if (newStatus == TicketStatus.SERVING) {
+                    // Transaction: mark previous serving ticket as COMPLETED
+                    db.runTransaction { transaction ->
+                        // Query for currently serving ticket
+                        val servingQuery = ticketCollection
+                            .whereEqualTo("ticketStatus", TicketStatus.SERVING.name)
+                            .get()
+                            .result
+
+                        val previousServing = servingQuery.documents.firstOrNull()
+                        previousServing?.let {
+                            transaction.update(it.reference, "ticketStatus", TicketStatus.CLOSED.name)
+                        }
+
+                        // Update the new ticket to SERVING
+                        val newTicketRef = ticketCollection.document(docId)
+                        transaction.update(newTicketRef, "ticketStatus", TicketStatus.SERVING.name)
+                    }.await()
+                } else {
+                    // Normal status update
+                    ticketCollection
+                        .document(docId)
+                        .update("ticketStatus", newStatus.name)
+                        .await()
+                }
+
+                Log.d("AdminTicketRepository", "Ticket status updated successfully")
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+    }
+
+
 
     override suspend fun updatePaymentStatus(ticketId: String, status: PaymentStatus): Result<Unit> {
         return try {

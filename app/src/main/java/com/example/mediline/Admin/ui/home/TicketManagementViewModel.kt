@@ -130,6 +130,10 @@ class AdminTicketViewModel @Inject constructor(
         Log.d("AdminTicketViewModel", "Completing ticket: $ticketId")
         updateTicketStatus(ticketId, TicketStatus.CLOSED)
     }
+    fun servingTicket(ticketId: String) {
+        Log.d("AdminTicketViewModel", "Completing ticket: $ticketId")
+        updateTicketStatus(ticketId, TicketStatus.SERVING)
+    }
 
     fun reassignTicket(ticketId: String) {
         Log.d("AdminTicketViewModel", "Reassigning ticket: $ticketId")

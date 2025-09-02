@@ -9,7 +9,6 @@ import com.example.mediline.data.model.AuthRepository
 import com.example.mediline.data.model.DepartmentRepository
 import com.example.mediline.data.model.FormRepository
 import com.example.mediline.data.model.PaymentRepository
-import com.example.mediline.data.model.QueueRepository
 import com.example.mediline.data.model.TicketRepository
 import com.example.mediline.data.repo.AdminAuthRepository
 import com.example.mediline.data.repo.AdminAuthRepositoryImpl
@@ -19,9 +18,13 @@ import com.example.mediline.data.repo.AdminTicketRepository
 import com.example.mediline.data.repo.AdminTicketRepositoryImpl
 import com.example.mediline.data.repo.AuthRepositoryImpl
 import com.example.mediline.data.repo.DepartmentRepositoryImpl
+import com.example.mediline.data.repo.DownloadTicketRepo
+import com.example.mediline.data.repo.DownloadTicketRepoImpl
+
 import com.example.mediline.data.repo.FormRepositoryImpl
 
 import com.example.mediline.data.repo.PaymentRepositoryImpl
+import com.example.mediline.data.repo.QueueRepository
 import com.example.mediline.data.repo.QueueRepositoryImpl
 import com.example.mediline.data.repo.TicketRepositoryImpl
 import com.example.mediline.data.room.AppDatabase
@@ -93,12 +96,6 @@ object AppModule {
         departmentDao = departmentDao
     )
 
-    @Provides
-    @Singleton
-    fun provideQueueRepository(
-        db: FirebaseFirestore
-    ): QueueRepository = QueueRepositoryImpl(db)
-
 
     @Provides
     @Singleton
@@ -115,7 +112,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://7d64c14f5b47.ngrok-free.app/") // 🔥 use your backend URL
+            .baseUrl("https://54a0d1b1c5fc.ngrok-free.app/") // 🔥 use your backend URL
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -173,4 +170,14 @@ object AppModule {
         auth: FirebaseAuth
     ): AdminAuthRepository = AdminAuthRepositoryImpl(auth)
 
+    @Provides
+    @Singleton
+    fun provideQueueRepository(
+        db: FirebaseFirestore
+    ): QueueRepository = QueueRepositoryImpl(db)
+
+
+    @Provides
+    @Singleton
+    fun provideDownloadTicketRepo(): DownloadTicketRepo= DownloadTicketRepoImpl()
 }

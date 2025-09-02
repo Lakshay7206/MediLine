@@ -93,7 +93,7 @@ fun TicketManagementScreen(
                         ticket = ticket,
                         onSkip = { viewModel.skipTicket(ticket.id,) },
                         onCancel = { viewModel.cancelTicket(ticket.id) },
-                        onComplete = { viewModel.completeTicket(ticket.id) },
+                        onComplete = { viewModel.servingTicket(ticket.id) },
                         onReassign = { viewModel.reassignTicket(ticket.id) },
                         onClick = { onTicketClick(ticket) }
                     )
@@ -207,7 +207,7 @@ fun TicketCard(
                 if (ticket.ticketStatus== TicketStatus.ACTIVE) {
                     ActionButton("Skip", onSkip, Color.Yellow)
                     ActionButton("Cancel", onCancel, Color.Red)
-                    ActionButton("Complete", onComplete, Color.Green)
+                    ActionButton("Serving", onComplete, Color.Green)
                 }
                 if (ticket.ticketStatus == TicketStatus.CANCELLED || ticket.ticketStatus == TicketStatus.SKIPPED ) {
                     ActionButton("Re-assign", onReassign, Color.Blue)
@@ -226,6 +226,7 @@ fun StatusChip(status: TicketStatus) {
         TicketStatus.NULL -> Color.LightGray       // Default
         TicketStatus.CANCELLED -> Color.DarkGray
         TicketStatus.EXPIRED -> Color.Blue
+        TicketStatus.SERVING -> Color.Green
     }
 
     Box(
