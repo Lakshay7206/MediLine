@@ -1,10 +1,12 @@
 package com.example.mediline.Admin.ui.CreateDepartment
 
+import androidx.compose.foundation.background
 import androidx.compose.ui.geometry.isEmpty
 import androidx.compose.ui.semantics.error
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -15,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -33,20 +36,12 @@ fun AdminDepartmentScreen(
 
     LaunchedEffect(key1 = uiState.error) {
         uiState.error?.let {
-            snackbarHostState.showSnackbar(
-                message = it,
-                duration = SnackbarDuration.Short
-            )
-            // Consider clearing the error in VM after showing
+            snackbarHostState.showSnackbar(it, duration = SnackbarDuration.Short)
         }
     }
     LaunchedEffect(key1 = uiState.successMessage) {
         uiState.successMessage?.let {
-            snackbarHostState.showSnackbar(
-                message = it,
-                duration = SnackbarDuration.Short
-            )
-            // Consider clearing the success message in VM after showing
+            snackbarHostState.showSnackbar(it, duration = SnackbarDuration.Short)
         }
     }
 
@@ -54,44 +49,87 @@ fun AdminDepartmentScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Manage Departments") },
-                actions = {
-                    IconButton(onClick = { viewModel.triggerSyncWithFirestore() }) {
-                        Icon(Icons.Filled.Refresh, contentDescription = "Sync Departments")
+                title = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            "Departments",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                        IconButton(onClick = { viewModel.triggerSyncWithFirestore() }) {
+                            Icon(
+                                Icons.Filled.Refresh,
+                                contentDescription = "Sync Departments",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { viewModel.showCreateDepartmentForm() }) {
+            FloatingActionButton(
+                onClick = { viewModel.showCreateDepartmentForm() },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                shape = RoundedCornerShape(16.dp),
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp)
+            ) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Department")
             }
         }
     ) { paddingValues ->
-        Box(modifier = Modifier
-            .padding(paddingValues)
-            .fillMaxSize()) {
-            if (uiState.isLoading && uiState.departments.isEmpty()) { // Show loading only if list is empty
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else if (uiState.departments.isEmpty()) {
-                Text("No departments found.", modifier = Modifier.align(Alignment.Center))
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(uiState.departments, key = { it.id }) { department ->
-                        DepartmentItem(
-                            department = department,
-                            onEdit = { viewModel.loadDepartmentForEdit(department) },
-                            onDelete = { viewModel.deleteDepartment(department.id) }
-                        )
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            when {
+                uiState.isLoading && uiState.departments.isEmpty() -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+
+                uiState.departments.isEmpty() -> {
+                    Text(
+                        "No departments found.",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(uiState.departments, key = { it.id }) { department ->
+                            // Yaha tera DepartmentItem call already hai
+                            DepartmentItem(
+                                department = department,
+                                onEdit = { viewModel.loadDepartmentForEdit(department) },
+                                onDelete = { viewModel.deleteDepartment(department.id) }
+                            )
+                        }
                     }
                 }
             }
 
             if (uiState.isFormVisible) {
+                // Tera DepartmentFormDialog call already hai
                 DepartmentFormDialog(
                     uiState = uiState,
                     onNameChange = viewModel::onDepartmentNameChanged,
@@ -102,11 +140,14 @@ fun AdminDepartmentScreen(
                     onDismiss = viewModel::dismissForm
                 )
             }
-            // Global loading indicator for actions like save/delete/sync
-            if (uiState.isLoading && !uiState.departments.isEmpty()) {
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .align(Alignment.Center)) {
+
+            if (uiState.isLoading && uiState.departments.isNotEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.4f))
+                        .align(Alignment.Center)
+                ) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
             }
@@ -114,28 +155,40 @@ fun AdminDepartmentScreen(
     }
 }
 
+
 @Composable
 fun DepartmentItem(
     department: DepartmentEntity,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
-    Card(elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-        Column(modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()) {
-            Text(department.name, style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                department.name,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+            Spacer(modifier = Modifier.height(6.dp))
             Text("Description: ${department.description}", style = MaterialTheme.typography.bodyMedium)
             Text("Doctor: ${department.doctor}", style = MaterialTheme.typography.bodyMedium)
             Text("Fees: ${department.fees}", style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 IconButton(onClick = onEdit) {
-                    Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                    Icon(Icons.Filled.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
                 }
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                    Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
                 }
             }
         }
@@ -154,14 +207,20 @@ fun DepartmentFormDialog(
     onDismiss: () -> Unit
 ) {
     Dialog(onDismissRequest = onDismiss) {
-        Card(modifier = Modifier.padding(16.dp)) {
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        ) {
             Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
                     text = if (uiState.currentEditDepartmentId == null) "Create Department" else "Edit Department",
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.SemiBold
+                    )
                 )
 
                 OutlinedTextField(
@@ -203,17 +262,30 @@ fun DepartmentFormDialog(
                         Text("Cancel")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Button(onClick = onSave, enabled = !uiState.isLoading) {
-                        if (uiState.isLoading && uiState.isFormVisible) { // Show loading only on form save
-                            CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
+                    Button(
+                        onClick = onSave,
+                        enabled = !uiState.isLoading,
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        if (uiState.isLoading && uiState.isFormVisible) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
                         } else {
                             Text("Save")
                         }
                     }
                 }
+
                 uiState.error?.let {
-                    if(uiState.isFormVisible){ // Show form specific error
-                        Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                    if (uiState.isFormVisible) {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                 }
             }

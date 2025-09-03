@@ -47,131 +47,130 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.mediline.User.ui.theme.AppTypography
+import com.example.mediline.User.ui.theme.LightColors
+import com.example.mediline.User.ui.theme.PrimaryGreen
 
 @Composable
 fun SignupScreen(
     viewModel: AuthViewModel = hiltViewModel(),
-    navigateHome: () -> Unit
+    navigateHome: () -> Unit,
+    navigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val formState by viewModel.formState.collectAsState()
 
-    // Color palette
-    val primaryColor = Color(0xFF3BB77E)   // Green
-    val textColor = Color(0xFF010F1C)      // Dark
-    val hintColor = Color(0xFF646464)      // Gray
-    val borderColor = Color(0xFF939393)    // Light gray
-
     var phoneInput by remember { mutableStateOf(formState.phone) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Title
-        Text(
-            text = "Sign up",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = textColor
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Create a new account to get started with MediLine and enjoy seamless healthcare",
-            fontSize = 14.sp,
-            color = hintColor,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // ✅ Phone input with +91 box
-        Row(
+    Scaffold(
+        topBar = {
+            CurvedTopBar("Sign up", true, navigateBack)
+        }
+    ) { padding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .border(1.dp, borderColor, RoundedCornerShape(8.dp))
-                .background(Color.White, RoundedCornerShape(8.dp)),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // +91 Box
-            Box(
-                modifier = Modifier
-                    .background(primaryColor.copy(alpha = 0.1f))
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "+91",
-                    color = primaryColor,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-            }
+            // Title
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Phone number field
-            OutlinedTextField(
-                value = phoneInput.removePrefix("+91"),
-                onValueChange = { input ->
-                    val digitsOnly = input.filter { it.isDigit() }
-                    phoneInput = "+91$digitsOnly"
-                    viewModel.updatePhone(phoneInput) // update ViewModel
-                },
-                placeholder = { Text("Phone number", color = hintColor) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                modifier = Modifier.weight(1f),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    cursorColor = primaryColor,
-                    focusedTextColor = textColor,
-                    unfocusedTextColor = textColor,
-                    focusedPlaceholderColor = hintColor,
-                    unfocusedPlaceholderColor = hintColor
-                )
+            Text(
+                text = "Create a new account to get started with MediLine and enjoy seamless healthcare",
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center
             )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // ✅ Phone input with +91 box
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth()
+
+            ) {
+                // +91 Box
+                OutlinedTextField(
+                    value = formState.otp,
+                    onValueChange = { viewModel.updateOtp(it) },
+                    label = {
+                        Text(
+                            "Phone Number",
+                            style = AppTypography.bodyLarge
+                        )
+                    }, // Ensure AppTypography styles (especially colors) are M3 compatible
+                    textStyle = AppTypography.bodyLarge, // Ensure AppTypography styles are M3 compatible
+                    singleLine = true,
+                     modifier = Modifier.fillMaxWidth(),// The Modifier.background is less idiomatic for M3 TextFields
+                    shape = RoundedCornerShape(20.dp), // Apply shape directly to the M3 OutlinedTextField
+                    colors = OutlinedTextFieldDefaults.colors(
+
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black, // Often the same unless you want a different unfocused text color
+
+                        focusedContainerColor = LightColors.surface,
+                        unfocusedContainerColor = LightColors.surface,
+
+                        cursorColor = LightColors.primary,
+
+                        focusedBorderColor = LightColors.primary,
+                        unfocusedBorderColor = LightColors.primary.copy(alpha = 0.5f), // Your existing logic
+
+                        focusedLabelColor = LightColors.primary, // Often good to match the focused border
+                        unfocusedLabelColor = LightColors.onSurface.copy(alpha = 0.7f), // A common practice for unfocused labels
+                    )
+                )
+                Spacer(Modifier.height(24.dp))
+
+
+                // User object
+                val user = User(
+                    id = formState.uid,
+                    phone = phoneInput,
+                    createdAt = System.currentTimeMillis()
+                )
+
+                // Sign Up Button
+
+                Button(
+                    onClick = { viewModel.createUser(user) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = LightColors.primary,
+                        contentColor = LightColors.onPrimary
+                    )
+                ) {
+                    Text("Sign Up", style = AppTypography.titleLarge)
+                }
+            }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // User object
-        val user = User(
-            id = formState.uid,
-            phone = phoneInput,
-            createdAt = System.currentTimeMillis()
-        )
-
-        // Sign Up Button
-        Button(
-            onClick = { viewModel.createUser(user) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            shape = MaterialTheme.shapes.medium,
-            colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
-        ) {
-            Text("Sign up", color = Color.White, fontWeight = FontWeight.Bold)
-        }
-    }
 
     Log.d("Logins", formState.phone)
 
     // State handling
     when (uiState) {
-        is AuthUiState.Loading -> CircularProgressIndicator(color = primaryColor)
+        is AuthUiState.Loading -> CircularProgressIndicator(color = PrimaryGreen)
         is AuthUiState.UserCreated -> {
             LaunchedEffect(Unit) { navigateHome() }
         }
-        is AuthUiState.Error -> Text((uiState as AuthUiState.Error).message, color = Color.Red)
+
+        is AuthUiState.Error -> Text(
+            (uiState as AuthUiState.Error).message,
+            color = Color.Red
+        )
+
         else -> {}
     }
 }
+    }
+
+
 
 
 

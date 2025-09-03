@@ -101,7 +101,7 @@ class AdminTicketViewModel @Inject constructor(
     fun applyFilters(tickets: List<Form>, filter: TicketFilters): List<Form> {
         return tickets.filter { ticket ->
             filter.ticketStatus?.let { ticket.ticketStatus == it } ?: true &&
-                    filter.departmentId?.let { it == "0" ||ticket.departmentId== it } ?: true &&
+                    filter.department?.let { it == "0" ||ticket.departmentId== it } ?: true &&
                     filter.todayCounter?.let { ticket.ticketNumber.toInt() == it } ?: true &&
                     filter.paymentStatus?.let { ticket.paymentStatus == it } ?: true &&
                     filter.searchQuery.takeIf { it.isNotBlank() }?.let { query ->

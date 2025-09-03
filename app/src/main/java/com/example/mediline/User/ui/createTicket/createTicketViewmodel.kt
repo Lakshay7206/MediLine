@@ -102,6 +102,9 @@ class CreateTicketViewModel @Inject constructor(
     fun updateDeptId(deptId: String) {
         _uiState.value = _uiState.value.copy(departmentId = deptId)
     }
+    fun updateBloodGroup(bloodGroup: String) {
+        _uiState.value = _uiState.value.copy(bloodGroup = bloodGroup)
+    }
 }
 
 sealed class UiEvent {

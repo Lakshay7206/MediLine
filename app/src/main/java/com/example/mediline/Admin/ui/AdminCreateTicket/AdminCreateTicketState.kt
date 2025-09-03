@@ -13,5 +13,5 @@ data class AdminTicketUiState(
     val departmentId: String = "",
     val isSubmitting: Boolean = false,
     val errorMessage: String? = null,
-    val address: String =""
+    val address: String ="",
 )

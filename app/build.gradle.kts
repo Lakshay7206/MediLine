@@ -44,7 +44,8 @@ android {
 dependencies {
 
     implementation("androidx.compose.material:material-icons-extended:<version>")
-
+    implementation("androidx.compose.material3:material3:1.1.1") // or latest
+    implementation("androidx.compose.material3:material3:1.2.0")
 
     implementation (platform("androidx.compose:compose-bom:2025.01.00") )// or your version
     implementation ("androidx.compose.material:material-icons-extended")

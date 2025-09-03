@@ -58,6 +58,10 @@ class AdminCreateTicketViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(address = address)
         savedStateHandle["address"] = address
     }
+    fun onBloodGroupChange(group: String) {
+        _uiState.value = _uiState.value.copy(bloodGroup =group)
+        savedStateHandle[ "bloodGroup" ] = group
+    }
 
     fun onSexChange(sex: String) {
         val sexEnum = try {

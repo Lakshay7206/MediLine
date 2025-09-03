@@ -2,6 +2,7 @@ package com.example.mediline
 
 import TicketScreen
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -9,15 +10,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.example.mediline.Admin.ui.AdminCreateTicket.AdminCreateTicketScreen
+
+import com.example.mediline.Admin.ui.CreateDepartment.AdminDepartmentScreen
 import com.example.mediline.Admin.ui.auth.AdminLoginScreen
+import com.example.mediline.Admin.ui.home.AdminTicketViewModel
 
 import com.example.mediline.Admin.ui.home.TicketManagementScreen
 import com.example.mediline.User.RootNavGraph
 import com.example.mediline.User.Screen
+import com.example.mediline.User.ui.Home.HomeScreen
 import com.example.mediline.User.ui.Queue.QueueScreen
 import com.example.mediline.User.ui.authentication.AuthViewModel
 import com.example.mediline.User.ui.authentication.LoginScreen
@@ -28,6 +35,7 @@ import com.example.mediline.User.ui.payment.PaymentGatewayScreen
 
 import com.example.mediline.User.ui.payment.PaymentViewModel
 import com.example.mediline.User.ui.theme.AppTheme
+import com.example.mediline.superAdmin.AcceptInviteScreen
 //import com.example.mediline.User.ui.theme.MediLineTheme
 import com.example.mediline.superAdmin.InviteAdminScreen
 
@@ -42,6 +50,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() , PaymentResultWithDataListener{
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("ViewModelConstructorInComposable")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,17 +58,20 @@ class MainActivity : ComponentActivity() , PaymentResultWithDataListener{
         setContent {
             AppTheme {
                 val navController = rememberNavController()
-               RootNavGraph(navController)
+             // RootNavGraph(navController)
                // InviteAdminScreen()
                 //AdminLoginScreen({Log.d("TAG", "onCreate:successful")})
-               //PaymentGatewayScreen()
+              // PaymentGatewayScreen({})
                // TicketManagementScreen({},{})
                // AdminCreateTicketScreen()
-              //  QueueScreen("1",{},{})
+          //  QueueScreen("1",{},{},{})
               //  TicketScreen()
-                AdminCreateTicketScreen()
-
-
+                //AdminCreateTicketScreen()
+                //TicketManagementScreen({})
+                //AcceptInviteScreen("")
+                 //AdminDepartmentScreen()
+                RegistrationScreen("1",{},{})
+               // HomeScreen({},{})
 
 
             }

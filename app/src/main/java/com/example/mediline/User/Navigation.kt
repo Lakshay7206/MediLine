@@ -26,7 +26,7 @@ import com.example.mediline.User.ui.payment.PaymentGatewayScreen
 
 sealed class Screen(val route:String){
     object Login: Screen("login")
-    object Signup: Screen("signup")
+    object Signup: Screen("signUp")
     object Otp: Screen("otp")
     object Home: Screen("home")
     object Queue: Screen("queue/{departmentId}"){
@@ -65,6 +65,7 @@ fun NavGraphBuilder.authNavGraph(rootNavController: NavHostController) {
             LoginScreen(
                 viewModel,
                 onNavigateOtp = { rootNavController.navigate("otp") },
+                {rootNavController.navigate("signUp")}
 
 
 
@@ -84,23 +85,25 @@ fun NavGraphBuilder.authNavGraph(rootNavController: NavHostController) {
                     }
                 },
 
-                onNewUser = { rootNavController.navigate("signup") },
+                onNewUser = { rootNavController.navigate("signUp") },
+                {rootNavController.navigate(Screen.Login.route)}
                 //onResendOtp = { /*TODO*/ }
             )
         }
-        composable("signup") { backStackEntry ->
+        composable("signUp") { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 rootNavController.getBackStackEntry("auth")
             }
             val viewModel: AuthViewModel = hiltViewModel(parentEntry)
 
             SignupScreen(
-                viewModel  ,
+                viewModel,
                 navigateHome = {
                     rootNavController.navigate("home_main") {
                         popUpTo("auth") { inclusive = true }
                     }
-                }
+                },
+                navigateBack = {rootNavController.navigate(Screen.Login.route)}
             )
         }
     }
@@ -114,7 +117,8 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
             HomeScreen(
                 onDepartmentClick = { deptId->
                     rootNavController.navigate("queue/${deptId}")
-                }
+                },
+                {rootNavController.navigate(Screen.ViewTicket.route)}
             )
         }
 
@@ -126,7 +130,8 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
             QueueScreen(
                 deptId,
                 { rootNavController.navigate("createTicket/$deptId") },
-                { rootNavController.navigate("viewTicket/$deptId") }
+                { rootNavController.navigate("viewTicket/$deptId") },
+                {rootNavController.navigate(Screen.Home.route)}
             )
         }
 
@@ -135,7 +140,8 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
             arguments = listOf(navArgument("departmentId") { type = NavType.StringType })
         ) { backStackEntry ->
             val deptId = backStackEntry.arguments?.getString("departmentId")!!
-            RegistrationScreen(deptId, { rootNavController.navigate("paymentGateway") })
+            RegistrationScreen(deptId, { rootNavController.navigate("paymentGateway") },
+                {rootNavController.popBackStack()})
         }
 
         composable(
@@ -147,7 +153,7 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
         }
 
         composable("paymentGateway"){
-            PaymentGatewayScreen()
+            PaymentGatewayScreen({ rootNavController.navigate(Screen.CreateTicket.route) })
 
         }
     }

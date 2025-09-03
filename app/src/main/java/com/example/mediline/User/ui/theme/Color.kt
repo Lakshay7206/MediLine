@@ -12,9 +12,40 @@ val TextGrayLight = Color(0xFF939393)
 val TextGray = Color(0xFF646464)
 val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
+// val LightColors = lightColorScheme(
+//    primary = Color(0xFF3BB77E),        // Main brand green
+//    onPrimary = White,            // Text/icons on primary
+//
+//    secondary = Color(0xFF010F1C),      // Deep navy for accents
+//    onSecondary = Color.White,          // Text/icons on secondary
+//
+//    background = Color(0xFFFDFDFD),     // App background (almost white)
+//    onBackground = Color(0xFF010F1C),   // Text/icons on background
+//
+//    surface = Color.White,              // Cards, sheets, input fields
+//    onSurface = Color(0xFF010F1C),      // Text/icons on cards
+//
+//    outline = Color(0xFF939393),        // Borders, strokes, hint text
+//)
+//
+// val DarkColors = darkColorScheme(
+//    primary = Color(0xFF3BB77E),
+//    onPrimary = Color.Black,
+//
+//    secondary = Color(0xFF646464),
+//    onSecondary = Color.White,
+//
+//    background = Color(0xFF010F1C),
+//    onBackground = Color(0xFFFDFDFD),
+//
+//    surface = Color(0xFF1A1A1A),
+//    onSurface = Color(0xFFFDFDFD),
+//
+//    outline = Color(0xFF646464),
+//)
 
 
-// Define the app's light color scheme
+ //Define the app's light color scheme
 val LightColors = lightColorScheme(
     primary = PrimaryGreen,
     onPrimary = White,
@@ -22,8 +53,8 @@ val LightColors = lightColorScheme(
     onPrimaryContainer = White,
     secondary = PrimaryGreen,
     onSecondary = White,
-    background = BackgroundDark,
-    onBackground = White,
+    background =White,
+    onBackground = Black,
     surface = White,
     onSurface = Black
 )

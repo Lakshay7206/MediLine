@@ -18,6 +18,6 @@ data class TicketFilters(
     val todayCounter: Int? = null,
     val ticketStatus: TicketStatus? = null,        // Active, Closed, Skipped, etc.
     val paymentStatus: PaymentStatus? = null,// Paid, Unpaid, Failed
-    val departmentId: String = "",
+    val department: String = "",
     val searchQuery: String = ""           // search by name, opdNo, etc.
 )
