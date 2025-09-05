@@ -35,9 +35,7 @@ sealed class Screen(val route:String){
     object CreateTicket: Screen("createTicket/{departmentId}") {
         fun createRoute(departmentId: String) = "createTicket/$departmentId"
     }
-    object ViewTicket: Screen("viewTicket/{departmentId}") {
-        fun createRoute(departmentId: String) = "viewTicket/$departmentId"
-    }
+    object ViewTicket: Screen("viewTicket")
 
     object PaymentGateway: Screen("paymentGateway/{formId}"){
         fun createRoute(formId: String) = "viewTicket/$formId"
@@ -134,9 +132,25 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
             QueueScreen(
                 deptId,
                 { rootNavController.navigate("createTicket/$deptId") },
-                { rootNavController.navigate("viewTicket/$deptId") },
+                { rootNavController.navigate("viewTicket") },
                 {rootNavController.popBackStack()}
             )
+        }
+
+//        composable(
+//            "createTicket/{departmentId}",
+//            arguments = listOf(navArgument("departmentId") { type = NavType.StringType })
+//        ) { backStackEntry ->
+//            val deptId = backStackEntry.arguments?.getString("departmentId")!!
+//            RegistrationScreen(deptId, { formId->
+//                rootNavController.navigate("paymentGateway/$formId") },
+//                {rootNavController.popBackStack()})
+//        }
+
+        composable(
+            "viewTicket"
+        ) {
+           TicketScreen({rootNavController.navigate(Screen.Home.route)})
         }
 
         composable(
@@ -144,24 +158,21 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
             arguments = listOf(navArgument("departmentId") { type = NavType.StringType })
         ) { backStackEntry ->
             val deptId = backStackEntry.arguments?.getString("departmentId")!!
-            RegistrationScreen(deptId, { formId->
-                rootNavController.navigate("paymentGateway/$formId") },
-                {rootNavController.popBackStack()})
+            RegistrationScreen(
+                deptId,
+                { formId -> rootNavController.navigate("paymentGateway/$formId") },
+                { rootNavController.popBackStack() }
+            )
         }
 
         composable(
-            "viewTicket/{departmentId}",
-            arguments = listOf(navArgument("departmentId") { type = NavType.StringType })
+            "paymentGateway/{formId}",
+            arguments = listOf(navArgument("formId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val deptId = backStackEntry.arguments?.getString("departmentId")!!
-           TicketScreen({rootNavController.navigate(Screen.Home.route)})
-        }
-
-        composable("paymentGateway"){backStackEntry->
             val formId = backStackEntry.arguments?.getString("formId")!!
-            PaymentGatewayScreen(formId,{ rootNavController.navigate(Screen.CreateTicket.route) })
-
+            PaymentGatewayScreen(formId, { rootNavController.navigate(Screen.CreateTicket.route) }, navController = rootNavController)
         }
+
     }
 }
 

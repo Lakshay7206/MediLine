@@ -148,6 +148,14 @@ fun RegistrationScreen(
                     shape = RoundedCornerShape(12.dp),
                     isError = uiState.errors["name"] != null
                 )
+                uiState.errors["name"]?.let { errorMsg ->
+                    Text(
+                        text = errorMsg,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+                    )
+                }
 
                 OutlinedTextField(
                     value = uiState.address,
@@ -157,8 +165,17 @@ fun RegistrationScreen(
                     leadingIcon = { Icon(Icons.Default.Home, contentDescription = null) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
+                    isError = uiState.errors["address"] != null
 
                 )
+                uiState.errors["address"]?.let { errorMsg ->
+                    Text(
+                        text = errorMsg,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+                    )
+                }
 
                 OutlinedTextField(
                     value = uiState.phone,
@@ -171,6 +188,14 @@ fun RegistrationScreen(
                     shape = RoundedCornerShape(12.dp),
                     isError = uiState.errors["phone"] != null,
                 )
+                uiState.errors["phone"]?.let { errorMsg ->
+                    Text(
+                        text = errorMsg,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+                    )
+                }
 
                 OutlinedTextField(
                     value = uiState.age,
@@ -183,6 +208,14 @@ fun RegistrationScreen(
                     shape = RoundedCornerShape(12.dp),
                     isError = uiState.errors["age"] != null,
                 )
+                uiState.errors["age"]?.let { errorMsg ->
+                    Text(
+                        text = errorMsg,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+                    )
+                }
 
                 // Gender Dropdown
                 ExposedDropdownMenuBox(
@@ -270,7 +303,7 @@ fun RegistrationScreen(
             ) {
                 Icon(Icons.Default.CheckCircle, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text(text = "Proceed to Pay ₹${department?.fees ?: "-"}")
+                Text(text = "Proceed to Payment")
             }
         }
     }

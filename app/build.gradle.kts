@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.androidx.navigation.common.android)
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0") // optional Hilt + Nav Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3") // optional ViewModel in Nav
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2")
 
     // Firebase
     implementation(platform(libs.firebase.bom))

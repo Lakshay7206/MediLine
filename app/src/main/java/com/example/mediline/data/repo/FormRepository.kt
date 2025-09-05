@@ -23,6 +23,7 @@ class FormRepositoryImpl(
             // Reference to the department document (where we store todayCounter)
             val deptRef = firestore.collection("departments")
                 .document(form.departmentId)
+            var result=""
 
             // Run Firestore transaction
             val ticketNo = firestore.runTransaction { transaction ->
@@ -34,7 +35,7 @@ class FormRepositoryImpl(
                 transaction.update(deptRef, "todayCounter", newCounter)
                 val formDocRef = firestore.collection("forms").document() // generates ID
 
-
+             result=formDocRef.id
                 // Create form with ticketNumber and userId
                 val formWithTicket = form.copy(
                     id = formDocRef.id,
@@ -49,7 +50,7 @@ class FormRepositoryImpl(
             }.await()
             // Converts Task<Long> to suspend-friendly value
 
-            Result.success(ticketNo.toString())
+            Result.success(result)
         } catch (e: Exception) {
             Result.failure(e)
         }

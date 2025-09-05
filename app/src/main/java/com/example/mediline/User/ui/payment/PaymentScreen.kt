@@ -1,6 +1,7 @@
 package com.example.mediline.User.ui.payment
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -52,13 +53,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.mediline.Admin.ui.AdminCreateTicket.CurvedTopBar
+import com.example.mediline.User.Screen
 import com.example.mediline.User.ui.authentication.CurvedTopBar
 import com.example.mediline.User.ui.theme.BackgroundDark
 import com.example.mediline.User.ui.theme.Black
 import com.example.mediline.User.ui.theme.PrimaryGreen
 import com.example.mediline.User.ui.theme.TextGray
 import com.example.mediline.User.ui.theme.White
+import com.example.mediline.data.repo.PaymentDataHolder
 import com.razorpay.Checkout
 import org.json.JSONObject
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,12 +73,22 @@ fun PaymentGatewayScreen(
     gateways: List<String> = listOf("Razorpay", "Paytm", "UPI"),
     amount: Int = 100,
     currency: String = "INR",
+    navController: NavController,
     viewModel: PaymentViewModel = hiltViewModel()
 ) {
     val selectedGateway by viewModel.selectedGateway.collectAsState()
     val paymentState by viewModel.paymentState.collectAsState()
 
-    viewModel.updateFormId(formId)
+ //   val formState by viewModel.formId.collectAsState()
+    Log.d("Payment", "Form ID: $formId")
+
+    LaunchedEffect(paymentState) {
+        if (paymentState is PaymentState.Success) {
+            navController.navigate(Screen.ViewTicket.route) {
+                popUpTo(Screen.PaymentGateway.route) { inclusive = true }
+            }
+        }
+    }
 
 
     val context = LocalContext.current
@@ -158,6 +172,7 @@ fun PaymentGatewayScreen(
             // Pay Button
             Button(
                 onClick = {
+                    PaymentDataHolder.formId = formId
                     selectedGateway?.let { viewModel.startPayment(amount, currency) }
                 },
                 enabled = selectedGateway != null && paymentState !is PaymentState.Loading,

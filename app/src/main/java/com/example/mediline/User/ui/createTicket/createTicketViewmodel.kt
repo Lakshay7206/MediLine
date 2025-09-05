@@ -143,7 +143,7 @@ fun validate(): Boolean {
         _uiState.value = _uiState.value.copy(phone = phone)
     }
 
-    fun updateAge(age: String) { // store as String
+    fun updateAge(age: String) {
         _uiState.value = _uiState.value.copy(age = age)
     }
 

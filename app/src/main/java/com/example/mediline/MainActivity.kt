@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.navigation.compose.rememberNavController
 import com.example.mediline.User.RootNavGraph
+import com.example.mediline.User.ui.Home.HomeScreen
 import com.example.mediline.User.ui.payment.PaymentViewModel
 import com.example.mediline.User.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
