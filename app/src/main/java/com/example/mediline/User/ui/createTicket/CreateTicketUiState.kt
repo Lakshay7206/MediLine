@@ -8,10 +8,11 @@ data class CreateTicketUiState(
     val name: String="",
     val address: String="",
     val phone: String="",
-    val age: Int=0,
+    val age: String="",
     val sex:Sex=Sex.Male,
     val departmentId: String="",
-   val bloodGroup: String?= ""
+   val bloodGroup: String?= "",
+    val errors: Map<String, String?> = emptyMap()
 )
 
 enum class Sex {

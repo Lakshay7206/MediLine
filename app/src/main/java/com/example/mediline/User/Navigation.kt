@@ -39,7 +39,11 @@ sealed class Screen(val route:String){
         fun createRoute(departmentId: String) = "viewTicket/$departmentId"
     }
 
-    object PaymentGateway: Screen("paymentGateway")
+    object PaymentGateway: Screen("paymentGateway/{formId}"){
+        fun createRoute(formId: String) = "viewTicket/$formId"
+
+
+    }
 }
 @Composable
 fun RootNavGraph(navController: NavHostController) {
@@ -131,7 +135,7 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
                 deptId,
                 { rootNavController.navigate("createTicket/$deptId") },
                 { rootNavController.navigate("viewTicket/$deptId") },
-                {rootNavController.navigate(Screen.Home.route)}
+                {rootNavController.popBackStack()}
             )
         }
 
@@ -140,7 +144,8 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
             arguments = listOf(navArgument("departmentId") { type = NavType.StringType })
         ) { backStackEntry ->
             val deptId = backStackEntry.arguments?.getString("departmentId")!!
-            RegistrationScreen(deptId, { rootNavController.navigate("paymentGateway") },
+            RegistrationScreen(deptId, { formId->
+                rootNavController.navigate("paymentGateway/$formId") },
                 {rootNavController.popBackStack()})
         }
 
@@ -149,74 +154,14 @@ fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
             arguments = listOf(navArgument("departmentId") { type = NavType.StringType })
         ) { backStackEntry ->
             val deptId = backStackEntry.arguments?.getString("departmentId")!!
-           TicketScreen()
+           TicketScreen({rootNavController.navigate(Screen.Home.route)})
         }
 
-        composable("paymentGateway"){
-            PaymentGatewayScreen({ rootNavController.navigate(Screen.CreateTicket.route) })
+        composable("paymentGateway"){backStackEntry->
+            val formId = backStackEntry.arguments?.getString("formId")!!
+            PaymentGatewayScreen(formId,{ rootNavController.navigate(Screen.CreateTicket.route) })
 
         }
     }
 }
 
-//fun NavGraphBuilder.homeNavGraph(rootNavController: NavHostController) {
-//    navigation(
-//        startDestination = "home",
-//        route = "home_main"
-//    ) {
-//        composable("home") {
-//            HomeScreen()
-//        }
-//        composable("queue",
-//                arguments = listOf(navArgument("departmentId") { type = NavType.StringType })) { backStackEntry ->
-//              val deptId = backStackEntry.arguments?.getString("departmentId")!!
-//
-//            QueueScreen(deptId,{rootNavController.navigate("createTicket/${deptId}")},{rootNavController.navigate(
-//                "viewTicket/${deptId}")})
-//        }
-//        composable("createTicket",listOf(navArgument("departmentId") { type = NavType.StringType })) {backStackEntry ->
-//            val deptId = backStackEntry.arguments?.getString("departmentId")!!
-//            RegistrationScreen(deptId,"","",0.0)
-//        }
-//        composable("viewTicket",listOf(navArgument("departmentId") { type = NavType.StringType })) {
-//            ViewTicketsScreen()
-//        }
-//
-//    }
-
-
-//@SuppressLint("UnrememberedGetBackStackEntry")
-//@Composable
-//fun NavGraph(navController: NavHostController) {
-//
-//
-//    NavHost(navController, startDestination = "login",route = "auth") {
-//        composable("login") {
-//            LoginScreen(
-//                onNavigateOtp = {
-//                    navController.navigate("otp")
-//                },
-//            )
-//        }
-//
-//        composable("otp") {
-//
-//            OtpScreen(
-//                onUserExists = {navController.navigate("home") },
-//                onNewUser = {navController.navigate("signup") }
-//            )
-//        }
-//
-//        composable("signup") {
-//
-//            SignupScreen( navigateHome = {
-//                 navController.navigate("home")
-//                })}
-//
-//        composable("home") {
-//
-//                    HomeScreen()
-//                }
-//
-//    }
-//}

@@ -7,9 +7,9 @@ import java.io.File
 sealed class TicketUiState {
     object Loading : TicketUiState()
     data class Success(
-        val activeTickets: List<Form>,  // Change this to a List
-        val history: List<Form>,
-        val ticketFile: File? = null
+        val activeTickets: List<Form> = emptyList() ,  // Change this to a List
+        val history: List<Form> = emptyList(),
+        val ticketFile: File? = null,
     ) : TicketUiState()
     data class Error(val message: String) : TicketUiState()
 }

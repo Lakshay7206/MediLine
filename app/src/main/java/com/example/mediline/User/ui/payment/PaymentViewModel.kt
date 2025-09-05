@@ -1,8 +1,9 @@
-package com.example.mediline.User.ui.payment
+    package com.example.mediline.User.ui.payment
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mediline.dl.CreateOrderUseCase
+import com.example.mediline.dl.UserUpdatePaymentStatusUseCase
 
 import com.example.mediline.dl.VerifyPaymentUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,8 @@ enum class PaymentGateway { RAZORPAY, PAYTM, STRIPE }
 @HiltViewModel
 class PaymentViewModel @Inject constructor(
     private val createOrderUseCase: CreateOrderUseCase,
-    private val verifyPaymentUseCase: VerifyPaymentUseCase
+    private val verifyPaymentUseCase: VerifyPaymentUseCase,
+    private val userUpdatePaymentStatusUseCase: UserUpdatePaymentStatusUseCase
 ) : ViewModel() {
 
     private val _paymentState = MutableStateFlow<PaymentState>(PaymentState.Idle)
@@ -25,6 +27,13 @@ class PaymentViewModel @Inject constructor(
 
     private val _selectedGateway = MutableStateFlow<String?>(null)
     val selectedGateway: StateFlow<String?> = _selectedGateway
+
+    private val _formId = MutableStateFlow<String>("")
+    val formId: StateFlow<String> = _formId
+
+    fun updateFormId(formId:String){
+        _formId.value = formId
+    }
 
     fun onGatewaySelected(gateway: String) {
         _selectedGateway.value = gateway
@@ -44,10 +53,24 @@ class PaymentViewModel @Inject constructor(
         viewModelScope.launch {
             verifyPaymentUseCase(orderId, paymentId, signature).fold(
                 onSuccess = { success ->
-                    _paymentState.value =
-                        if (success) PaymentState.Success else PaymentState.Error("Verification failed")
+                    if (success) {
+                        // Update Firestore
+                        val result =userUpdatePaymentStatusUseCase( formId.value,"PAID")
+                        result.fold(
+                            onSuccess = {
+                                _paymentState.value = PaymentState.Success
+                            },
+                            onFailure = {
+                                _paymentState.value = PaymentState.Error("Payment verified but failed to update status")
+                            }
+                        )
+                    } else {
+                        _paymentState.value = PaymentState.Error("Verification failed")
+                    }
                 },
-                onFailure = { _paymentState.value = PaymentState.Error(it.message ?: "Error") }
+                onFailure = {
+                    _paymentState.value = PaymentState.Error(it.message ?: "Error")
+                }
             )
         }
     }

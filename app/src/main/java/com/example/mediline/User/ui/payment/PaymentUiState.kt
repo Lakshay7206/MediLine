@@ -10,3 +10,4 @@ sealed class PaymentState{
     data  class Error(val msg: String): PaymentState()
     object Success: PaymentState()
 }
+

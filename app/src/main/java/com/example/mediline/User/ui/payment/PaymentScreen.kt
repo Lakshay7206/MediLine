@@ -1,5 +1,6 @@
 package com.example.mediline.User.ui.payment
 
+import android.app.Activity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,20 +59,26 @@ import com.example.mediline.User.ui.theme.Black
 import com.example.mediline.User.ui.theme.PrimaryGreen
 import com.example.mediline.User.ui.theme.TextGray
 import com.example.mediline.User.ui.theme.White
-
-
-
+import com.razorpay.Checkout
+import org.json.JSONObject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentGatewayScreen(
+    formId: String,
     navigateBack: () -> Unit,
-    amount: Int = 100,
     gateways: List<String> = listOf("Razorpay", "Paytm", "UPI"),
+    amount: Int = 100,
     currency: String = "INR",
     viewModel: PaymentViewModel = hiltViewModel()
 ) {
     val selectedGateway by viewModel.selectedGateway.collectAsState()
     val paymentState by viewModel.paymentState.collectAsState()
+
+    viewModel.updateFormId(formId)
+
+
+    val context = LocalContext.current
+    val activity = context as? Activity
 
     Scaffold(
         topBar = {
@@ -82,26 +89,18 @@ fun PaymentGatewayScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .background(Color(0xFFF9FAFB)) // very light gray, soft background
+                .background(Color(0xFFF9FAFB)) // light gray background
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Header text only (no ugly card)
-            Column {
-                Text(
-                    text = "Choose a payment method",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = Color(0xFF111827) // neutral dark gray
-                )
-                Spacer(Modifier.height(4.dp))
-//                Text(
-//                    text = "Amount: ₹$amount $currency",
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    color = Color(0xFF6B7280) // muted gray
-//                )
-            }
+            // Title
+            Text(
+                text = "Choose a payment method",
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                color = Color(0xFF111827) // dark gray
+            )
 
-            // Gateways list
+            // Gateways list with card style
             LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 items(gateways) { gateway ->
                     Card(
@@ -111,14 +110,14 @@ fun PaymentGatewayScreen(
                         colors = if (gateway == selectedGateway) {
                             CardDefaults.cardColors(containerColor = Color(0xFFF1FDF6)) // soft green tint
                         } else {
-                            CardDefaults.cardColors(containerColor = White)
+                            CardDefaults.cardColors(containerColor = Color.White)
                         },
                         shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(
                             width = if (gateway == selectedGateway) 2.dp else 1.dp,
                             color = if (gateway == selectedGateway) PrimaryGreen else Color(0xFFE0E0E0)
                         ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // no ugly shadow
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
                         Row(
                             modifier = Modifier
@@ -129,7 +128,7 @@ fun PaymentGatewayScreen(
                             Box(
                                 modifier = Modifier
                                     .size(48.dp)
-                                    .background(Color(0xFFF1FDF6), shape = CircleShape), // soft green bg
+                                    .background(Color(0xFFF1FDF6), shape = CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
@@ -139,7 +138,7 @@ fun PaymentGatewayScreen(
                                         else -> Icons.Default.QrCode
                                     },
                                     contentDescription = gateway,
-                                    tint = PrimaryGreen, // ✅ always green
+                                    tint = PrimaryGreen,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -151,8 +150,6 @@ fun PaymentGatewayScreen(
                             )
                         }
                     }
-
-
                 }
             }
 
@@ -160,12 +157,14 @@ fun PaymentGatewayScreen(
 
             // Pay Button
             Button(
-                onClick = { selectedGateway?.let { viewModel.startPayment(amount, currency) } },
+                onClick = {
+                    selectedGateway?.let { viewModel.startPayment(amount, currency) }
+                },
                 enabled = selectedGateway != null && paymentState !is PaymentState.Loading,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PrimaryGreen,
-                    contentColor = White
+                    contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -174,18 +173,40 @@ fun PaymentGatewayScreen(
                 Text("Pay ₹$amount", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             }
 
-            // Status Feedback
+            // Payment states
             when (paymentState) {
                 is PaymentState.Loading -> StatusCard(
-                    message = "Processing payment...",
+                    message = "Creating order...",
                     icon = Icons.Default.Schedule,
                     background = Color(0xFFE8F5E9),
                     iconTint = PrimaryGreen,
                     textColor = PrimaryGreen
                 )
 
+                is PaymentState.OrderCreated -> {
+                    val order = (paymentState as PaymentState.OrderCreated).order
+                    LaunchedEffect(order) {
+                        val checkout = Checkout()
+                        checkout.setKeyID("rzp_test_R9cjVF2K3mkxS1")
+
+                        val options = JSONObject().apply {
+                            put("name", "MediLine")
+                            put("description", "Payment for order ${order.orderId}")
+                            put("order_id", order.orderId)
+                            put("currency", "INR")
+                            put("amount", order.amount)
+                        }
+
+                        try {
+                            activity?.let { checkout.open(it, options) }
+                        } catch (e: Exception) {
+                            viewModel.markPaymentFailed(e.message ?: "Payment failed")
+                        }
+                    }
+                }
+
                 is PaymentState.Success -> StatusCard(
-                    message = "Payment Successful",
+                    message = "Payment Successful ✅",
                     icon = Icons.Default.CheckCircle,
                     background = Color(0xFFD1FAE5),
                     iconTint = Color(0xFF059669),
@@ -193,7 +214,7 @@ fun PaymentGatewayScreen(
                 )
 
                 is PaymentState.Error -> StatusCard(
-                    message = "Payment Failed",
+                    message = "Payment Failed ❌",
                     icon = Icons.Default.Close,
                     background = Color(0xFFFEE2E2),
                     iconTint = Color(0xFFDC2626),
@@ -205,7 +226,6 @@ fun PaymentGatewayScreen(
         }
     }
 }
-
 
 @Composable
 fun StatusCard(
@@ -247,11 +267,12 @@ fun StatusCard(
     }
 }
 
+
 //
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
 //fun PaymentGatewayScreen(
-////    activity : Activity,
+//    navigateBack: () -> Unit,
 //    gateways: List<String> = listOf("Razorpay", "Paytm", "UPI"),
 //    amount: Int = 100, // Example amount
 //    currency: String = "INR",
@@ -453,5 +474,5 @@ fun StatusCard(
 //    }
 //}
 //
-//
-//
+
+

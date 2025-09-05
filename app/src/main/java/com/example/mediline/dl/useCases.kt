@@ -121,13 +121,6 @@ class SyncDepartmentsUseCase @Inject constructor(private val repository: Departm
     suspend operator fun invoke(): Result<Unit> = repository.syncDepartmentsFromFirestore()
 }
 
-//class GetQueueLengthUseCase @Inject constructor(
-//    private val repository: QueueRepository
-//) {
-//    suspend operator fun invoke(deptId: String): Result<Int> {
-//        return withContext(Dispatchers.IO){repository.getQueue(deptId)}
-//    }
-//}
 
 
     class CreateOrderUseCase @Inject constructor(private val repo: PaymentRepository) {
@@ -221,9 +214,16 @@ class SyncDepartmentsUseCase @Inject constructor(private val repository: Departm
     class generatePdfUseCase @Inject constructor(
         private val repository: DownloadTicketRepo
     ) {
-        operator fun invoke(context: Context, ticket: Form): File {
-            return repository.generateTicketPdf(context, ticket)
+        operator fun invoke(context: Context, ticket: Form, doctors: List<String>): File {
+            return repository.generateTicketPdf(context, ticket, doctors)
         }
     }
 
+class UserUpdatePaymentStatusUseCase @Inject constructor(
+    private val repository: FormRepository
+){
+    suspend operator fun invoke(formId: String, status: String): Result<Unit> {
+        return repository.updatePaymentStatus(formId, status)
+    }
+}
 

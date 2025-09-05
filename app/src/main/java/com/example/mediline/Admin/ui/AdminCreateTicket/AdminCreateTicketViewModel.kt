@@ -95,6 +95,7 @@ class AdminCreateTicketViewModel @Inject constructor(
                 paymentStatus = PaymentStatus.UNPAID,
                 ticketStatus = TicketStatus.NULL,
                 creatorRole = CreatorRole.ADMIN,
+                //fatherName = uiState.fatherName
             )
 
             val result = adminAddFormUseCase(form, userId)

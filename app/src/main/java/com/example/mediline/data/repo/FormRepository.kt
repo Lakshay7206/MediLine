@@ -45,20 +45,28 @@ class FormRepositoryImpl(
                 )
 
                 transaction.set(formDocRef, formWithTicket.copy(id = formDocRef.id))
-               // firestore.collection("forms").add(formWithTicket)
-//
-                // Add form to "forms" collection
-//                transaction.set(firestore.collection("forms").document(), formWithTicket)
-
                 newCounter
             }.await()
             // Converts Task<Long> to suspend-friendly value
 
-            Result.success("Ticket created! No: $ticketNo")
+            Result.success(ticketNo.toString())
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
+    override suspend fun updatePaymentStatus(formId: String, status: String): Result<Unit> {
+        return try {
+            firestore.collection("forms")
+                .document(formId)
+                .update("paymentStatus", status)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }
 
 

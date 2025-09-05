@@ -44,13 +44,65 @@ class CreateTicketViewModel @Inject constructor(
         }
     }
 
+//    fun validate(): Boolean {
+//        val state = _uiState.value
+//        val errors = mutableMapOf<String, String?>()
+//
+//        if (state.name.trim().isBlank()) {
+//            errors["name"] = "Name is required"
+//        }
+//
+//        if (state.phone.isNotBlank() && !state.phone.matches(Regex("^\\d{10}$"))) {
+//            errors["phone"] = "Phone must be 10 digits"
+//        }
+//
+//        if (state.age <= 0 || state.age > 120) {
+//            errors["age"] = "Enter valid age"
+//        }
+//
+//        if (state.departmentId.isBlank()) {
+//            errors["department"] = "Department is required"
+//        }
+//
+//        // optional fields: validate only if non-empty
+//
+//
+//        return errors.isEmpty()
+//    }
+fun validate(): Boolean {
+    val state = _uiState.value
+    val errors = mutableMapOf<String, String?>()
+
+    if (state.name.trim().isBlank()) {
+        errors["name"] = "Name is required"
+    }
+
+    if (state.phone.isNotBlank() && !state.phone.matches(Regex("^\\d{10}$"))) {
+        errors["phone"] = "Phone must be 10 digits"
+    }
+
+    val ageInt = state.age.toIntOrNull()
+    if (ageInt == null || ageInt <= 0 || ageInt > 120) {
+        errors["age"] = "Enter valid age"
+    }
+
+    if (state.address.trim().isBlank()) {
+        errors["address"] = "Address is required"
+    }
+
+    _uiState.value = _uiState.value.copy(errors = errors) // push errors to state
+    return errors.isEmpty()
+}
+
+
     fun addFormFromState(){
+       if (!validate()) return
         val currentState = uiState.value
         val form = Form(
             name = currentState.name,
             address = currentState.address,
             phone = currentState.phone,
-            age = currentState.age,
+            age = currentState.age.toInt() ,
             sex = currentState.sex,
             userId = "",
             opdNo = "123",
@@ -92,7 +144,7 @@ class CreateTicketViewModel @Inject constructor(
     }
 
     fun updateAge(age: String) { // store as String
-        _uiState.value = _uiState.value.copy(age = age.toIntOrNull() ?: 0)
+        _uiState.value = _uiState.value.copy(age = age)
     }
 
     fun updateSex(sex: Sex) {

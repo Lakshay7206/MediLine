@@ -42,6 +42,7 @@ class QueueRepositoryImpl @Inject constructor(
             .whereEqualTo("departmentId", departmentId)
             .whereGreaterThanOrEqualTo("timeStamp", startOfDay)
             .whereLessThanOrEqualTo("timeStamp", endOfDay)
+            .whereEqualTo("paymentStatus","PAID" )
             //.orderBy("timeStamp", Query.Direction.ASCENDING)
         Log.d("QueueRepositoryImpl", "Query: $query")
         val subscription = query.addSnapshotListener { snapshot, error ->

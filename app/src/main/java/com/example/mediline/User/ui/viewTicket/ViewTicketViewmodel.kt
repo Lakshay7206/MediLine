@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mediline.data.model.Form
 import com.example.mediline.data.model.TicketStatus
+import com.example.mediline.dl.GetDepartmentsUseCase
 import com.example.mediline.dl.GetTicketsUseCase
 import com.example.mediline.dl.generatePdfUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ViewTicketViewModel @Inject constructor(
     private val getTicketsUseCase: GetTicketsUseCase,
-    private val generatePdfUseCase: generatePdfUseCase
+    private val generatePdfUseCase: generatePdfUseCase,
+    private val getDepartmentsUseCase: GetDepartmentsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TicketUiState>(TicketUiState.Loading)
@@ -49,9 +51,22 @@ class ViewTicketViewModel @Inject constructor(
         }
     }
 
+    private val _doctors = MutableStateFlow<List<String>>(emptyList())
+    val doctors: StateFlow<List<String>> = _doctors
+
+    fun loadDoctors() {
+        viewModelScope.launch {
+            getDepartmentsUseCase().collect { departments ->
+                val doctorList = departments.map { "${it.doctor} (${it.name})" }
+                _doctors.value = doctorList
+            }
+        }
+    }
+
     fun createAndDownloadTicketFile(context: Context, ticket: Form): File? {
+        loadDoctors()
         // 1. Generate PDF (temp file first)
-        val pdfFile = generatePdfUseCase(context, ticket)
+        val pdfFile = generatePdfUseCase(context, ticket, doctors.value)
 
         // 2. Copy to Downloads folder
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)

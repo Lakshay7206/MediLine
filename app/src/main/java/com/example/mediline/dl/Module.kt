@@ -112,7 +112,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://54a0d1b1c5fc.ngrok-free.app/") // 🔥 use your backend URL
+            .baseUrl("https://5fd36b286e12.ngrok-free.app/") // 🔥 use your backend URL
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
