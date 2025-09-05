@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -41,12 +42,14 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.mediline.R
 import com.example.mediline.User.ui.theme.AppTypography
 import com.example.mediline.User.ui.theme.LightColors
 @SuppressLint("ContextCastToActivity")
@@ -77,6 +80,13 @@ fun OtpScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo), // your logo file name
+                contentDescription = "App Logo",
+                modifier = Modifier
+                    .size(120.dp) // adjust size as needed
+                    .padding(bottom = 24.dp)
+            )
             Text(
                 text = "Enter the 6-digit code sent to your number",
                 style = MaterialTheme.typography.bodyLarge,

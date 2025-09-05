@@ -23,5 +23,6 @@ data class AuthFormState(
     val verificationId: String = "",
     var cooldownSeconds: Int = 0,
     var resendAttempts: Int = 0,
-    var resendToken: PhoneAuthProvider.ForceResendingToken? = null
+    var resendToken: PhoneAuthProvider.ForceResendingToken? = null,
+    var enableNotification: Boolean=false
 )

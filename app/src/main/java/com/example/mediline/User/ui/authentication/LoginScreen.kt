@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.OutlinedTextField
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -42,12 +44,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.mediline.R
 import com.example.mediline.User.ui.theme.AppTheme
 import com.example.mediline.User.ui.theme.AppTypography
 import com.example.mediline.User.ui.theme.LightColors
@@ -82,6 +86,16 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                Spacer(Modifier.height(16.dp))
+
+                Image(
+                    painter = painterResource(id = R.drawable.logo), // your logo file name
+                    contentDescription = "App Logo",
+                    modifier = Modifier
+                        .size(120.dp) // adjust size as needed
+                        .padding(bottom = 24.dp)
+                )
+
 
                 Text(
                     text = "Log in",
@@ -96,16 +110,7 @@ fun LoginScreen(
                     modifier = Modifier.padding(bottom = 48.dp)
                 )
 
-//                OutlinedTextField(
-//                    value = formState.phone,
-//                    onValueChange = { authViewModel.updatePhone(it) },
-//                    label = { Text("Phone Number",
-//                        style = AppTypography.bodyLarge
-//                    )
-//                            },
-//                    modifier = Modifier.fillMaxWidth(),
-//                    shape = RoundedCornerShape(20.dp)
-//                )
+//
                 OutlinedTextField(
                     value = formState.phone,
                     onValueChange = { authViewModel.updatePhone(it) },
