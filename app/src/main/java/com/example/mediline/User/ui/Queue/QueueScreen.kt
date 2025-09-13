@@ -155,6 +155,7 @@ fun QueueScreen(
         }
     }
 }
+
 @Composable
 fun QueueGridCard(
     title: String,
@@ -175,6 +176,7 @@ fun QueueGridCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
+            // Title
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
@@ -183,6 +185,7 @@ fun QueueGridCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Ticket grid
             FlowRow(
                 mainAxisSpacing = 6.dp,
                 crossAxisSpacing = 6.dp,
@@ -204,9 +207,100 @@ fun QueueGridCard(
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Legend row - color meanings
+            FlowRow(
+                mainAxisSpacing = 8.dp,
+                crossAxisSpacing = 8.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                StatusChip("Serving", Color(0xFF2196F3))   // Blue
+                StatusChip("Active", Color(0xFF4CAF50))    // Green
+                // Green
+                StatusChip("Closed", Color(0xFF9E9E9E))    // Gray
+                 // Gray
+            }
         }
     }
 }
+
+@Composable
+fun StatusChip(label: String, color: Color) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .background(color.copy(alpha = 0.2f), RoundedCornerShape(50))
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(10.dp)
+                .background(color, CircleShape)
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.Black
+        )
+    }
+}
+
+//@Composable
+//fun QueueGridCard(
+//    title: String,
+//    ticketBoxes: List<TicketBox>
+//) {
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .wrapContentHeight(),
+//        shape = RoundedCornerShape(16.dp),
+//        colors = CardDefaults.cardColors(
+//            containerColor = Color.White
+//        ),
+//        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+//    ) {
+//        Column(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(16.dp)
+//        ) {
+//            Text(
+//                text = title,
+//                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+//                color = MaterialTheme.colorScheme.primary
+//            )
+//
+//            Spacer(modifier = Modifier.height(12.dp))
+//
+//            FlowRow(
+//                mainAxisSpacing = 6.dp,
+//                crossAxisSpacing = 6.dp,
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                ticketBoxes.forEach { box ->
+//                    Box(
+//                        contentAlignment = Alignment.Center,
+//                        modifier = Modifier
+//                            .size(42.dp)
+//                            .background(box.color, RoundedCornerShape(10.dp))
+//                    ) {
+//                        Text(
+//                            "${box.ticketNumber}",
+//                            fontSize = 14.sp,
+//                            fontWeight = FontWeight.Bold,
+//                            color = Color.White
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 @Composable
 fun BigSummaryCard(

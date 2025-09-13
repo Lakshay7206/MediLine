@@ -38,8 +38,6 @@ class PaymentViewModel @Inject constructor(
 
     private val _paymentState = MutableStateFlow<PaymentState>(PaymentState.Idle)
     val paymentState: StateFlow<PaymentState> = _paymentState
-    private val _eventFlow = MutableSharedFlow<PaymentEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
 
     private val _selectedGateway = MutableStateFlow<String?>(null)
     val selectedGateway: StateFlow<String?> = _selectedGateway
@@ -152,13 +150,12 @@ class PaymentViewModel @Inject constructor(
         _paymentState.value = PaymentState.Success
 
         PaymentDataHolder.formId = null
-        viewModelScope.launch {
-            _eventFlow.emit(PaymentEvent.NavigateToViewTicket)
-        }
+
     }
 
 
-//    fun verifyPayment(orderId: String, paymentId: String, signature: String) {
+
+    //    fun verifyPayment(orderId: String, paymentId: String, signature: String) {
 //        viewModelScope.launch {
 //            val currentFormId = PaymentDataHolder.formId
 //            if (!currentFormId.isNullOrEmpty()) {
@@ -196,11 +193,6 @@ fun markPaymentFailed(message: String) {
     _paymentState.value = PaymentState.Error(message)
 }
 }
-
-    sealed class PaymentEvent {
-        object NavigateToViewTicket : PaymentEvent()
-    }
-
 
 
 //@HiltViewModel

@@ -17,13 +17,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.ReceiptLong
-//import androidx.compose.material.icons.filled.Female
-//import androidx.compose.material.icons.filled.LocalHospital
-//import androidx.compose.material.icons.filled.MedicalInformation
-//import androidx.compose.material.icons.filled.MonitorHeart
-//import androidx.compose.material.icons.filled.Psychology
-//import androidx.compose.material.icons.filled.Spa
-//import androidx.compose.material.icons.filled.Vaccines
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment

@@ -79,31 +79,22 @@ fun PaymentGatewayScreen(
     val selectedGateway by viewModel.selectedGateway.collectAsState()
     val paymentState by viewModel.paymentState.collectAsState()
 
- //   val formState by viewModel.formId.collectAsState()
-    Log.d("Payment", "Form ID: $formId")
-
-    LaunchedEffect(paymentState) {
-        if (paymentState is PaymentState.Success) {
-            navController.navigate(Screen.ViewTicket.route) {
-                popUpTo(Screen.PaymentGateway.route) { inclusive = true }
-            }
-        }
-    }
-
-
     val context = LocalContext.current
     val activity = context as? Activity
 
+    // Collect events from ViewModel for navigation
+
+
+
+
     Scaffold(
-        topBar = {
-            CurvedTopBar("PaymentGateways", true, navigateBack)
-        }
+        topBar = { CurvedTopBar("PaymentGateways", true, navigateBack) }
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .background(Color(0xFFF9FAFB)) // light gray background
+                .background(Color(0xFFF9FAFB))
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
@@ -111,10 +102,10 @@ fun PaymentGatewayScreen(
             Text(
                 text = "Choose a payment method",
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                color = Color(0xFF111827) // dark gray
+                color = Color(0xFF111827)
             )
 
-            // Gateways list with card style
+            // Gateways list
             LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 items(gateways) { gateway ->
                     Card(
@@ -122,7 +113,7 @@ fun PaymentGatewayScreen(
                             .fillMaxWidth()
                             .clickable { viewModel.onGatewaySelected(gateway) },
                         colors = if (gateway == selectedGateway) {
-                            CardDefaults.cardColors(containerColor = Color(0xFFF1FDF6)) // soft green tint
+                            CardDefaults.cardColors(containerColor = Color(0xFFF1FDF6))
                         } else {
                             CardDefaults.cardColors(containerColor = Color.White)
                         },
@@ -281,6 +272,7 @@ fun StatusCard(
         }
     }
 }
+
 
 
 //

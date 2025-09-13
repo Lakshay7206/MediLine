@@ -14,6 +14,8 @@ import java.io.FileOutputStream
 interface DownloadTicketRepo {
     fun generateTicketPdf(context: Context, ticket: Form, doctors: List<String>): File
 }
+
+
 class DownloadTicketRepoImpl : DownloadTicketRepo {
 
     override fun generateTicketPdf(context: Context, ticket: Form, doctors: List<String>): File {
@@ -76,8 +78,8 @@ class DownloadTicketRepoImpl : DownloadTicketRepo {
         canvas.drawText("Date: ${ticket.timeStamp}", 320f, y, boldPaint)
 
         y += 20f
-        canvas.drawText("Consultant: Dr. Manoj Rai", 40f, y, boldPaint)
-        canvas.drawText("Department: Physician", 320f, y, boldPaint)
+        canvas.drawText("Consultant: Mr. Falan 3", 40f, y, boldPaint)
+        canvas.drawText("Department: Endocrinology", 320f, y, boldPaint)
 
         y += 10f
         canvas.drawLine(30f, y, 570f, y, linePaint) // bottom line

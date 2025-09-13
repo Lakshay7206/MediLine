@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -142,6 +143,13 @@ fun validate(): Boolean {
     fun updateBloodGroup(bloodGroup: String) {
         _uiState.value = _uiState.value.copy(bloodGroup = bloodGroup)
     }
+
+    fun markFieldTouched(field: String) {
+        _uiState.update { state ->
+            state.copy(touched = state.touched + (field to true))
+        }
+    }
+
 }
 
 sealed class UiEvent {

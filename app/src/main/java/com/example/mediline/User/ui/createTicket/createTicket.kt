@@ -127,7 +127,7 @@ fun RegistrationScreen(
 
                     Spacer(Modifier.height(4.dp)) // same gap
                     Text(
-                        text = "Registration Fee: ₹${department?.fees ?: "-"}",
+                        text = "Registration Fee: ₹100",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
@@ -140,17 +140,18 @@ fun RegistrationScreen(
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 OutlinedTextField(
                     value = uiState.name,
-                    onValueChange = { viewModel.updateName(it) },
+                    onValueChange = { viewModel.updateName(it)
+                        viewModel.markFieldTouched("name")},
                     label = { Text("Patient Name") },
                     singleLine = true,
                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    isError = uiState.errors["name"] != null
+                    isError = uiState.errors["name"] != null && uiState.touched["name"] == true
                 )
-                uiState.errors["name"]?.let { errorMsg ->
+                if (uiState.errors["name"] != null && uiState.touched["name"] == true) {
                     Text(
-                        text = errorMsg,
+                        text = uiState.errors["name"]!!,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(start = 16.dp, top = 2.dp)
@@ -178,18 +179,20 @@ fun RegistrationScreen(
 
                 OutlinedTextField(
                     value = uiState.address,
-                    onValueChange = { viewModel.updateAddress(it) },
+                    onValueChange = { viewModel.markFieldTouched("address")
+                        viewModel.updateAddress(it)
+                        },
                     label = { Text("Address") },
                     singleLine = true,
                     leadingIcon = { Icon(Icons.Default.Home, contentDescription = null) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    isError = uiState.errors["address"] != null
+                    isError = uiState.errors["address"] != null && uiState.touched["address"] == true
 
                 )
-                uiState.errors["address"]?.let { errorMsg ->
+                if (uiState.errors["address"] != null && uiState.touched["address"] == true) {
                     Text(
-                        text = errorMsg,
+                        text = uiState.errors["address"]!!,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(start = 16.dp, top = 2.dp)
@@ -198,18 +201,20 @@ fun RegistrationScreen(
 
                 OutlinedTextField(
                     value = uiState.phone,
-                    onValueChange = { viewModel.updatePhone(it) },
+                    onValueChange = {    viewModel.markFieldTouched("phone")
+                        viewModel.updatePhone(it)
+                                    },
                     label = { Text("Contact Number") },
                     singleLine = true,
                     leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    isError = uiState.errors["phone"] != null,
+                    isError = uiState.errors["phone"] != null && uiState.touched["phone"] == true
                 )
-                uiState.errors["phone"]?.let { errorMsg ->
+                if (uiState.errors["phone"] != null && uiState.touched["phone"] == true) {
                     Text(
-                        text = errorMsg,
+                        text = uiState.errors["phone"]!!,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(start = 16.dp, top = 2.dp)
@@ -218,18 +223,19 @@ fun RegistrationScreen(
 
                 OutlinedTextField(
                     value = uiState.age,
-                    onValueChange = { viewModel.updateAge(it) },
+                    onValueChange = { viewModel.updateAge(it)
+                        viewModel.markFieldTouched("age")},
                     label = { Text("Age") },
                     singleLine = true,
                     leadingIcon = { Icon(Icons.Default.Cake, contentDescription = null) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    isError = uiState.errors["age"] != null,
+                    isError = uiState.errors["age"] != null&& uiState.touched["age"] == true
                 )
-                uiState.errors["age"]?.let { errorMsg ->
+                if (uiState.errors["age"] != null && uiState.touched["age"] == true) {
                     Text(
-                        text = errorMsg,
+                        text = uiState.errors["age"]!!,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(start = 16.dp, top = 2.dp)

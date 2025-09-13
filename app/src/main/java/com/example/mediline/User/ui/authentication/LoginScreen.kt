@@ -104,7 +104,7 @@ fun LoginScreen(
                     modifier = Modifier.padding(bottom = 32.dp)
                 )
                 Text(
-                    text = "Enter your phone number to continue",
+                    text = "Enter your phone number  to continue",
                     style = AppTypography.bodyMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 48.dp)
