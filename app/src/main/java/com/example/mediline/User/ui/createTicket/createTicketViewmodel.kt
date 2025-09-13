@@ -44,31 +44,7 @@ class CreateTicketViewModel @Inject constructor(
         }
     }
 
-//    fun validate(): Boolean {
-//        val state = _uiState.value
-//        val errors = mutableMapOf<String, String?>()
-//
-//        if (state.name.trim().isBlank()) {
-//            errors["name"] = "Name is required"
-//        }
-//
-//        if (state.phone.isNotBlank() && !state.phone.matches(Regex("^\\d{10}$"))) {
-//            errors["phone"] = "Phone must be 10 digits"
-//        }
-//
-//        if (state.age <= 0 || state.age > 120) {
-//            errors["age"] = "Enter valid age"
-//        }
-//
-//        if (state.departmentId.isBlank()) {
-//            errors["department"] = "Department is required"
-//        }
-//
-//        // optional fields: validate only if non-empty
-//
-//
-//        return errors.isEmpty()
-//    }
+
 fun validate(): Boolean {
     val state = _uiState.value
     val errors = mutableMapOf<String, String?>()
@@ -88,6 +64,10 @@ fun validate(): Boolean {
 
     if (state.address.trim().isBlank()) {
         errors["address"] = "Address is required"
+    }
+    if (state.fatherName.trim().isBlank()){
+        errors["fatherName"] = "Father's name is required"
+
     }
 
     _uiState.value = _uiState.value.copy(errors = errors) // push errors to state
@@ -111,7 +91,8 @@ fun validate(): Boolean {
             ticketStatus = TicketStatus.ACTIVE,
             departmentId =currentState.departmentId,
             createdBy = "",
-            creatorRole = CreatorRole.USER
+            creatorRole = CreatorRole.USER,
+            fatherName = currentState.fatherName,
 
         )
         addForm(form)
@@ -133,6 +114,10 @@ fun validate(): Boolean {
 
     fun updateName(name: String) {
         _uiState.value = _uiState.value.copy(name = name)
+    }
+
+    fun updateFatherName(fatherName: String) {
+        _uiState.value = _uiState.value.copy(fatherName = fatherName)
     }
 
     fun updateAddress(address: String) {

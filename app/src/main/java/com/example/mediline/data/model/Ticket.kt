@@ -16,7 +16,8 @@ data class FormEntity(
     val paymentStatus: String = "UNPAID",  // stored as String
     val ticketStatus: String = "ACTIVE" ,
     val createdBy: String = "",
-    val creatorRole: String=""
+    val creatorRole: String="",
+    val fatherName: String = ""
 )
 
 fun FormEntity.toDomain(): Form {
@@ -40,11 +41,13 @@ fun FormEntity.toDomain(): Form {
         ticketStatus = enumTicket,
         departmentId = departmentId,
         createdBy =userId,
-        creatorRole =enumCreator
+        creatorRole =enumCreator,
+        fatherName = fatherName,
     )
 }
 
 
 interface TicketRepository {
     suspend fun getTickets(): Result<List<Form>>
+
 }

@@ -5,12 +5,14 @@ import android.content.Context
 import androidx.room.Room
 import com.example.mediline.data.api.BackendApi
 import com.example.mediline.data.api.PaymentApi
+import com.example.mediline.data.model.AdminProfileRepository
 import com.example.mediline.data.model.DepartmentRepository
 import com.example.mediline.data.model.FormRepository
 import com.example.mediline.data.model.PaymentRepository
 import com.example.mediline.data.model.TicketRepository
 import com.example.mediline.data.repo.AdminAuthRepository
 import com.example.mediline.data.repo.AdminAuthRepositoryImpl
+import com.example.mediline.data.repo.AdminProfileRepositoryImpl
 import com.example.mediline.data.repo.AdminRepository
 import com.example.mediline.data.repo.AdminRepositoryImpl
 import com.example.mediline.data.repo.AdminTicketRepository
@@ -56,6 +58,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+
+//    @Provides
+//    @Singleton
+//    fun provideStorage(): FirebaseStorage = FirebaseStorage.getInstance()
 
     @Provides
     @Singleton
@@ -160,8 +166,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAdminRepository(backendApi: BackendApi): AdminRepository =
-        AdminRepositoryImpl(backendApi)
+    fun provideAdminRepository(
+        backendApi: BackendApi,
+        db: FirebaseFirestore
+    ): AdminRepository =
+        AdminRepositoryImpl(db,backendApi)
 
 
     @Provides
@@ -180,4 +189,31 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDownloadTicketRepo(): DownloadTicketRepo= DownloadTicketRepoImpl()
+
+    @Provides
+    @Singleton
+    fun provideAdminProfileRepository(
+        firestore: FirebaseFirestore,
+        auth: FirebaseAuth
+    ): AdminProfileRepository = AdminProfileRepositoryImpl(firestore)
+
+    @Provides
+    @Singleton
+    fun provideLoadAdminProfileUseCase(repository: AdminProfileRepository): LoadAdminProfileUseCase =
+        LoadAdminProfileUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideUpdateAdminProfileUseCase(repository: AdminProfileRepository): UpdateAdminProfileUseCase =
+        UpdateAdminProfileUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetAllAdminsUseCase(repository: AdminProfileRepository): GetAllAdminsUseCase =
+        GetAllAdminsUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideRemoveAdminUseCase(repository: AdminRepository) =
+        DeleteAdminUseCase(repository)
 }

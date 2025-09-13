@@ -2,7 +2,10 @@ package com.example.mediline.dl
 
 import android.app.Activity
 import android.content.Context
+import android.net.Uri
 import com.example.mediline.data.model.AdminFormRepository
+import com.example.mediline.data.model.AdminProfile
+import com.example.mediline.data.model.AdminProfileRepository
 
 import com.example.mediline.data.model.Department
 import com.example.mediline.data.model.DepartmentRepository
@@ -67,6 +70,8 @@ class ResendOtpUseCase @Inject constructor(
         return withContext(Dispatchers.IO) { repository.resendOtp(phone, activity, resendToken) }
     }
 }
+
+
 
 
     class CreateUserUseCase @Inject constructor(
@@ -141,6 +146,8 @@ class SyncDepartmentsUseCase @Inject constructor(private val repository: Departm
             return repository.getTickets()
         }
     }
+
+
 
 
     class UpdateTicketStatusUseCase @Inject constructor(
@@ -224,6 +231,38 @@ class UserUpdatePaymentStatusUseCase @Inject constructor(
 ){
     suspend operator fun invoke(formId: String, status: String): Result<Unit> {
         return repository.updatePaymentStatus(formId, status)
+    }
+}
+
+
+
+// Use case to load admin profile
+class LoadAdminProfileUseCase @Inject constructor(
+    private val repository: AdminProfileRepository
+) {
+    suspend operator fun invoke(): AdminProfile = repository.loadProfile()
+}
+
+// Use case to update admin profile
+class UpdateAdminProfileUseCase @Inject constructor(
+    private val repository: AdminProfileRepository
+) {
+    suspend operator fun invoke(profile: AdminProfile) {
+        repository.saveProfile(profile)
+    }
+}
+
+class GetAllAdminsUseCase @Inject constructor(
+    private val repository: AdminProfileRepository
+) {
+    suspend operator fun invoke(): List<AdminProfile> = repository.getAllAdmins()
+}
+
+class DeleteAdminUseCase @Inject constructor(
+    private val repository: AdminRepository
+) {
+    suspend operator fun invoke(adminId: String) {
+        repository.deleteAdmin(adminId)
     }
 }
 

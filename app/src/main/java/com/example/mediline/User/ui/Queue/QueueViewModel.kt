@@ -52,14 +52,14 @@ class QueueViewModel @Inject constructor(
                         .filter { it.ticketStatus !in listOf(TicketStatus.CLOSED, TicketStatus.SKIPPED, TicketStatus.CANCELLED) }
                         .sortedBy { it.timeStamp }
 
-                    val currentServing = activeTickets.firstOrNull { it.ticketStatus == TicketStatus.SERVING }?.ticketNumber ?: 0
+                    val currentServing = activeTickets.firstOrNull { it.ticketStatus == TicketStatus.ACTIVE }?.ticketNumber ?: 0
 
                     val boxes = activeTickets.map { ticket ->
                         TicketBox(
                             ticketNumber = ticket.ticketNumber.toInt(),
                             status = ticket.ticketStatus,
                             color = when (ticket.ticketStatus) {
-                                TicketStatus.SERVING -> Color(0xFFFFC107)
+                                TicketStatus.ACTIVE -> Color(0xFFFFC107)
                                 TicketStatus.ACTIVE-> Color(0xFF64B5F6)
                                 else -> Color(0xFF81C784)
                             }

@@ -1,5 +1,6 @@
 package com.example.mediline.Admin.ui.CreateDepartment
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.ui.geometry.isEmpty
 import androidx.compose.ui.semantics.error
@@ -10,18 +11,28 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.mediline.Admin.ui.Screen
+import com.example.mediline.Admin.ui.home.BottomNavBar
+import com.example.mediline.data.model.Form
 import com.example.mediline.data.room.DepartmentEntity
 import com.example.mediline.ui.admin.department.AdminDepartmentScreenState
 import com.example.mediline.ui.admin.department.AdminDepartmentViewModel
@@ -29,21 +40,34 @@ import com.example.mediline.ui.admin.department.AdminDepartmentViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminDepartmentScreen(
-    viewModel: AdminDepartmentViewModel = hiltViewModel()
+    onBack: () -> Unit,
+    onHome: () -> Unit,
+    onCreateTicket: () -> Unit,
+    onProfile:()->Unit,
+    viewModel: AdminDepartmentViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(key1 = uiState.error) {
-        uiState.error?.let {
-            snackbarHostState.showSnackbar(it, duration = SnackbarDuration.Short)
-        }
-    }
-    LaunchedEffect(key1 = uiState.successMessage) {
+    LaunchedEffect(uiState.successMessage) {
         uiState.successMessage?.let {
             snackbarHostState.showSnackbar(it, duration = SnackbarDuration.Short)
+            viewModel.clearSuccessMessage() // clear so it doesn’t repeat
         }
     }
+
+
+
+//    LaunchedEffect(key1 = uiState.error) {
+//        uiState.error?.let {
+//            snackbarHostState.showSnackbar(it, duration = SnackbarDuration.Short)
+//        }
+//    }
+//    LaunchedEffect(key1 = uiState.successMessage) {
+//        uiState.successMessage?.let {
+//            snackbarHostState.showSnackbar(it, duration = SnackbarDuration.Short)
+//        }
+//    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -62,7 +86,7 @@ fun AdminDepartmentScreen(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                         )
-                        IconButton(onClick = { viewModel.triggerSyncWithFirestore() }) {
+                        IconButton(onClick = { viewModel.triggerSyncWithFirestore(fromUserAction = true) }) {
                             Icon(
                                 Icons.Filled.Refresh,
                                 contentDescription = "Sync Departments",
@@ -76,7 +100,19 @@ fun AdminDepartmentScreen(
                     titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
+
         },
+        bottomBar = {
+            BottomNavBar { route ->
+                when (route) {
+                    Screen.Home.route -> onHome()
+                    Screen.CreateTicket.route -> onCreateTicket()
+                    Screen.Departments.route -> {} // already here
+                    Screen.Profile.route -> onProfile()
+                }
+            }
+        }
+        ,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { viewModel.showCreateDepartmentForm() },
@@ -292,3 +328,6 @@ fun DepartmentFormDialog(
         }
     }
 }
+
+
+

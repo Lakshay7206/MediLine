@@ -20,12 +20,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bloodtype
+import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Wc
@@ -42,12 +45,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,252 +73,57 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.mediline.Admin.ui.Screen
+import com.example.mediline.Admin.ui.home.BottomNavBar
 import com.example.mediline.User.ui.createTicket.Sex
 import com.example.mediline.User.ui.theme.PrimaryGreen
+import com.example.mediline.data.model.Form
 import kotlin.io.path.Path
 import kotlin.io.path.moveTo
 
 
-// Form Content
 
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun AdminCreateTicketScreen(
-//    viewModel: AdminCreateTicketViewModel = hiltViewModel()
-//) {
-//    val uiState by viewModel.uiState.collectAsState()
-//
-//    val bloodGroups = listOf("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-")
-//
-//    var sexExpanded by remember { mutableStateOf(false) }
-//    var bloodGroupExpanded by remember { mutableStateOf(false) }
-//
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = { Text("🩺 Admin Panel") },
-//                colors = TopAppBarDefaults.topAppBarColors(
-//                    containerColor = MaterialTheme.colorScheme.primary,
-//                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-//                )
-//            )
-//        },
-//        bottomBar = {
-//            Text(
-//                text = "© 2025 Your Hospital Admin Panel",
-//                style = MaterialTheme.typography.bodySmall,
-//                color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(12.dp),
-//                textAlign = TextAlign.Center
-//            )
-//        }
-//    ) { innerPadding ->
-//
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .background(MaterialTheme.colorScheme.background) // ✅ stays white/light
-//                .padding(innerPadding)
-//                .verticalScroll(rememberScrollState())
-//                .padding(20.dp),
-//            verticalArrangement = Arrangement.spacedBy(24.dp)
-//        ) {
-//            // Page Title
-//            Text(
-//                text = "Create New Ticket  ",
-//                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-//                color = MaterialTheme.colorScheme.onSurface,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(top = 20.dp), // 👈 push it down a little
-//                textAlign = TextAlign.Center
-//            )
-//
-//
-//
-//            // Card wrapping form
-//
-//                Column(
-//                    modifier = Modifier.padding(20.dp),
-//                    verticalArrangement = Arrangement.spacedBy(16.dp)
-//                ) {
-//                    // Name
-//                    OutlinedTextField(
-//                        value = uiState.name,
-//                        onValueChange = { viewModel.onNameChange(it) },
-//                        label = { Text("Name") },
-//                        singleLine = true,
-//                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-//                        modifier = Modifier.fillMaxWidth(),
-//                        shape = RoundedCornerShape(12.dp)
-//                    )
-//
-//                    // Mobile Number
-//                    OutlinedTextField(
-//                        value = uiState.phone,
-//                        onValueChange = { viewModel.onPhoneChange(it) },
-//                        label = { Text("Mobile Number") },
-//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-//                        singleLine = true,
-//                        leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
-//                        modifier = Modifier.fillMaxWidth(),
-//                        shape = RoundedCornerShape(12.dp)
-//                    )
-//
-//                    // Age
-//                    OutlinedTextField(
-//                        value = uiState.age,
-//                        onValueChange = { viewModel.onAgeChange(it) },
-//                        label = { Text("Age") },
-//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//                        singleLine = true,
-//                        leadingIcon = { Icon(Icons.Default.Cake, contentDescription = null) },
-//                        modifier = Modifier.fillMaxWidth(),
-//                        shape = RoundedCornerShape(12.dp)
-//                    )
-//
-//                    // Sex Dropdown
-//                    ExposedDropdownMenuBox(
-//                        expanded = sexExpanded,
-//                        onExpandedChange = { sexExpanded = !sexExpanded }
-//                    ) {
-//                        OutlinedTextField(
-//                            value = uiState.sex?.name ?: "",
-//                            onValueChange = {},
-//                            label = { Text("Sex") },
-//                            readOnly = true,
-//                            leadingIcon = { Icon(Icons.Default.Wc, contentDescription = null) },
-//                            trailingIcon = {
-//                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = sexExpanded)
-//                            },
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .menuAnchor(),
-//                            shape = RoundedCornerShape(12.dp)
-//                        )
-//
-//                        ExposedDropdownMenu(
-//                            expanded = sexExpanded,
-//                            onDismissRequest = { sexExpanded = false }
-//                        ) {
-//                            Sex.entries.forEach { sex ->
-//                                DropdownMenuItem(
-//                                    text = { Text(sex.name) },
-//                                    onClick = {
-//                                        viewModel.onSexChange(sex.name)
-//                                        sexExpanded = false
-//                                    }
-//                                )
-//                            }
-//                        }
-//                    }
-//
-//                    // Address
-//                    OutlinedTextField(
-//                        value = uiState.address,
-//                        onValueChange = { viewModel.onAddressChange(it) },
-//                        label = { Text("Address") },
-//                        leadingIcon = { Icon(Icons.Default.Home, contentDescription = null) },
-//                        modifier = Modifier.fillMaxWidth(),
-//                        shape = RoundedCornerShape(12.dp)
-//                    )
-//
-//                    // Blood Group Dropdown
-//                    ExposedDropdownMenuBox(
-//                        expanded = bloodGroupExpanded,
-//                        onExpandedChange = { bloodGroupExpanded = !bloodGroupExpanded }
-//                    ) {
-//                        OutlinedTextField(
-//                            value = uiState.bloodGroup ?: "",
-//                            onValueChange = {},
-//                            label = { Text("Blood Group (Optional)") },
-//                            readOnly = true,
-//                            leadingIcon = { Icon(Icons.Default.Favorite, contentDescription = null) },
-//                            trailingIcon = {
-//                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = bloodGroupExpanded)
-//                            },
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
-//                            shape = RoundedCornerShape(12.dp)
-//                        )
-//
-//                        ExposedDropdownMenu(
-//                            expanded = bloodGroupExpanded,
-//                            onDismissRequest = { bloodGroupExpanded = false }
-//                        ) {
-//                            bloodGroups.forEach { bg ->
-//                                DropdownMenuItem(
-//                                    text = { Text(bg) },
-//                                    onClick = {
-//                                        viewModel.onBloodGroupChange(bg)
-//                                        bloodGroupExpanded = false
-//                                    }
-//                                )
-//                            }
-//                        }
-//
-//                }
-//            }
-//
-//            // Create Ticket Button
-//            Button(
-//                onClick = { viewModel.submitTicket(userId = "1") },
-//                enabled = !uiState.isSubmitting,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(56.dp),
-//                shape = RoundedCornerShape(14.dp)
-//            ) {
-//                Icon(Icons.Default.CheckCircle, contentDescription = null)
-//                Spacer(Modifier.width(8.dp))
-//                Text(
-//                    if (uiState.isSubmitting) "Creating..." else "Create Ticket",
-//                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-//                )
-//            }
-//
-//            // Error / Success Messages
-//            uiState.errorMessage?.let {
-//                Text(
-//                    it,
-//                    color = Color.Red,
-//                    style = MaterialTheme.typography.bodyMedium
-//                )
-//            }
-//        }
-//    }
-//}
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminCreateTicketScreen(
+    onBack: () -> Unit,
+    onHome: () -> Unit,
+    onDepartments: () -> Unit,
+    onProfile:()->Unit,
     viewModel: AdminCreateTicketViewModel = hiltViewModel()
-) {
+    )
+{
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
 
     val bloodGroups = listOf("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-")
 
     var sexExpanded by remember { mutableStateOf(false) }
     var bloodGroupExpanded by remember { mutableStateOf(false) }
+    var departmentExpanded by remember { mutableStateOf(false) }
+
 
     Scaffold(
         topBar = {
             CurvedTopBar()
         },
         bottomBar = {
-            Text(
-                text = "© 2025 Your Hospital Admin Panel",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                textAlign = TextAlign.Center
-            )
-        }
+            BottomNavBar { route ->
+                when (route) {
+                    Screen.Home.route -> onHome()
+                    Screen.CreateTicket.route -> {} // already here
+                    Screen.Departments.route -> onDepartments()
+                    Screen.Profile.route -> onProfile()
+                } }
+        },
+
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -320,7 +133,11 @@ fun AdminCreateTicketScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
+        )
+
+
+
+        {
             // Title
             Text(
                 text = "Create New Ticket  ",
@@ -337,127 +154,218 @@ fun AdminCreateTicketScreen(
 //                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
 //                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
 //            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+            Column(
+                modifier = Modifier
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+
+                ExposedDropdownMenuBox(
+                    expanded = departmentExpanded,
+                    onExpandedChange = { departmentExpanded = !departmentExpanded }
                 ) {
-                    // Name
+                    val selectedDeptName = uiState.departments
+                        .firstOrNull { it.id == uiState.departmentId }
+                        ?.name ?: ""
+
                     OutlinedTextField(
-                        value = uiState.name,
-                        onValueChange = { viewModel.onNameChange(it) },
-                        label = { Text("Name") },
-                        singleLine = true,
-                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                        modifier = Modifier.fillMaxWidth(),
+                        value = selectedDeptName,
+                        onValueChange = {},
+                        label = { Text("Department") },
+                        readOnly = true,
+                        leadingIcon = { Icon(Icons.Default.Business, contentDescription = null) },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = departmentExpanded)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(),
                         shape = RoundedCornerShape(12.dp)
                     )
 
-                    // Mobile Number
+                    ExposedDropdownMenu(
+                        expanded = departmentExpanded,
+                        onDismissRequest = { departmentExpanded = false }
+                    ) {
+                        uiState.departments.forEach { dept ->
+                            DropdownMenuItem(
+                                text = { Text(dept.name) },
+                                onClick = {
+                                    viewModel.onDepartmentChange(dept.id)
+                                    departmentExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                // Name
+                OutlinedTextField(
+                    value = uiState.name,
+                    onValueChange = { viewModel.onNameChange(it) },
+                    label = { Text("Name") },
+                    singleLine = true,
+                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                uiState.errors["Name"]?.let { errorMsg ->
+                    Text(
+                        text = errorMsg,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+                    )
+                }
+
+                // Father's Name
+                OutlinedTextField(
+                    value = uiState.fatherName,
+                    onValueChange = { viewModel.onFatherNameChange(it) },
+                    label = { Text("Father's Name") },
+                    singleLine = true,
+                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                uiState.errors["Father's Name"]?.let { errorMsg ->
+                    Text(
+                        text = errorMsg,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+                    )
+                }
+
+                // Mobile Number
+                OutlinedTextField(
+                    value = uiState.phone,
+                    onValueChange = { viewModel.onPhoneChange(it) },
+                    label = { Text("Mobile Number") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    singleLine = true,
+                    leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                uiState.errors["Mobile Number"]?.let { errorMsg ->
+                    Text(
+                        text = errorMsg,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+                    )
+                }
+
+                // Age
+                OutlinedTextField(
+                    value = uiState.age,
+                    onValueChange = { viewModel.onAgeChange(it) },
+                    label = { Text("Age") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    leadingIcon = { Icon(Icons.Default.Cake, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                uiState.errors["Age"]?.let { errorMsg ->
+                    Text(
+                        text = errorMsg,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+                    )
+                }
+
+                // Sex Dropdown
+                ExposedDropdownMenuBox(
+                    expanded = sexExpanded,
+                    onExpandedChange = { sexExpanded = !sexExpanded }
+                ) {
                     OutlinedTextField(
-                        value = uiState.phone,
-                        onValueChange = { viewModel.onPhoneChange(it) },
-                        label = { Text("Mobile Number") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                        singleLine = true,
-                        leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
-                        modifier = Modifier.fillMaxWidth(),
+                        value = uiState.sex?.name ?: "",
+                        onValueChange = {},
+                        label = { Text("Sex") },
+                        readOnly = true,
+                        leadingIcon = { Icon(Icons.Default.Wc, contentDescription = null) },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = sexExpanded)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(),
                         shape = RoundedCornerShape(12.dp)
                     )
 
-                    // Age
-                    OutlinedTextField(
-                        value = uiState.age,
-                        onValueChange = { viewModel.onAgeChange(it) },
-                        label = { Text("Age") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        leadingIcon = { Icon(Icons.Default.Cake, contentDescription = null) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
-                    // Sex Dropdown
-                    ExposedDropdownMenuBox(
+                    ExposedDropdownMenu(
                         expanded = sexExpanded,
-                        onExpandedChange = { sexExpanded = !sexExpanded }
+                        onDismissRequest = { sexExpanded = false }
                     ) {
-                        OutlinedTextField(
-                            value = uiState.sex?.name ?: "",
-                            onValueChange = {},
-                            label = { Text("Sex") },
-                            readOnly = true,
-                            leadingIcon = { Icon(Icons.Default.Wc, contentDescription = null) },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = sexExpanded)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = sexExpanded,
-                            onDismissRequest = { sexExpanded = false }
-                        ) {
-                            Sex.entries.forEach { sex ->
-                                DropdownMenuItem(
-                                    text = { Text(sex.name) },
-                                    onClick = {
-                                        viewModel.onSexChange(sex.name)
-                                        sexExpanded = false
-                                    }
-                                )
-                            }
+                        Sex.entries.forEach { sex ->
+                            DropdownMenuItem(
+                                text = { Text(sex.name) },
+                                onClick = {
+                                    viewModel.onSexChange(sex.name)
+                                    sexExpanded = false
+                                }
+                            )
                         }
                     }
+                }
 
-                    // Address
-                    OutlinedTextField(
-                        value = uiState.address,
-                        onValueChange = { viewModel.onAddressChange(it) },
-                        label = { Text("Address") },
-                        leadingIcon = { Icon(Icons.Default.Home, contentDescription = null) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                // Address
+                OutlinedTextField(
+                    value = uiState.address,
+                    onValueChange = { viewModel.onAddressChange(it) },
+                    label = { Text("Address") },
+                    leadingIcon = { Icon(Icons.Default.Home, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                uiState.errors["Address"]?.let { errorMsg ->
+                    Text(
+                        text = errorMsg,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 2.dp)
                     )
+                }
 
-                    // Blood Group Dropdown
-                    ExposedDropdownMenuBox(
-                        expanded = bloodGroupExpanded,
-                        onExpandedChange = { bloodGroupExpanded = !bloodGroupExpanded }
-                    ) {
-                        OutlinedTextField(
-                            value = uiState.bloodGroup ?: "",
-                            onValueChange = {},
-                            label = { Text("Blood Group (Optional)") },
-                            readOnly = true,
-                            leadingIcon = { Icon(Icons.Default.Favorite, contentDescription = null) },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = bloodGroupExpanded)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
+                // Blood Group Dropdown
+                ExposedDropdownMenuBox(
+                    expanded = bloodGroupExpanded,
+                    onExpandedChange = { bloodGroupExpanded = !bloodGroupExpanded }
+                ) {
+                    OutlinedTextField(
+                        value = uiState.bloodGroup ?: "",
+                        onValueChange = {},
+                        label = { Text("Blood Group (Optional)") },
+                        readOnly = true,
+                        leadingIcon = { Icon(Icons.Default.Favorite, contentDescription = null) },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = bloodGroupExpanded)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
 
                         )
 
-                        ExposedDropdownMenu(
-                            expanded = bloodGroupExpanded,
-                            onDismissRequest = { bloodGroupExpanded = false }
-                        ) {
-                            bloodGroups.forEach { bg ->
-                                DropdownMenuItem(
-                                    text = { Text(bg) },
-                                    onClick = {
-                                        viewModel.onBloodGroupChange(bg)
-                                        bloodGroupExpanded = false
-                                    }
-                                )
-                            }
+                    ExposedDropdownMenu(
+                        expanded = bloodGroupExpanded,
+                        onDismissRequest = { bloodGroupExpanded = false }
+                    ) {
+                        bloodGroups.forEach { bg ->
+                            DropdownMenuItem(
+                                text = { Text(bg) },
+                                onClick = {
+                                    viewModel.onBloodGroupChange(bg)
+                                    bloodGroupExpanded = false
+                                }
+                            )
                         }
                     }
+                }
 
             }
 
@@ -476,14 +384,16 @@ fun AdminCreateTicketScreen(
             }
 
             // Error / Success Messages
-            uiState.errorMessage?.let {
-                Text(
-                    it,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+
+            LaunchedEffect(uiState.successMessage) {
+                uiState.successMessage?.let { message ->
+                    snackbarHostState.showSnackbar(message)
+                    viewModel.clearSuccessMessage() // clear after showing
+                }
             }
+
         }
+
     }
 }
 
@@ -499,7 +409,7 @@ fun CurvedTopBar(
             .fillMaxWidth()
             .height(180.dp),
 
-    ) {
+        ) {
         Canvas(modifier = Modifier.matchParentSize()) {
             val width = size.width
             val height = size.height
@@ -529,6 +439,3 @@ fun CurvedTopBar(
         )
     }
 }
-
-
-

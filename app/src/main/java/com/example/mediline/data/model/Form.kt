@@ -18,7 +18,7 @@ data class Form (
     val ticketStatus: TicketStatus=TicketStatus.ACTIVE,
     val createdBy: String="",     // UID of creator (admin or same as userId)
     val creatorRole: CreatorRole=CreatorRole.NULL,   // "admin" or "user"
-   // val fatherName: String,
+    val fatherName: String,
 
 )
 
@@ -29,13 +29,15 @@ enum class CreatorRole{
 }
 enum class TicketStatus{
 
-   ACTIVE,
+    ACTIVE,
     CLOSED,
     EXPIRED,
     CANCELLED,
     SKIPPED,
     NULL,
-    SERVING
+
+
+
 }
 enum class PaymentStatus{
     PAID,

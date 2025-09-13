@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.example.mediline.data.model.FormEntity
+import com.example.mediline.data.model.TicketStatus
 import com.example.mediline.data.model.toDomain
 import com.google.firebase.firestore.toObjects
 
@@ -16,43 +17,81 @@ class TicketRepositoryImpl(
 ) : TicketRepository {
 
     override suspend fun getTickets(): Result<List<Form>> = try {
-        val userId= auth.currentUser?.uid
+        val userId = auth.currentUser?.uid
 
         val snapshot = db.collection("forms")
-            .whereEqualTo("userId",
-                "tLwAmbqR7cWKQekSjBc19woTif83")
-
+            .whereEqualTo("userId", userId) // ✅ use current user instead of hardcoded
             .get()
             .await()
 
-        Log.d("TicketRepo","$snapshot")
-
         val entities = snapshot.toObjects(FormEntity::class.java)
-
-//        val validEntities = entities.filter {
-//            try {
-//                // This line tries to get an enum value for the payment status.
-//                // If it fails, the entry is filtered out.
-//                PaymentStatus.valueOf(it.paymentStatus.uppercase())
-//                true // Keep this entry
-//            } catch (e: IllegalArgumentException) {
-//                // The status string does not match an enum value
-//                // Log the issue and filter out the entry
-//                Log.w("TicketRepo", "Invalid paymentStatus found: ${it.paymentStatus}")
-//                false // Filter this entry out
-//            }
-//        }
-
-
-      val tickets = entities.map { it.toDomain() }
+        val tickets = entities.map { it.toDomain() }
 
         Result.success(tickets)
     } catch (e: Exception) {
-        Log.e("TicketRepo", "Error fetching tickets", e)  // ✅ log error with stacktrace
-
+        Log.e("TicketRepo", "Error fetching tickets", e)
         Result.failure(e)
     }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+//class TicketRepositoryImpl(
+//    private val db: FirebaseFirestore,
+//    private val auth: FirebaseAuth
+//) : TicketRepository {
+//
+//    override suspend fun getTickets(): Result<List<Form>> = try {
+//        val userId= auth.currentUser?.uid
+//
+//        val snapshot = db.collection("forms")
+//            .whereEqualTo("userId",
+//                "tLwAmbqR7cWKQekSjBc19woTif83")
+//
+//            .get()
+//            .await()
+//
+//        Log.d("TicketRepo","$snapshot")
+//
+//        val entities = snapshot.toObjects(FormEntity::class.java)
+//
+////        val validEntities = entities.filter {
+////            try {
+////                // This line tries to get an enum value for the payment status.
+////                // If it fails, the entry is filtered out.
+////                PaymentStatus.valueOf(it.paymentStatus.uppercase())
+////                true // Keep this entry
+////            } catch (e: IllegalArgumentException) {
+////                // The status string does not match an enum value
+////                // Log the issue and filter out the entry
+////                Log.w("TicketRepo", "Invalid paymentStatus found: ${it.paymentStatus}")
+////                false // Filter this entry out
+////            }
+////        }
+//
+//
+//      val tickets = entities.map { it.toDomain() }
+//
+//        Result.success(tickets)
+//    } catch (e: Exception) {
+//        Log.e("TicketRepo", "Error fetching tickets", e)  // ✅ log error with stacktrace
+//
+//        Result.failure(e)
+//    }
+//}
+
+
+
+
 
 
 //  val tickets = snapshot.toObjects(FormEntity::class.java).map { it.toDomain() }

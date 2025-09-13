@@ -302,7 +302,7 @@ fun StatusChip(isActive: Boolean, status: TicketStatus) {
             .padding(horizontal = 12.dp, vertical = 4.dp)
     ) {
         Text(
-            text = if (isActive) "Active" else status.name,
+            text = if (isActive) "Active" else status.name.lowercase().replaceFirstChar { it.uppercase() },
             color = if (isActive) Color(0xFF2E7D32) else Color(0xFF616161),
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium

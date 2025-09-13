@@ -1,6 +1,5 @@
 package com.example.mediline.Admin.ui.home
 
-
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -20,8 +19,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
@@ -62,28 +63,45 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.mediline.data.model.Form
 import com.example.mediline.data.model.TicketStatus
- import androidx.compose.material3.OutlinedTextField
- import androidx.compose.material3.Text
- import androidx.compose.material3.Icon
- import androidx.compose.material.icons.Icons // For Icons.Default.Search
- import androidx.compose.material.icons.filled.Search // Often used directly
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons // For Icons.Default.Search
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search // Often used directly
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
- import androidx.compose.ui.text.TextStyle
- import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.mediline.Admin.ui.Screen
+import com.example.mediline.data.model.Department
+import com.example.mediline.data.room.DepartmentEntity
+
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TicketManagementScreen(
-    onTicketClick: (Form) -> Unit,
+    onBack: () -> Unit,
+    onProfile:()->Unit,
+    onTicketClick: (Form) -> Unit ,
+    onCreateTicket: () -> Unit,
+    onDepartments: () -> Unit,
     viewModel: AdminTicketViewModel = hiltViewModel()
-) {
+)
+
+{
+
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
@@ -97,13 +115,20 @@ fun TicketManagementScreen(
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF3BB77E) // ✅ PrimaryGreen
+                    containerColor = Color(0xFF3BB77E)
                 )
             )
         },
-       bottomBar = {
-           BottomNavBar({})
-       },
+        bottomBar = {
+            BottomNavBar { route ->
+                when (route) {
+                    Screen.Home.route -> {} // already here
+                    Screen.CreateTicket.route -> onCreateTicket()
+                    Screen.Departments.route -> onDepartments()
+                    Screen.Profile.route -> onProfile()
+                } }
+        }
+        ,
     ) { padding ->
         Column(
             modifier = Modifier
@@ -111,7 +136,14 @@ fun TicketManagementScreen(
                 .fillMaxSize()
         ) {
             // ✅ Compact Search Bar inside card
-            SearchSection()
+            SearchSection(
+                departments = uiState.departments,
+                filter = uiState.filter,
+                onFilterChanged = { newFilter ->
+                    viewModel.setFilter(newFilter)
+                }
+            )
+
 
             // ✅ Ticket list
             LazyColumn(
@@ -124,9 +156,10 @@ fun TicketManagementScreen(
                         ticket = ticket,
                         onSkip = { viewModel.skipTicket(ticket.id) },
                         onCancel = { viewModel.cancelTicket(ticket.id) },
-                        onComplete = { viewModel.servingTicket(ticket.id) },
+                        onComplete = { viewModel.completeTicket(ticket.id) },
                         onReassign = { viewModel.reassignTicket(ticket.id) },
-                        onClick = { onTicketClick(ticket) }
+                        onClick = { onTicketClick(ticket) },
+                        departments = uiState.departments
                     )
                 }
             }
@@ -139,39 +172,44 @@ fun BottomNavBar(onNavigate: (String) -> Unit) {
     NavigationBar(containerColor = Color.White) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home") },
-            selected = false,
+            label = { Text("Home") }, selected = false,
             onClick = { onNavigate("home") }
+        )
+
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Create Ticket") },
+            label = { Text("New Ticket") },
+            selected = false, onClick = { onNavigate("create_ticket") }
+        )
+        NavigationBarItem( icon = { Icon(Icons.Default.List, contentDescription = "Departments") },
+            label = { Text("Departments") }, selected = false,
+            onClick = { onNavigate("departments") }
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
             label = { Text("Profile") },
-            selected = false,
-            onClick = { onNavigate("profile") }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Create Ticket") },
-            label = { Text("New Ticket") },
-            selected = false,
-            onClick = { onNavigate("create_ticket") }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.List, contentDescription = "Departments") },
-            label = { Text("Departments") },
-            selected = false,
-            onClick = { onNavigate("departments") }
+            selected = false, onClick = { onNavigate("profile") }
         )
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchSection() {
-    var department by remember { mutableStateOf("Department") }
+fun SearchSection(
+    departments: List<Department>,
+    modifier: Modifier = Modifier,
+    filter: TicketFilters, // current filter from uiState
+    onFilterChanged: (TicketFilters) -> Unit // callback to update ViewModel
+) {
     var expanded by remember { mutableStateOf(false) }
+    var selectedDepartment by remember { mutableStateOf(filter.department) }
+
+    // Add an "All" department with id = "" at the start
+    val departmentsWithAll = listOf(Department(id = "", name = "All Departments")) + departments
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 6.dp),
         shape = RoundedCornerShape(12.dp),
@@ -182,19 +220,19 @@ fun SearchSection() {
     ) {
         Column(
             modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Department Dropdown (full width, first row)
+            // Department Dropdown
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
-                    value = department,
+                    value = if (selectedDepartment.isBlank()) "" else departmentsWithAll.find { it.id == selectedDepartment }?.name ?: "",
                     onValueChange = {},
                     readOnly = true,
-                    placeholder = { Text("Department") },
+                    placeholder = { Text("Departments") }, // Show placeholder if none selected
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
                     modifier = Modifier
                         .menuAnchor()
@@ -212,51 +250,47 @@ fun SearchSection() {
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    listOf("Cardiology", "Neurology", "Orthopedics", "Dermatology").forEach {
+                    departmentsWithAll.forEach { department ->
                         DropdownMenuItem(
-                            text = { Text(it) },
+                            text = { Text(department.name) },
                             onClick = {
-                                department = it
+                                selectedDepartment = department.id
                                 expanded = false
+                                // If id is "", it means "All", show all tickets
+                                onFilterChanged(filter.copy(department = department.id))
                             }
                         )
                     }
                 }
             }
 
-            // Row for Query and Ticket No
+            // Search inputs (Name + Ticket No)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    placeholder = { Text("Patient") },
-                    singleLine = true,
+                    value = filter.searchQuery,
+                    onValueChange = { query ->
+                        onFilterChanged(filter.copy(searchQuery = query))
+                    },
+                    label = { Text("Name") },
                     modifier = Modifier.weight(1f),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
+                    singleLine = true,
                     shape = RoundedCornerShape(8.dp)
                 )
 
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    placeholder = { Text("Ticket No") },
+                    value = filter.todayCounter?.toString() ?: "",
+                    onValueChange = { text ->
+                        val number = text.toIntOrNull()
+                        onFilterChanged(filter.copy(todayCounter = number))
+                    },
+                    label = { Text("Ticket No") },
+                    modifier = Modifier.weight(1f),
                     singleLine = true,
-                    modifier = Modifier.weight(0.8f),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
         }
@@ -265,24 +299,133 @@ fun SearchSection() {
 
 
 
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun SearchSection(
+//    departments: List<Department>,
+//    modifier: Modifier = Modifier,
+//    filter: TicketFilters, // ✅ current filter from uiState
+//    onFilterChanged: (TicketFilters) -> Unit // ✅ callback to update ViewModel
+//) {
+//    var expanded by remember { mutableStateOf(false) }
+//    var selectedDepartment by remember { mutableStateOf(filter.department) }
+//
+//    Card(
+//        modifier = modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 12.dp, vertical = 6.dp),
+//        shape = RoundedCornerShape(12.dp),
+//        colors = CardDefaults.cardColors(
+//            containerColor = MaterialTheme.colorScheme.background
+//        ),
+//        elevation = CardDefaults.cardElevation(1.dp)
+//    ) {
+//        Column(
+//            modifier = Modifier.padding(8.dp),
+//            verticalArrangement = Arrangement.spacedBy(12.dp)
+//        ) {
+//            // ✅ Department Dropdown
+//            ExposedDropdownMenuBox(
+//                expanded = expanded,
+//                onExpandedChange = { expanded = !expanded },
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                OutlinedTextField(
+//                    value = departments.find { it.id == selectedDepartment }?.name ?: "",
+//                    onValueChange = {},
+//                    readOnly = true,
+//                    placeholder = { Text("Department") },
+//                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+//                    modifier = Modifier
+//                        .menuAnchor()
+//                        .fillMaxWidth(),
+//                    colors = OutlinedTextFieldDefaults.colors(
+//                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+//                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+//                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+//                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+//                    ),
+//                    shape = RoundedCornerShape(8.dp)
+//                )
+//
+//                ExposedDropdownMenu(
+//                    expanded = expanded,
+//                    onDismissRequest = { expanded = false }
+//                ) {
+//                    departments.forEach { department ->
+//                        DropdownMenuItem(
+//                            text = { Text(department.name) },
+//                            onClick = {
+//                                selectedDepartment = department.id
+//                                expanded = false
+//                                onFilterChanged(filter.copy(department = department.id.toString()))
+//
+//                            }
+//                        )
+//                    }
+//                }
+//            }
+//
+//            // ✅ Search inputs (Name + Ticket No)
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(12.dp)
+//            ) {
+//                OutlinedTextField(
+//                    value = filter.searchQuery,
+//                    onValueChange = { query ->
+//                        onFilterChanged(filter.copy(searchQuery = query))
+//                    },
+//                    label = { Text("Name") },
+//                    modifier = Modifier.weight(1f),
+//                    singleLine = true,
+//                    shape = RoundedCornerShape(8.dp)
+//                )
+//
+//                OutlinedTextField(
+//                    value = filter.todayCounter?.toString() ?: "",
+//                    onValueChange = { text ->
+//                        val number = text.toIntOrNull()
+//                        onFilterChanged(filter.copy(todayCounter = number))
+//                    },
+//                    label = { Text("Ticket No") },
+//                    modifier = Modifier.weight(1f),
+//                    singleLine = true,
+//                    shape = RoundedCornerShape(8.dp),
+//                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+//                )
+//            }
+//        }
+//    }
+//}
 
-/* ✅ Ticket Card */
-@Composable
+
+
+
+/* ✅ Ticket Card */@Composable
 fun TicketCard(
+    departments: List<Department>,
     ticket: Form,
     onSkip: () -> Unit,
     onCancel: () -> Unit,
-    onComplete: () -> Unit,
     onReassign: () -> Unit,
+    onComplete: () -> Unit,
     onClick: () -> Unit
 ) {
+    val cardColor = when (ticket.ticketStatus) {
+        TicketStatus.CLOSED -> Color(0xFF60A462) // Green
+        TicketStatus.CANCELLED -> Color(0xFFF44336) // Red
+        TicketStatus.SKIPPED -> Color(0xFFFFB300) // Orange
+        else -> Color.White
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -290,35 +433,44 @@ fun TicketCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "👤 ${ticket.name}", // ✅ Patient name shown
+                    text = "👤 ${ticket.name}",
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
-                StatusChip(ticket.ticketStatus) // ✅ status chip
+                StatusChip(ticket.ticketStatus)
             }
 
             Spacer(Modifier.height(6.dp))
-            Text("Dept: ${ticket.departmentId}", style = MaterialTheme.typography.bodySmall)
-            Text("Queue No: ${ticket.ticketNumber}", style = MaterialTheme.typography.bodySmall)
+            Text(
+                "Department: ${departments.find { it.id == ticket.departmentId }?.name}",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text("Ticket No: ${ticket.ticketNumber}", style = MaterialTheme.typography.bodySmall)
 
             Spacer(Modifier.height(12.dp))
 
-            // ✅ Action Buttons
+            // ✅ Actions controlled by status
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (ticket.ticketStatus == TicketStatus.ACTIVE) {
-                    ActionButton("Skip", onSkip, Color(0xFFFFB300))
-                    ActionButton("Cancel", onCancel, Color(0xFFE53935))
-                    ActionButton("Serving", onComplete, Color(0xFF43A047))
-                }
-                if (ticket.ticketStatus == TicketStatus.CANCELLED || ticket.ticketStatus == TicketStatus.SKIPPED) {
-                    ActionButton("Re-assign", onReassign, Color(0xFF1E88E5))
+                when (ticket.ticketStatus) {
+                    TicketStatus.ACTIVE -> {
+                        ActionButton("Skip", onSkip, Color(0xFFFFB300))
+                        ActionButton("Cancel", onCancel, Color(0xFFF44336))
+                        ActionButton("Complete", onComplete, Color(0xFF60A462))
+                    }
+
+                    TicketStatus.CLOSED,
+                    TicketStatus.CANCELLED,
+                    TicketStatus.SKIPPED -> {
+                        ActionButton("Re-assign", onReassign, Color(0xFF1E88E5))
+                    }
+
+                    else -> {}
                 }
             }
         }
     }
 }
 
-/* ✅ Action Button */
 @Composable
 fun ActionButton(text: String, onClick: () -> Unit, color: Color) {
     Button(
@@ -331,15 +483,15 @@ fun ActionButton(text: String, onClick: () -> Unit, color: Color) {
         Text(text, fontSize = 12.sp, color = Color.White)
     }
 }
+
 @Composable
 fun StatusChip(status: TicketStatus) {
     val (color, text) = when (status) {
-        TicketStatus.ACTIVE -> Color(0xFF4CAF50) to "Active"
-        TicketStatus.CLOSED -> Color(0xFFF44336) to "Closed"
-        TicketStatus.SKIPPED -> Color(0xFF9C27B0) to "Skipped"
-        TicketStatus.CANCELLED -> Color(0xFF757575) to "Cancelled"
-        TicketStatus.EXPIRED -> Color(0xFF2196F3) to "Expired"
-        TicketStatus.SERVING -> Color(0xFFFF9800) to "Serving"
+        TicketStatus.CLOSED -> Color(0xFF60A462) to "Closed"
+        TicketStatus.SKIPPED -> Color(0xFFFFB300) to "Skipped"
+        TicketStatus.CANCELLED -> Color(0xFFF44336) to "Cancelled"
+        TicketStatus.EXPIRED -> Color(0xFF140E1A) to "Expired"
+        TicketStatus.ACTIVE -> Color(0xFF2196F3) to "Active"
         TicketStatus.NULL -> Color.LightGray to "Unknown"
     }
 
@@ -356,212 +508,87 @@ fun StatusChip(status: TicketStatus) {
         )
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TicketDetailScreen(
+    departments: List<Department>,
+    ticket: Form,
+    onBack: () -> Unit,
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "Ticket Details",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = Color.White
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF3BB77E)
+                )
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            // ✅ Ticket Summary
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF6F6F6)),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Ticket No. : ${ticket.ticketNumber}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(4.dp))
+                }
+            }
 
+            Spacer(Modifier.height(16.dp))
 
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun TicketManagementScreen(
-//    onCreateTicket: () -> Unit,
-//    onTicketClick: (Form) -> Unit,
-//    viewModel: AdminTicketViewModel = hiltViewModel()
-//) {
-//    val uiState by viewModel.uiState.collectAsState()
-//
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = {
-//                    Text(
-//                        "Tickets",
-//                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-//                    )
-//                },
-//                colors = TopAppBarDefaults.topAppBarColors(
-//                    containerColor = Color(0xFF1E88E5), // Blue for hospital admin
-//                    titleContentColor = Color.White
-//                )
-//            )
-//        },
-//        floatingActionButton = {
-//            FloatingActionButton(
-//                onClick = onCreateTicket,
-//                containerColor = Color(0xFF43A047) // Green accent
-//            ) {
-//                Icon(Icons.Default.Add, contentDescription = "Create Ticket", tint = Color.White)
-//            }
-//        },
-//        containerColor = Color(0xFFF5F7FA) // Soft hospital background
-//    ) { padding ->
-//        Column(modifier = Modifier.padding(padding).fillMaxSize()) {
-//
-//            // Filter section in a card
-//            Card(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(12.dp),
-//                shape = RoundedCornerShape(12.dp),
-//                colors = CardDefaults.cardColors(containerColor = Color.White),
-//                elevation = CardDefaults.cardElevation(4.dp)
-//            ) {
-//                Column(Modifier.padding(12.dp)) {
-//                    FilterSection(
-//                        filters = uiState.filter,
-//                        onFilterChange = { viewModel.setFilter(it) }
-//                    )
-//                }
-//            }
-//
-//            // Ticket list
-//            LazyColumn(
-//                modifier = Modifier.fillMaxSize(),
-//                contentPadding = PaddingValues(12.dp),
-//                verticalArrangement = Arrangement.spacedBy(12.dp)
-//            ) {
-//                items(uiState.filteredTickets) { ticket ->
-//                    TicketCard(
-//                        ticket = ticket,
-//                        onSkip = { viewModel.skipTicket(ticket.id) },
-//                        onCancel = { viewModel.cancelTicket(ticket.id) },
-//                        onComplete = { viewModel.servingTicket(ticket.id) },
-//                        onReassign = { viewModel.reassignTicket(ticket.id) },
-//                        onClick = { onTicketClick(ticket) }
-//                    )
-//                }
-//            }
-//        }
-//    }
-//}
-//
-///* ✅ Filter Section included inline */
-//@Composable
-//fun FilterSection(
-//    filters: TicketFilters,
-//    onFilterChange: (TicketFilters) -> Unit
-//) {
-//    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-//
-//        Text("Departments", style = MaterialTheme.typography.labelMedium)
-//
-//        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-//            items(listOf("Cardiology", "Dentistry", "Ortho", "General", "Neurology", "ENT", "Dermatology")) { dept ->
-//                FilterChip(
-//                    selected = filters.department == dept,
-//                    onClick = { onFilterChange(filters.copy(department = dept)) },
-//                    label = { Text(dept) }
-//                )
-//            }
-//        }
-//
-//        Text("Ticket Number", style = MaterialTheme.typography.labelMedium)
-//        OutlinedTextField(
-//            value = filters.todayCounter?.toString() ?: "",
-//            onValueChange = { input ->
-//                val value = input.toIntOrNull()
-//                onFilterChange(filters.copy(todayCounter = value))
-//            },
-//            label = { Text("Enter Ticket No") },
-//            singleLine = true,
-//            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//    }
-//}
-//
-///* ✅ Ticket Card */
-//@Composable
-//fun TicketCard(
-//    ticket: Form,
-//    onSkip: () -> Unit,
-//    onCancel: () -> Unit,
-//    onComplete: () -> Unit,
-//    onReassign: () -> Unit,
-//    onClick: () -> Unit
-//) {
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .clickable { onClick() },
-//        shape = RoundedCornerShape(16.dp),
-//        elevation = CardDefaults.cardElevation(6.dp),
-//        colors = CardDefaults.cardColors(containerColor = Color.White)
-//    ) {
-//        Column(modifier = Modifier.padding(16.dp)) {
-//            Row(
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                Text(
-//                    "Ticket #${ticket.ticketNumber}",
-//                    fontWeight = FontWeight.Bold,
-//                    style = MaterialTheme.typography.titleMedium
-//                )
-//                StatusChip(status = ticket.ticketStatus)
-//            }
-//
-//            Spacer(Modifier.height(8.dp))
-//            Text("👤 Patient: ${ticket.name}", style = MaterialTheme.typography.bodyMedium)
-//            Text("🆔 ID: ${ticket.id}", style = MaterialTheme.typography.bodySmall)
-//            Text("🔢 Queue No: ${ticket.ticketNumber}", style = MaterialTheme.typography.bodySmall)
-//
-//            Spacer(Modifier.height(12.dp))
-//            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-//                if (ticket.ticketStatus == TicketStatus.ACTIVE) {
-//                    ActionButton("Skip", onSkip, Color(0xFFFFB300))
-//                    ActionButton("Cancel", onCancel, Color(0xFFE53935))
-//                    ActionButton("Serving", onComplete, Color(0xFF43A047))
-//                }
-//                if (ticket.ticketStatus == TicketStatus.CANCELLED || ticket.ticketStatus == TicketStatus.SKIPPED) {
-//                    ActionButton("Re-assign", onReassign, Color(0xFF1E88E5))
-//                }
-//            }
-//        }
-//    }
-//}
-//
-///* ✅ Status Chip */
-//@Composable
-//fun StatusChip(status: TicketStatus) {
-//    val color = when (status) {
-//        TicketStatus.ACTIVE -> Color(0xFF4CAF50)
-//        TicketStatus.CLOSED -> Color(0xFFF44336)
-//        TicketStatus.SKIPPED -> Color(0xFF9C27B0)
-//        TicketStatus.NULL -> Color.LightGray
-//        TicketStatus.CANCELLED -> Color.DarkGray
-//        TicketStatus.EXPIRED -> Color.Blue
-//        TicketStatus.SERVING -> Color.Green
-//    }
-//
-//    Box(
-//        modifier = Modifier
-//            .background(color, shape = RoundedCornerShape(8.dp))
-//            .padding(horizontal = 8.dp, vertical = 4.dp)
-//    ) {
-//        Text(
-//            text = status.name.replaceFirstChar { it.uppercase() },
-//            color = Color.White,
-//            fontSize = 12.sp
-//        )
-//    }
-//}
-//
-///* ✅ Action Button inline */
-//@Composable
-//fun ActionButton(text: String, onClick: () -> Unit, color: Color) {
-//    Button(
-//        onClick = onClick,
-//        colors = ButtonDefaults.buttonColors(containerColor = color),
-//        modifier = Modifier.height(36.dp),
-//        shape = RoundedCornerShape(8.dp),
-//        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp)
-//    ) {
-//        Text(text, fontSize = 12.sp, color = Color.White)
-//    }
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun ShowPrev() {
-//    TicketManagementScreen(onCreateTicket = {}, onTicketClick = {})
-//}
-//
+            // ✅ Ticket Details
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    DetailRow(label = "Department", value = departments.find { it.id == ticket.departmentId }?.name ?: "")
+                    DetailRow(label = "Name", value = ticket.name)
+                    DetailRow(label = "Age", value = ticket.age.toString())
+                    DetailRow(label = "Sex", value = ticket.sex.toString())
+                    DetailRow(label = "Father's Name", value = ticket.fatherName)
+                    DetailRow(label = "Mobile No.", value = ticket.phone)
+                    DetailRow(label = "Address", value = ticket.address)
+                    DetailRow(label = "Time Stamp", value = ticket.timeStamp.toString())
+                    DetailRow(label = "Ticket Status", value = ticket.ticketStatus.toString())
+                    DetailRow(label = "Payment Status", value = ticket.paymentStatus.toString())
+
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailRow(label: String, value: String) {
+    Column {
+        Text(label, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+        Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+    }
+}
+

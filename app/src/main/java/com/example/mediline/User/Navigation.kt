@@ -47,7 +47,7 @@ sealed class Screen(val route:String){
 fun RootNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = "auth"
+        startDestination = "home_main"
     ) {
         authNavGraph(navController)
         homeNavGraph(navController)
@@ -56,23 +56,23 @@ fun RootNavGraph(navController: NavHostController) {
 
 fun NavGraphBuilder.authNavGraph(rootNavController: NavHostController) {
     navigation(
-        startDestination = "login",
-        route = "auth"
+        startDestination = "home",
+        route = "home_main"
     ) {
-        composable("login") { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                rootNavController.getBackStackEntry("auth")
-            }
-            val viewModel: AuthViewModel = hiltViewModel(parentEntry)
-            LoginScreen(
-                viewModel,
-                onNavigateOtp = { rootNavController.navigate("otp") },
-                {rootNavController.navigate("signUp")}
-
-
-
-            )
-        }
+//        composable("login") { backStackEntry ->
+//            val parentEntry = remember(backStackEntry) {
+//                rootNavController.getBackStackEntry("auth")
+//            }
+//            val viewModel: AuthViewModel = hiltViewModel(parentEntry)
+//            LoginScreen(
+//                viewModel,
+//                onNavigateOtp = { rootNavController.navigate("otp") },
+//                {rootNavController.navigate("signUp")}
+//
+//
+//
+//            )
+//        }
         composable("otp") { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 rootNavController.getBackStackEntry("auth")

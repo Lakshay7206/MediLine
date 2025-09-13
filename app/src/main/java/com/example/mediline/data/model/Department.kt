@@ -12,6 +12,28 @@ data class Department(
 
 )
 
+
+fun DepartmentEntity.toDomain(): Department {
+    return Department(
+        id = id,
+        name = name,
+        description = description,
+        doctor = doctor,
+        fees = fees
+    )
+}
+
+fun Department.toEntity(): DepartmentEntity {
+    return DepartmentEntity(
+        id = id,
+        name = name,
+        description = description,
+        doctor = doctor,
+        fees = fees
+    )
+}
+
+
 interface DepartmentRepository {
     fun getDepartments(): Flow<List<DepartmentEntity>>
     suspend fun createDepartment(department: DepartmentEntity): Result<String>

@@ -42,6 +42,7 @@ android {
     }
 }
 dependencies {
+    implementation("io.coil-kt:coil-compose:2.6.0") // latest stable
 
     implementation("androidx.compose.material:material-icons-extended:<version>")
     implementation("androidx.compose.material3:material3:1.1.1") // or latest
@@ -72,10 +73,17 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2")
 
     // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth")
-    implementation(libs.firebase.firestore)
+// Firebase Bill of Materials
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+
+// Firebase services with KTX (Kotlin extensions)
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    //implementation("com.google.firebase:firebase-storage-ktx") // add this
+    //implementation("com.google.firebase:firebase-storage-ktx:22.0.0")
+
+    implementation("com.google.firebase:firebase-analytics-ktx") // optional
+
     // Optional Realtime DB
     // implementation(libs.firebase.database)
 
@@ -95,6 +103,10 @@ dependencies {
 
     // Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
+    implementation(libs.androidx.runtime)
+    implementation(libs.material3)
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.foundation.layout)
     kapt("com.google.dagger:hilt-compiler:2.51.1")
 
     // Room

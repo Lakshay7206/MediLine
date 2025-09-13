@@ -47,7 +47,7 @@ class AdminDepartmentViewModel @Inject constructor(
     init {
         loadDepartmentsFromRoom()
         // Optionally, trigger a sync on init or provide a manual sync button
-        triggerSyncWithFirestore()
+//        triggerSyncWithFirestore()
     }
 
     private fun loadDepartmentsFromRoom() {
@@ -87,14 +87,34 @@ class AdminDepartmentViewModel @Inject constructor(
         }
     }
 
-    fun triggerSyncWithFirestore() {
+//    fun triggerSyncWithFirestore() {
+//        viewModelScope.launch {
+//            _uiState.update { it.copy(isLoading = true, successMessage = null, error = null) }
+//            val result = syncDepartmentsUseCase()
+//            result.fold(
+//                onSuccess = {
+//                    _uiState.update { it.copy(isLoading = false, successMessage = "Departments synced successfully!") }
+//                    // The flow from loadDepartmentsFromRoom will automatically update the list
+//                },
+//                onFailure = { e ->
+//                    _uiState.update { it.copy(isLoading = false, error = "Sync failed: ${e.localizedMessage}") }
+//                }
+//            )
+//        }
+//    }
+
+    fun triggerSyncWithFirestore(fromUserAction: Boolean = false) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, successMessage = null, error = null) }
+            _uiState.update { it.copy(isLoading = true, error = null) }
             val result = syncDepartmentsUseCase()
             result.fold(
                 onSuccess = {
-                    _uiState.update { it.copy(isLoading = false, successMessage = "Departments synced successfully!") }
-                    // The flow from loadDepartmentsFromRoom will automatically update the list
+                    _uiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            successMessage = if (fromUserAction) "Departments synced successfully!" else null
+                        )
+                    }
                 },
                 onFailure = { e ->
                     _uiState.update { it.copy(isLoading = false, error = "Sync failed: ${e.localizedMessage}") }
@@ -103,8 +123,12 @@ class AdminDepartmentViewModel @Inject constructor(
         }
     }
 
+
     fun onDepartmentNameChanged(name: String) {
         _uiState.update { it.copy(departmentNameInput = name, error = null, successMessage = null) }
+    }
+    fun clearSuccessMessage() {
+        _uiState.update { it.copy(successMessage = null) }
     }
 
     fun onDepartmentDescriptionChanged(description: String) {

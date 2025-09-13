@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
@@ -38,15 +39,22 @@ class ViewTicketViewModel @Inject constructor(
                 onSuccess = { tickets ->
                     // Change .find to .filter to get a List<Form>
                     val activeTickets = tickets.filter { it.ticketStatus == TicketStatus.ACTIVE  }
-                    val history = tickets.filter { it.ticketStatus != TicketStatus.ACTIVE && it.ticketStatus!= TicketStatus.NULL }
-                        .sortedByDescending { it.timeStamp }
+                    val history = tickets.filter {
+                        it.ticketStatus != TicketStatus.ACTIVE && it.ticketStatus != TicketStatus.NULL
+                    }.sortedByDescending { it.timeStamp }
+
+
+//                    val history = tickets.filter { it.ticketStatus != TicketStatus.ACTIVE && it.ticketStatus!= TicketStatus.NULL }
+//                        .sortedByDescending { it.timeStamp }
 
                     // Pass the list to the UI state
                     _uiState.value = TicketUiState.Success(activeTickets, history)
                 },
-                onFailure = {
-                    _uiState.value = TicketUiState.Error(it.localizedMessage ?: "Unknown error")
+                onFailure = { e ->
+                    Log.e("ViewTicketViewModel", "Error loading tickets", e)
+                    _uiState.value = TicketUiState.Error(e.message ?: "Failed to load tickets")
                 }
+
             )
         }
     }

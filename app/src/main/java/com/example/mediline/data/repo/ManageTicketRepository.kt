@@ -61,42 +61,93 @@ class AdminTicketRepositoryImpl(
 //    }
 
 
-
-
     override suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit> {
-            return try {
-                if (newStatus == TicketStatus.SERVING) {
-                    // Transaction: mark previous serving ticket as COMPLETED
-                    db.runTransaction { transaction ->
-                        // Query for currently serving ticket
-                        val servingQuery = ticketCollection
-                            .whereEqualTo("ticketStatus", TicketStatus.SERVING.name)
-                            .get()
-                            .result
-
-                        val previousServing = servingQuery.documents.firstOrNull()
-                        previousServing?.let {
-                            transaction.update(it.reference, "ticketStatus", TicketStatus.CLOSED.name)
-                        }
-
-                        // Update the new ticket to SERVING
-                        val newTicketRef = ticketCollection.document(docId)
-                        transaction.update(newTicketRef, "ticketStatus", TicketStatus.SERVING.name)
-                    }.await()
-                } else {
-                    // Normal status update
-                    ticketCollection
-                        .document(docId)
-                        .update("ticketStatus", newStatus.name)
-                        .await()
-                }
-
-                Log.d("AdminTicketRepository", "Ticket status updated successfully")
-                Result.success(Unit)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+        return try {
+            // Simply update the ticket status; no closing of other tickets
+            ticketCollection.document(docId)
+                .update("ticketStatus", newStatus.name)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
+
+
+
+
+
+//    override suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit> {
+//        return try {
+//            if (newStatus == TicketStatus.ACTIVE) {
+//                // Step 1: Find previous ACTIVE ticket
+//                val prevActiveSnapshot = ticketCollection
+//                    .whereEqualTo("ticketStatus", TicketStatus.ACTIVE.name)
+//                    .get()
+//                    .await()
+//
+//                val prevActiveDoc = prevActiveSnapshot.documents.firstOrNull()
+//
+//                // Step 2: Transaction to update previous and new ticket
+//                db.runTransaction { transaction ->
+//                    prevActiveDoc?.let {
+//                        transaction.update(it.reference, "ticketStatus", TicketStatus.CLOSED.name)
+//                    }
+//
+//                    val newTicketRef = ticketCollection.document(docId)
+//                    transaction.update(newTicketRef, "ticketStatus", TicketStatus.ACTIVE.name)
+//                }.await()
+//            } else {
+//                // Normal status update
+//                ticketCollection
+//                    .document(docId)
+//                    .update("ticketStatus", newStatus.name)
+//                    .await()
+//            }
+//
+//            Log.d("AdminTicketRepository", "Ticket status updated successfully")
+//            Result.success(Unit)
+//        } catch (e: Exception) {
+//            Result.failure(e)
+//        }
+//    }
+
+
+
+//    override suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit> {
+//            return try {
+//                if (newStatus == TicketStatus.ACTIVE) {
+//                    // Transaction: mark previous serving ticket as COMPLETED
+//                    db.runTransaction { transaction ->
+//                        // Query for currently serving ticket
+//                        val servingQuery = ticketCollection
+//                            .whereEqualTo("ticketStatus", TicketStatus.ACTIVE.name)
+//                            .get()
+//                            .result
+//
+//                        val previousServing = servingQuery.documents.firstOrNull()
+//                        previousServing?.let {
+//                            transaction.update(it.reference, "ticketStatus", TicketStatus.CLOSED.name)
+//                        }
+//
+//                        // Update the new ticket to SERVING
+//                        val newTicketRef = ticketCollection.document(docId)
+//                        transaction.update(newTicketRef, "ticketStatus", TicketStatus.ACTIVE.name)
+//                    }.await()
+//                } else {
+//                    // Normal status update
+//                    ticketCollection
+//                        .document(docId)
+//                        .update("ticketStatus", newStatus.name)
+//                        .await()
+//                }
+//
+//                Log.d("AdminTicketRepository", "Ticket status updated successfully")
+//                Result.success(Unit)
+//            } catch (e: Exception) {
+//                Result.failure(e)
+//            }
+//    }
 
 
 

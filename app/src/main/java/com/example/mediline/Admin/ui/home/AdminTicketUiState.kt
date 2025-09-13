@@ -1,8 +1,10 @@
 package com.example.mediline.Admin.ui.home
 
+import com.example.mediline.data.model.Department
 import com.example.mediline.data.model.Form
 import com.example.mediline.data.model.PaymentStatus
 import com.example.mediline.data.model.TicketStatus
+import com.example.mediline.data.room.DepartmentEntity
 
 // UI state for Admin Ticket Screen
 data class AdminTicketUiState(
@@ -10,7 +12,8 @@ data class AdminTicketUiState(
     val filteredTickets: List<Form> = tickets, // filtered tickets
     val isLoading: Boolean = false,
     val error: String? = null,
-    val filter: TicketFilters = TicketFilters()
+    val filter: TicketFilters = TicketFilters(),
+    val departments: List<Department> = emptyList()
 )
 
 // Represents all available filters

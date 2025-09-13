@@ -12,6 +12,7 @@ data class CreateTicketUiState(
     val sex:Sex=Sex.Male,
     val departmentId: String="",
    val bloodGroup: String?= "",
+    val fatherName: String="",
     val errors: Map<String, String?> = emptyMap()
 )
 

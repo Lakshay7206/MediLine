@@ -158,6 +158,25 @@ fun RegistrationScreen(
                 }
 
                 OutlinedTextField(
+                    value = uiState.fatherName,
+                    onValueChange = { viewModel.updateFatherName(it) },
+                    label = { Text("Father's Name") },
+                    singleLine = true,
+                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    isError = uiState.errors["Father's Name"] != null
+                )
+                uiState.errors["Father's Name"]?.let { errorMsg ->
+                    Text(
+                        text = errorMsg,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+                    )
+                }
+
+                OutlinedTextField(
                     value = uiState.address,
                     onValueChange = { viewModel.updateAddress(it) },
                     label = { Text("Address") },

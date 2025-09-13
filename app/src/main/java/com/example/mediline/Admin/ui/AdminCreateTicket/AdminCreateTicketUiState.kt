@@ -1,6 +1,7 @@
 package com.example.mediline.Admin.ui.AdminCreateTicket
 
 import com.example.mediline.User.ui.createTicket.Sex
+import com.example.mediline.data.model.Department
 
 data class AdminTicketUiState(
     val name: String = "",
@@ -14,4 +15,10 @@ data class AdminTicketUiState(
     val isSubmitting: Boolean = false,
     val errorMessage: String? = null,
     val address: String ="",
+    val fatherName: String ="",
+    val departments: List<Department> = emptyList(),
+    val errors: Map<String, String?> = emptyMap(),
+    val successMessage: String? = null // ✅ new field
 )
+
+
