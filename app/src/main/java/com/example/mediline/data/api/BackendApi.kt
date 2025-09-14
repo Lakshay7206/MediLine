@@ -7,9 +7,9 @@ data class InviteRequest(val email: String)
 data class AcceptInviteRequest(val token: String, val password: String)
 
 interface BackendApi {
-    @POST("invite")
+    @POST("admin/invite")
     suspend fun sendInvite(@Body request: InviteRequest)
 
-    @POST("accept")
+    @POST("admin/accept")
     suspend fun acceptInvite(@Body request: AcceptInviteRequest)
 }

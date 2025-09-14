@@ -240,7 +240,9 @@ class UserUpdatePaymentStatusUseCase @Inject constructor(
 class LoadAdminProfileUseCase @Inject constructor(
     private val repository: AdminProfileRepository
 ) {
-    suspend operator fun invoke(): AdminProfile = repository.loadProfile()
+    suspend operator fun invoke(uid: String): AdminProfile? = repository.loadProfile(
+        uid = uid
+    )
 }
 
 // Use case to update admin profile
@@ -255,7 +257,7 @@ class UpdateAdminProfileUseCase @Inject constructor(
 class GetAllAdminsUseCase @Inject constructor(
     private val repository: AdminProfileRepository
 ) {
-    suspend operator fun invoke(): List<AdminProfile> = repository.getAllAdmins()
+    suspend operator fun invoke(): Flow<List<AdminProfile>> = repository.getAllAdmins()
 }
 
 class DeleteAdminUseCase @Inject constructor(
@@ -265,4 +267,24 @@ class DeleteAdminUseCase @Inject constructor(
         repository.deleteAdmin(adminId)
     }
 }
+
+
+class AssignTicketUseCase(
+    private val repository: FormRepository
+)  {
+
+   suspend operator  fun invoke(formId: String): Result<Long?> {
+        return repository.assignTicketNumber(formId)
+    }
+}
+
+class AdminSignOutUseCase(
+    private val repository: AdminAuthRepository
+
+){
+    operator fun invoke(): Result<Unit> {
+        return repository.logoutAdmin()
+    }
+}
+
 

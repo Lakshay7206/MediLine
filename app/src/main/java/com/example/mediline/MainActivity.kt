@@ -16,11 +16,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.mediline.Admin.ui.AdminAppNavigation
 import com.example.mediline.Admin.ui.CreateDepartment.AdminDepartmentScreen
 import com.example.mediline.User.RootNavGraph
 import com.example.mediline.User.Screen
 import com.example.mediline.User.ui.payment.PaymentViewModel
 import com.example.mediline.User.ui.theme.AppTheme
+import com.example.mediline.superAdmin.SuperAdminScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.getValue
 import com.razorpay.PaymentData
@@ -47,8 +49,8 @@ class MainActivity : ComponentActivity(), PaymentResultWithDataListener {
         setContent {
             AppTheme {
                  navController = rememberNavController()
-                RootNavGraph(navController)
-                //AdminDepartmentScreen()
+                AdminAppNavigation(navController)
+
 
             }
         }

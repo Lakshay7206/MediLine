@@ -103,10 +103,10 @@ dependencies {
 
     // Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
-    implementation(libs.androidx.runtime)
-    implementation(libs.material3)
-    implementation(libs.androidx.foundation)
-    implementation(libs.androidx.foundation.layout)
+//    implementation(libs.androidx.runtime)
+//    implementation(libs.material3)
+//    implementation(libs.androidx.foundation)
+//    implementation(libs.androidx.foundation.layout)
     kapt("com.google.dagger:hilt-compiler:2.51.1")
 
     // Room

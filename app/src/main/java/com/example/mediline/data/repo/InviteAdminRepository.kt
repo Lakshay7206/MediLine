@@ -49,11 +49,11 @@ class AdminRepositoryImpl @Inject constructor(
         }
 
         val deletedAdmin = AdminProfile(
-            id = snapshot.id,
-            name = snapshot.getString("name") ?: "",
+            uid = snapshot.id,
+           // name = snapshot.getString("name") ?: "",
             email = snapshot.getString("email") ?: "",
             role = snapshot.getString("role") ?: "",
-            imageUrl = snapshot.getString("imageUrl") ?: "https://example.com/default_profile.jpg"
+            //imageUrl = snapshot.getString("imageUrl") ?: "https://example.com/default_profile.jpg"
         )
 
         // Now delete the document

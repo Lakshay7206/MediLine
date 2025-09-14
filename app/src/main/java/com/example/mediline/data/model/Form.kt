@@ -18,7 +18,7 @@ data class Form (
     val ticketStatus: TicketStatus=TicketStatus.ACTIVE,
     val createdBy: String="",     // UID of creator (admin or same as userId)
     val creatorRole: CreatorRole=CreatorRole.NULL,   // "admin" or "user"
-    val fatherName: String,
+    val fatherName: String=""
 
 )
 
@@ -49,6 +49,7 @@ enum class PaymentStatus{
 interface FormRepository{
     suspend fun addForm(form: Form): Result<String>
     suspend fun updatePaymentStatus(formId: String,status: String ): Result<Unit>
+    suspend fun assignTicketNumber(formId: String): Result<Long?>
 
 
 }

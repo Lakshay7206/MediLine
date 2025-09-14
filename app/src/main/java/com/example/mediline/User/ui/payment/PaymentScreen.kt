@@ -68,7 +68,7 @@ import org.json.JSONObject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentGatewayScreen(
-    formId: String,
+   formId: String,
     navigateBack: () -> Unit,
     gateways: List<String> = listOf("Razorpay", "Paytm", "UPI"),
     amount: Int = 100,

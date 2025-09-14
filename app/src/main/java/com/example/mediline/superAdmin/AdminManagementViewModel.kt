@@ -11,15 +11,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import androidx.lifecycle.viewModelScope
 import com.example.mediline.data.model.AdminProfile
-import com.example.mediline.data.repo.AdminRepository
 
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-
-
 
 
 @HiltViewModel
@@ -30,9 +26,6 @@ class SuperAdminViewModel @Inject constructor(
     private val sendInviteUseCase: InviteAdminUseCase
 ) : ViewModel() {
 
-    // -----------------------------
-    // Super Admin State
-    // -----------------------------
     private val _superAdminUiState = MutableStateFlow(SuperAdminUiState())
     val superAdminUiState: StateFlow<SuperAdminUiState> = _superAdminUiState.asStateFlow()
 
@@ -40,30 +33,55 @@ class SuperAdminViewModel @Inject constructor(
         loadAllAdmins()
     }
 
-    /** Loads all admins from repository */
     fun loadAllAdmins() {
         viewModelScope.launch {
             _superAdminUiState.update { it.copy(isLoading = true, error = null) }
 
             try {
-                val admins = getAllAdminsUseCase()
-                _superAdminUiState.update {
-                    it.copy(
-                        isLoading = false,
-                        admins = admins,
-                        error = null
-                    )
-                }
+                // Collect the Flow from Firestore listener
+                getAllAdminsUseCase()  // This is the Flow version we created
+                    .catch { e ->
+                        _superAdminUiState.update {
+                            it.copy(isLoading = false, error = e.message ?: "Failed to load admins")
+                        }
+                    }
+                    .collect { admins ->
+                        _superAdminUiState.update {
+                            it.copy(isLoading = false, admins = admins, error = null)
+                        }
+                    }
             } catch (e: Exception) {
                 _superAdminUiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = e.message ?: "Failed to load admins"
-                    )
+                    it.copy(isLoading = false, error = e.message ?: "Failed to load admins")
                 }
             }
         }
     }
+
+    /** Loads all admins from repository */
+//    fun loadAllAdmins() {
+//        viewModelScope.launch {
+//            _superAdminUiState.update { it.copy(isLoading = true, error = null) }
+//
+//            try {
+//                val admins = getAllAdminsUseCase()
+//                _superAdminUiState.update {
+//                    it.copy(
+//                        isLoading = false,
+//                        admins = admins ,
+//                        error = null
+//                    )
+//                }
+//            } catch (e: Exception) {
+//                _superAdminUiState.update {
+//                    it.copy(
+//                        isLoading = false,
+//                        error = e.message ?: "Failed to load admins"
+//                    )
+//                }
+//            }
+//        }
+//    }
 
     /** Removes an admin */
     /** Removes an admin */
@@ -73,13 +91,13 @@ class SuperAdminViewModel @Inject constructor(
 
             try {
                 // Call the use case to delete the admin by ID
-                deleteAdminUseCase(admin.id)
+                deleteAdminUseCase(admin.uid)
 
                 // Update the UI state by removing the deleted admin
                 _superAdminUiState.update { state ->
                     state.copy(
                         isLoading = false,
-                        admins = state.admins.filterNot { it.id == admin.id }
+                        admins = state.admins.filterNot { it.uid == admin.uid }
                     )
                 }
             } catch (e: Exception) {

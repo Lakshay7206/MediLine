@@ -487,6 +487,7 @@ fun ActionButton(text: String, onClick: () -> Unit, color: Color) {
 @Composable
 fun StatusChip(status: TicketStatus) {
     val (color, text) = when (status) {
+        TicketStatus.SERVING-> Color(0xFF1E88E5) to "Pending"
         TicketStatus.CLOSED -> Color(0xFF60A462) to "Closed"
         TicketStatus.SKIPPED -> Color(0xFFFFB300) to "Skipped"
         TicketStatus.CANCELLED -> Color(0xFFF44336) to "Cancelled"

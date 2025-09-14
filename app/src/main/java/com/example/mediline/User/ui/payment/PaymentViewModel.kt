@@ -10,6 +10,7 @@ import androidx.navigation.NavController
 import androidx.savedstate.savedState
 import com.example.mediline.User.ui.authentication.LoginScreen
 import com.example.mediline.data.repo.PaymentDataHolder
+import com.example.mediline.dl.AssignTicketUseCase
 import com.example.mediline.dl.CreateOrderUseCase
 import com.example.mediline.dl.UserUpdatePaymentStatusUseCase
 
@@ -33,8 +34,10 @@ class PaymentViewModel @Inject constructor(
     private val createOrderUseCase: CreateOrderUseCase,
     private val verifyPaymentUseCase: VerifyPaymentUseCase,
     private val userUpdatePaymentStatusUseCase: UserUpdatePaymentStatusUseCase,
+    private val assignTicketUseCase: AssignTicketUseCase,
 
-) : ViewModel() {
+
+    ) : ViewModel() {
 
     private val _paymentState = MutableStateFlow<PaymentState>(PaymentState.Idle)
     val paymentState: StateFlow<PaymentState> = _paymentState
@@ -99,7 +102,8 @@ class PaymentViewModel @Inject constructor(
                         // Update Firestore / backend status
                         val updateResult = withContext(Dispatchers.IO) {
                             runCatching {
-                                userUpdatePaymentStatusUseCase(currentFormId, "PAID")
+                                assignTicketUseCase(currentFormId)
+                                //userUpdatePaymentStatusUseCase(currentFormId, "PAID")
                             }.getOrThrow()
                         }
 

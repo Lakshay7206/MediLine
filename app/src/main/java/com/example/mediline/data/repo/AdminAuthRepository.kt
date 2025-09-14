@@ -1,11 +1,13 @@
 package com.example.mediline.data.repo
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 interface AdminAuthRepository {
     suspend fun loginAdmin(email: String, password: String): Result<Unit>
+    fun logoutAdmin(): Result<Unit>
 }
 
 class AdminAuthRepositoryImpl @Inject constructor(
@@ -26,6 +28,17 @@ class AdminAuthRepositoryImpl @Inject constructor(
 
             Result.success(Unit)
         } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override fun logoutAdmin(): Result<Unit> {
+        return try {
+            firebaseAuth.signOut()
+            Log.d("AuthRepositoryImpl", "User session cleared")// This clears the current user session
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.d("AuthRepositoryImpl", "Error clearing user session: $e")
             Result.failure(e)
         }
     }

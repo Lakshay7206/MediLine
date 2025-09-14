@@ -1,6 +1,7 @@
 package com.example.mediline.data.repo
 
 import android.app.Activity
+import android.util.Log
 import com.example.mediline.data.model.User
 import com.example.mediline.data.model.UserEntity
 import com.google.firebase.FirebaseException
@@ -25,6 +26,7 @@ interface AuthRepository {
     suspend fun createUser(user: User): Result<Unit>
 
     suspend fun resendOtp(phone: String,activity: Activity,resendToken: PhoneAuthProvider.ForceResendingToken): Result<OtpData>
+    fun logout(): Result<Unit>
 }
 
 class AuthRepositoryImpl(private val auth: FirebaseAuth,
@@ -224,6 +226,16 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth,
             }
 
         }
+
+    override fun logout(): Result<Unit> {
+        return try {
+            auth.signOut()
+            Log.d("AuthRepositoryImpl", "User session cleared")// This clears the current user session
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
 
 

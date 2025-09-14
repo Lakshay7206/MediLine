@@ -118,7 +118,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://4f95a267c909.ngrok-free.app/") // 🔥 use your backend URL
+            .baseUrl("https://7185090cddbc.ngrok-free.app/") // 🔥 use your backend URL
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -216,4 +216,16 @@ object AppModule {
     @Singleton
     fun provideRemoveAdminUseCase(repository: AdminRepository) =
         DeleteAdminUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideAssignTicketUseCase(repository: FormRepository) =
+        AssignTicketUseCase(repository)
+
+
+    @Provides
+    @Singleton
+    fun provideAdminSignOutUseCase(repository: AdminAuthRepository) =
+        AdminSignOutUseCase(repository)
+
 }

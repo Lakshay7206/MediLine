@@ -50,18 +50,18 @@ fun AdminAppNavigation(navController: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route
+        startDestination = Screen.Login.route
     ) {
         // 🔹 Login
-//        composable(Screen.Login.route) {
-//            AdminLoginScreen(
-//                onLoginSuccess = {
-//                    navController.navigate(Screen.Home.route) {
-//                        popUpTo(Screen.Login.route) { inclusive = true }
-//                    }
-//                }
-//            )
-//        }
+        composable(Screen.Login.route) {
+            AdminLoginScreen(
+                onLoginSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            )
+        }
 
         // 🔹 Home (Ticket Management)
         composable(Screen.Home.route) {
@@ -112,7 +112,7 @@ fun AdminAppNavigation(navController: NavHostController) {
         // 🔹 Departments
         composable(Screen.Departments.route) {
             AdminDepartmentScreen(
-                onBack = { navController.popBackStack() },
+                //onBack = { navController.popBackStack() },
                 onHome = { navController.navigate(Screen.Home.route) },
                 onCreateTicket = { navController.navigate(Screen.CreateTicket.route) },
                 onProfile = { navController.navigate(Screen.Profile.route) }
@@ -122,11 +122,15 @@ fun AdminAppNavigation(navController: NavHostController) {
         // 🔹 Profile
         composable(Screen.Profile.route) {
             AdminProfileScreen(
-                onBack = { navController.popBackStack() },
-                onLogout = { /* navigate to login screen */ },
+                //onBack = { navController.popBackStack() },
                 onHome = { navController.navigate(Screen.Home.route) },
                 onDepartments = { navController.navigate(Screen.Departments.route) },
-                onCreateTicket = { navController.navigate(Screen.CreateTicket.route) }
+                onCreateTicket = { navController.navigate(Screen.CreateTicket.route) },
+                navigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Profile.route) { inclusive = true }
+                    }
+                }
             )
         }
 

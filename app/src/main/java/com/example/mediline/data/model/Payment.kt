@@ -20,7 +20,8 @@ data class CreateOrderResponse(
 data class VerifyPaymentRequest(
     val orderId: String,
     val paymentId: String,
-    val signature: String
+    val signature: String,
+   // val departmentId:String
 )
 
 // VerifyPaymentResponse.kt

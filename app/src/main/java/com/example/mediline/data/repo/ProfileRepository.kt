@@ -7,63 +7,55 @@ import android.net.Uri
 import com.example.mediline.data.model.AdminProfileRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 
-class AdminProfileRepositoryImpl @Inject constructor(
+class AdminProfileRepositoryImpl(
     private val firestore: FirebaseFirestore
 ) : AdminProfileRepository {
 
-    override suspend fun loadProfile(): AdminProfile {
-        // For practice mode: just return the first admin if exists
-        val snapshot = firestore.collection("admins").limit(1).get().await()
-        val doc = snapshot.documents.firstOrNull()
+    private val adminsCollection = firestore.collection("admins")
 
-        return doc?.let {
-            AdminProfile(
-                id = it.id,
-                name = it.getString("name") ?: "",
-                email = it.getString("email") ?: "",
-                role = it.getString("role") ?: "",
-                imageUrl = it.getString("imageUrl") ?: "https://example.com/default_profile.jpg"
-            )
-        } ?: AdminProfile(
-            imageUrl = "https://example.com/default_profile.jpg"
-        )
+    override suspend fun loadProfile(uid: String): AdminProfile? {
+        val snapshot = adminsCollection.document(uid).get().await()
+        return if (snapshot.exists()) {
+            snapshot.toObject(AdminProfile::class.java)
+        } else {
+            null
+        }
     }
 
     override suspend fun saveProfile(profile: AdminProfile) {
-        // Generate new document or update existing one
-        val docRef = if (profile.id.isNotEmpty()) {
-            firestore.collection("admins").document(profile.id)
-        } else {
-            firestore.collection("admins").document()
-        }
-
-        val profileWithId = profile.copy(id = docRef.id)
-
-        val profileData = mapOf(
-            "id" to profileWithId.id,
-            "name" to profileWithId.name,
-            "email" to profileWithId.email,
-            "role" to profileWithId.role,
-            "imageUrl" to profileWithId.imageUrl.ifEmpty { "https://example.com/default_profile.jpg" }
-        )
-
-        docRef.set(profileData).await()
+        adminsCollection.document(profile.uid).set(profile).await()
     }
 
-    override suspend fun getAllAdmins(): List<AdminProfile> {
-        val snapshot = firestore.collection("admins").get().await()
-        return snapshot.documents.map { doc ->
-            AdminProfile(
-                id = doc.id,
-                name = doc.getString("name") ?: "",
-                email = doc.getString("email") ?: "",
-                role = doc.getString("role") ?: "",
-                imageUrl = doc.getString("imageUrl") ?: "https://example.com/default_profile.jpg"
-            )
+//    override suspend fun getAllAdmins(): List<AdminProfile> {
+//        val snapshot = adminsCollection.get().await()
+//        return snapshot.documents.mapNotNull { it.toObject(AdminProfile::class.java) }
+//    }
+    override  suspend fun getAllAdmins(): Flow<List<AdminProfile>> = callbackFlow {
+        val listener = adminsCollection.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error) // close flow on error
+                return@addSnapshotListener
+            }
+
+            val admins = snapshot?.documents
+                ?.mapNotNull { it.toObject(AdminProfile::class.java) }
+                ?: emptyList()
+
+            trySend(admins).isSuccess
         }
+
+        awaitClose { listener.remove() }
+    }
+
+
+    override suspend fun deleteProfile(uid: String) {
+        adminsCollection.document(uid).delete().await()
     }
 }

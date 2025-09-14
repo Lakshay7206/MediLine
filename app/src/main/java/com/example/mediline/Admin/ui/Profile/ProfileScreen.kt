@@ -3,12 +3,14 @@ package com.example.mediline.Admin.ui.Profile
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Canvas
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,8 +18,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
@@ -51,32 +55,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.mediline.Admin.ui.Screen
 import com.example.mediline.Admin.ui.home.BottomNavBar
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminProfileScreen(
-    onBack: () -> Unit,
-    onLogout: () -> Unit,
     onHome: () -> Unit,
     onDepartments: () -> Unit,
     onCreateTicket: () -> Unit,
+    navigateToLogin: () -> Unit,
     viewModel: AdminProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-
-    // Keep image picker for preview only
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let { viewModel.updateProfileImage(it) } // updates UI only
-    }
 
     LaunchedEffect(uiState.error, uiState.successMessage) {
         uiState.error?.let { snackbarHostState.showSnackbar(it) }
@@ -85,24 +82,8 @@ fun AdminProfileScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Admin Profile", style = MaterialTheme.typography.titleLarge) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    TextButton(
-                        onClick = { viewModel.logout(onLogout) },
-                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                    ) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Logout", tint = MaterialTheme.colorScheme.error)
-                        Spacer(Modifier.width(6.dp))
-                        Text("Logout", color = MaterialTheme.colorScheme.error)
-                    }
-                }
-            )
+            ProfileCurvedTopBar("Profile", logout = {viewModel.logout()
+            navigateToLogin()})
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
@@ -120,103 +101,333 @@ fun AdminProfileScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(20.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement = Arrangement.Top
         ) {
-            // Profile Picture (preview only)
-            Card(
-                shape = CircleShape,
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                modifier = Modifier.size(140.dp)
-            ) {
-                Box(contentAlignment = Alignment.BottomEnd) {
-                    val painter = when {
-                        uiState.profileImageUri != null -> rememberAsyncImagePainter(uiState.profileImageUri)
-                        else -> rememberAsyncImagePainter("https://example.com/default_profile.jpg") // hardcoded
-                    }
-
-                    Image(
-                        painter = painter,
-                        contentDescription = "Profile Image",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-
-                    // Picker only updates UI, doesn't save
-                    IconButton(
-                        onClick = { imagePickerLauncher.launch("image/*") },
-                        modifier = Modifier
-                            .padding(6.dp)
-                            .size(38.dp)
-                            .background(Color.White, CircleShape)
-                    ) {
-                        Icon(Icons.Default.Edit, contentDescription = "Change Photo", tint = MaterialTheme.colorScheme.primary)
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
             // Profile Information Card
+//            Card(
+//                modifier = Modifier.fillMaxWidth(),
+//                shape = RoundedCornerShape(20.dp),
+//                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+//            ) {
+//                Column(
+//                    modifier = Modifier.padding(20.dp),
+//                    verticalArrangement = Arrangement.spacedBy(16.dp)
+//                ) {
+//                    Text(
+//                        text = "Profile Information",
+//                        style = MaterialTheme.typography.headlineSmall,
+//                        color = MaterialTheme.colorScheme.primary
+//                    )
+//
+//                    OutlinedTextField(
+//                        value = uiState.name,
+//                        onValueChange = { viewModel.updateName(it) },
+//                        label = { Text("Full Name") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        singleLine = true
+//                    )
+//
+//                    OutlinedTextField(
+//                        value = uiState.email,
+//                        onValueChange = { viewModel.updateEmail(it) },
+//                        label = { Text("Email Address") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        singleLine = true
+//                    )
+//
+//                    OutlinedTextField(
+//                        value = uiState.role,
+//                        onValueChange = { viewModel.updateRole(it) },
+//                        label = { Text("Role / Position") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        singleLine = true
+//                    )
+//
+//                    Spacer(Modifier.height(12.dp))
+//
+//                    Button(
+//                        onClick = { viewModel.saveProfile() },
+//                        enabled = !uiState.isLoading,
+//                        modifier = Modifier.fillMaxWidth(),
+//                        shape = RoundedCornerShape(12.dp)
+//                    ) {
+//                        if (uiState.isLoading) {
+//                            CircularProgressIndicator(
+//                                modifier = Modifier.size(20.dp),
+//                                color = Color.White,
+//                                strokeWidth = 2.dp
+//                            )
+//                        } else {
+//                            Text("Save Changes")
+//                        }
+//                    }
+//                }
+//            }
+//
+//            Spacer(Modifier.height(24.dp))
+
+            // Change Password Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                shape = RoundedCornerShape(20.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "Profile Information",
+                        text = "Security",
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
 
-                    OutlinedTextField(
-                        value = uiState.name,
-                        onValueChange = { viewModel.updateName(it) },
-                        label = { Text("Full Name") },
+                    Button(
+                        onClick = { viewModel.saveProfile()},
                         modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-
-                    OutlinedTextField(
-                        value = uiState.email,
-                        onValueChange = { viewModel.updateEmail(it) },
-                        label = { Text("Email Address") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-
-                    OutlinedTextField(
-                        value = uiState.role,
-                        onValueChange = { viewModel.updateRole(it) },
-                        label = { Text("Role / Position") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-
-                    Spacer(Modifier.height(12.dp))
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Change Password")
+                    }
 
                     Button(
-                        onClick = { viewModel.saveProfile() },
-                        enabled = !uiState.isLoading,
-                        modifier = Modifier.fillMaxWidth()
+                        onClick = {
+                            viewModel.logout()
+                            navigateToLogin()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
-                        if (uiState.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                color = Color.White,
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Text("Save Changes")
-                        }
+                        Text("Delete Account", color = MaterialTheme.colorScheme.onError)
                     }
                 }
             }
         }
     }
 }
+
+@Composable
+fun ProfileCurvedTopBar(
+    title: String,
+    logout: () -> Unit
+) {
+    val primary = MaterialTheme.colorScheme.primary
+    val onPrimary = MaterialTheme.colorScheme.onPrimary
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp),
+
+        ) {
+        Canvas(modifier = Modifier.matchParentSize()) {
+            val width = size.width
+            val height = size.height
+
+            val path = Path().apply {
+                moveTo(0f, height * 0.6f)
+                quadraticBezierTo(
+                    width / 2, height, // control point
+                    width, height * 0.6f // end point
+                )
+                lineTo(width, 0f)
+                lineTo(0f, 0f)
+                close()
+            }
+
+            drawPath(
+                path = path,
+                color = primary
+            )
+        }
+
+            IconButton(
+                onClick = {logout()},
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ExitToApp,
+                    contentDescription = "Back",
+                    tint = onPrimary
+                )
+            }
+
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+            color = onPrimary,
+            modifier = Modifier
+                .align(Alignment.Center)
+        )
+    }
+}
+
+
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun AdminProfileScreen(
+//    onBack: () -> Unit,
+//    onHome: () -> Unit,
+//    onDepartments: () -> Unit,
+//    onCreateTicket: () -> Unit,
+//    navigateToLogin:()-> Unit,
+//    viewModel: AdminProfileViewModel = hiltViewModel()
+//) {
+//    val uiState by viewModel.uiState.collectAsState()
+//    val snackbarHostState = remember { SnackbarHostState() }
+//
+//    // Keep image picker for preview only
+//    val imagePickerLauncher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.GetContent()
+//    ) { uri: Uri? ->
+//        uri?.let { viewModel.updateProfileImage(it) } // updates UI only
+//    }
+//
+//    LaunchedEffect(uiState.error, uiState.successMessage) {
+//        uiState.error?.let { snackbarHostState.showSnackbar(it) }
+//        uiState.successMessage?.let { snackbarHostState.showSnackbar(it) }
+//    }
+//
+//    Scaffold(
+//        topBar = {
+//            TopAppBar(
+//                title = { Text("Admin Profile", style = MaterialTheme.typography.titleLarge) },
+//                navigationIcon = {
+//                    IconButton(onClick = onBack) {
+//                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+//                    }
+//                },
+//                actions = {
+//                    TextButton(
+//                        onClick = { viewModel.logout()
+//                                  navigateToLogin()},
+//                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+//                    ) {
+//                        Icon(Icons.Default.ExitToApp, contentDescription = "Logout", tint = MaterialTheme.colorScheme.error)
+//                        Spacer(Modifier.width(6.dp))
+//                        Text("Logout", color = MaterialTheme.colorScheme.error)
+//                    }
+//                }
+//            )
+//        },
+//        snackbarHost = { SnackbarHost(snackbarHostState) },
+//        bottomBar = {
+//            BottomNavBar { route ->
+//                when (route) {
+//                    Screen.Home.route -> onHome()
+//                    Screen.CreateTicket.route -> onCreateTicket()
+//                    Screen.Departments.route -> onDepartments()
+//                    Screen.Profile.route -> {}
+//                }
+//            }
+//        }
+//    ) { paddingValues ->
+//        Column(
+//            modifier = Modifier
+//                .padding(paddingValues)
+//                .fillMaxSize()
+//                .padding(20.dp),
+//            verticalArrangement = Arrangement.Top,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            // Profile Picture (preview only)
+//            Card(
+//                shape = CircleShape,
+//                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+//                modifier = Modifier.size(140.dp)
+//            ) {
+//                Box(contentAlignment = Alignment.BottomEnd) {
+//                    val painter = when {
+//                        uiState.profileImageUri != null -> rememberAsyncImagePainter(uiState.profileImageUri)
+//                        else -> rememberAsyncImagePainter("https://example.com/default_profile.jpg") // hardcoded
+//                    }
+//
+//                    Image(
+//                        painter = painter,
+//                        contentDescription = "Profile Image",
+//                        modifier = Modifier.fillMaxSize(),
+//                        contentScale = ContentScale.Crop
+//                    )
+//
+//                    // Picker only updates UI, doesn't save
+//                    IconButton(
+//                        onClick = { imagePickerLauncher.launch("image/*") },
+//                        modifier = Modifier
+//                            .padding(6.dp)
+//                            .size(38.dp)
+//                            .background(Color.White, CircleShape)
+//                    ) {
+//                        Icon(Icons.Default.Edit, contentDescription = "Change Photo", tint = MaterialTheme.colorScheme.primary)
+//                    }
+//                }
+//            }
+//
+//            Spacer(Modifier.height(24.dp))
+//
+//            // Profile Information Card
+//            Card(
+//                modifier = Modifier.fillMaxWidth(),
+//                shape = RoundedCornerShape(16.dp),
+//                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+//            ) {
+//                Column(
+//                    modifier = Modifier.padding(20.dp),
+//                    verticalArrangement = Arrangement.spacedBy(16.dp)
+//                ) {
+//                    Text(
+//                        text = "Profile Information",
+//                        style = MaterialTheme.typography.headlineSmall,
+//                        color = MaterialTheme.colorScheme.primary
+//                    )
+//
+//                    OutlinedTextField(
+//                        value = uiState.name,
+//                        onValueChange = { viewModel.updateName(it) },
+//                        label = { Text("Full Name") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        singleLine = true
+//                    )
+//
+//                    OutlinedTextField(
+//                        value = uiState.email,
+//                        onValueChange = { viewModel.updateEmail(it) },
+//                        label = { Text("Email Address") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        singleLine = true
+//                    )
+//
+//                    OutlinedTextField(
+//                        value = uiState.role,
+//                        onValueChange = { viewModel.updateRole(it) },
+//                        label = { Text("Role / Position") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        singleLine = true
+//                    )
+//
+//                    Spacer(Modifier.height(12.dp))
+//
+//                    Button(
+//                        onClick = { viewModel.saveProfile() },
+//                        enabled = !uiState.isLoading,
+//                        modifier = Modifier.fillMaxWidth()
+//                    ) {
+//                        if (uiState.isLoading) {
+//                            CircularProgressIndicator(
+//                                modifier = Modifier.size(20.dp),
+//                                color = Color.White,
+//                                strokeWidth = 2.dp
+//                            )
+//                        } else {
+//                            Text("Save Changes")
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}

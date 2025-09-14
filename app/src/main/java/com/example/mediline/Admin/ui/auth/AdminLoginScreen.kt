@@ -1,12 +1,18 @@
 package com.example.mediline.Admin.ui.auth
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -18,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -30,123 +37,170 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.mediline.R
+import com.example.mediline.User.ui.authentication.CurvedTopBar
+import com.example.mediline.User.ui.theme.AppTypography
+import com.example.mediline.User.ui.theme.LightColors
 
 
-
+@SuppressLint("ContextCastToActivity")
 @Composable
 fun AdminLoginScreen(
     onLoginSuccess: () -> Unit,
     viewModel: AdminLoginViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current as Activity
 
-    val primaryColor = Color(0xFF3BB77E)
-    val textColor = Color(0xFF010F1C)
-    val hintColor = Color(0xFF646464)
-    val borderColor = Color(0xFF939393)
+    // App theme colors
+    val primaryColor = LightColors.primary
+    val textColor = LightColors.onSurface
+    val hintColor = LightColors.onSurface.copy(alpha = 0.6f)
 
-    // ✅ Password visibility state
+    // Password visibility state
     var passwordVisible by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            "Admin Login",
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontWeight = FontWeight.Bold,
-                color = textColor
-            )
-        )
+    Scaffold(
+        topBar = { CurvedTopBar(title = "Admin Login", false,{}) }
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(LightColors.background)
+                .padding(24.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-        Spacer(modifier = Modifier.height(32.dp))
+                // Logo
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "App Logo",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(bottom = 24.dp)
+                )
 
-        // ✅ Email Field
-        OutlinedTextField(
-            value = uiState.email,
-            onValueChange = { viewModel.onEmailChange(it) },
-            label = { Text("Email", color = hintColor) },
-            singleLine = true,
-            textStyle = TextStyle(color = Color(0xFF010F1C)),
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = primaryColor,
-                unfocusedBorderColor = borderColor,
-                focusedLabelColor = primaryColor,
-                unfocusedLabelColor = hintColor,
-                cursorColor = primaryColor
-            )
-        )
+                Text(
+                    text = "Admin Login",
+                    style = AppTypography.displayLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 32.dp)
+                )
 
-        Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Enter your credentials to continue",
+                    style = AppTypography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 48.dp)
+                )
 
-        // ✅ Password Field with Eye Icon
-        OutlinedTextField(
-            value = uiState.password,
-            onValueChange = { viewModel.onPasswordChange(it) },
-            label = { Text("Password", color = hintColor) },
-            singleLine = true,
-            textStyle = TextStyle(color = Color(0xFF010F1C)),
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
-            trailingIcon = {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(
-                        imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                        tint = if (passwordVisible) primaryColor else hintColor
+                // Email
+                OutlinedTextField(
+                    value = uiState.email,
+                    onValueChange = { viewModel.onEmailChange(it) },
+                    label = {
+                        Text("Email", style = AppTypography.bodyLarge)
+                    },
+                    textStyle = AppTypography.bodyLarge.copy(color = textColor),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = textColor,
+                        unfocusedTextColor = textColor,
+                        focusedContainerColor = LightColors.surface,
+                        unfocusedContainerColor = LightColors.surface,
+                        cursorColor = primaryColor,
+                        focusedBorderColor = primaryColor,
+                        unfocusedBorderColor = primaryColor.copy(alpha = 0.5f),
+                        focusedLabelColor = primaryColor,
+                        unfocusedLabelColor = hintColor,
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Password
+                OutlinedTextField(
+                    value = uiState.password,
+                    onValueChange = { viewModel.onPasswordChange(it) },
+                    label = {
+                        Text("Password", style = AppTypography.bodyLarge)
+                    },
+                    textStyle = AppTypography.bodyLarge.copy(color = textColor),
+                    singleLine = true,
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                                tint = if (passwordVisible) primaryColor else hintColor
+                            )
+                        }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = textColor,
+                        unfocusedTextColor = textColor,
+                        focusedContainerColor = LightColors.surface,
+                        unfocusedContainerColor = LightColors.surface,
+                        cursorColor = primaryColor,
+                        focusedBorderColor = primaryColor,
+                        unfocusedBorderColor = primaryColor.copy(alpha = 0.5f),
+                        focusedLabelColor = primaryColor,
+                        unfocusedLabelColor = hintColor,
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Login button
+                Button(
+                    onClick = { viewModel.loginAdmin(onLoginSuccess) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = primaryColor,
+                        contentColor = LightColors.onPrimary
+                    )
+                ) {
+                    Text("Login", style = AppTypography.titleLarge)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Error state
+                if (uiState.error.isNotEmpty()) {
+                    Text(
+                        text = uiState.error,
+                        color = Color.Red,
+                        style = AppTypography.bodyLarge,
+                        modifier = Modifier.padding(top = 16.dp)
                     )
                 }
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = primaryColor,
-                unfocusedBorderColor = borderColor,
-                focusedLabelColor = primaryColor,
-                unfocusedLabelColor = hintColor,
-                cursorColor = primaryColor
-            )
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // ✅ Login Button
-        Button(
-            onClick = { viewModel.loginAdmin(onLoginSuccess) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Text("Login", color = Color.White, fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ✅ Error Message
-        if (uiState.error.isNotEmpty()) {
-            Text(uiState.error, color = Color.Red, fontSize = 14.sp)
+            }
         }
     }
 }
-
-
-
-
-
-
-
 
 //@Composable
 //fun AdminLoginScreen(
@@ -155,39 +209,104 @@ fun AdminLoginScreen(
 //) {
 //    val uiState by viewModel.uiState.collectAsState()
 //
+//    val primaryColor = Color(0xFF3BB77E)
+//    val textColor = Color(0xFF010F1C)
+//    val hintColor = Color(0xFF646464)
+//    val borderColor = Color(0xFF939393)
+//
+//    // ✅ Password visibility state
+//    var passwordVisible by remember { mutableStateOf(false) }
+//
 //    Column(
 //        modifier = Modifier
 //            .fillMaxSize()
-//            .padding(16.dp),
-//        verticalArrangement = Arrangement.Center
+//            .padding(24.dp),
+//        verticalArrangement = Arrangement.Center,
+//        horizontalAlignment = Alignment.CenterHorizontally
 //    ) {
-//        Text("Admin Login", style = MaterialTheme.typography.bodyMedium)
+//        Text(
+//            "Admin Login",
+//            style = MaterialTheme.typography.headlineSmall.copy(
+//                fontWeight = FontWeight.Bold,
+//                color = textColor
+//            )
+//        )
 //
-//        Spacer(modifier = Modifier.height(16.dp))
+//        Spacer(modifier = Modifier.height(32.dp))
 //
-//        TextField(
+//        // ✅ Email Field
+//        OutlinedTextField(
 //            value = uiState.email,
 //            onValueChange = { viewModel.onEmailChange(it) },
-//            label = { Text("Email") }
-//        )
-//
-//        Spacer(modifier = Modifier.height(8.dp))
-//
-//        TextField(
-//            value = uiState.password,
-//            onValueChange = { viewModel.onPasswordChange(it) },
-//            label = { Text("Password") },
-//            visualTransformation = PasswordVisualTransformation()
+//            label = { Text("Email", color = hintColor) },
+//            singleLine = true,
+//            textStyle = TextStyle(color = Color(0xFF010F1C)),
+//            modifier = Modifier.fillMaxWidth(),
+//            colors = OutlinedTextFieldDefaults.colors(
+//                focusedBorderColor = primaryColor,
+//                unfocusedBorderColor = borderColor,
+//                focusedLabelColor = primaryColor,
+//                unfocusedLabelColor = hintColor,
+//                cursorColor = primaryColor
+//            )
 //        )
 //
 //        Spacer(modifier = Modifier.height(16.dp))
 //
-//        Button(onClick = { viewModel.loginAdmin(onLoginSuccess) }) {
-//            Text("Login")
+//        // ✅ Password Field with Eye Icon
+//        OutlinedTextField(
+//            value = uiState.password,
+//            onValueChange = { viewModel.onPasswordChange(it) },
+//            label = { Text("Password", color = hintColor) },
+//            singleLine = true,
+//            textStyle = TextStyle(color = Color(0xFF010F1C)),
+//            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+//            modifier = Modifier.fillMaxWidth(),
+//            trailingIcon = {
+//                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+//                    Icon(
+//                        imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+//                        contentDescription = if (passwordVisible) "Hide password" else "Show password",
+//                        tint = if (passwordVisible) primaryColor else hintColor
+//                    )
+//                }
+//            },
+//            colors = OutlinedTextFieldDefaults.colors(
+//                focusedBorderColor = primaryColor,
+//                unfocusedBorderColor = borderColor,
+//                focusedLabelColor = primaryColor,
+//                unfocusedLabelColor = hintColor,
+//                cursorColor = primaryColor
+//            )
+//        )
+//
+//        Spacer(modifier = Modifier.height(24.dp))
+//
+//        // ✅ Login Button
+//        Button(
+//            onClick = { viewModel.loginAdmin(onLoginSuccess) },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(50.dp),
+//            colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+//            shape = RoundedCornerShape(8.dp)
+//        ) {
+//            Text("Login", color = Color.White, fontWeight = FontWeight.Bold)
 //        }
 //
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        // ✅ Error Message
 //        if (uiState.error.isNotEmpty()) {
-//            Text(uiState.error, color = Color.Red)
+//            Text(uiState.error, color = Color.Red, fontSize = 14.sp)
 //        }
 //    }
 //}
+//
+
+
+
+
+
+
+
