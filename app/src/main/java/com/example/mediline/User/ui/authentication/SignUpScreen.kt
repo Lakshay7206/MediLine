@@ -67,7 +67,7 @@ fun SignupScreen(
 
     Scaffold(
         topBar = {
-            CurvedTopBar("Sign up", true, navigateBack)
+            CurvedTopBar("Sign up", true, { navigateBack() })
         }
     ) { padding ->
         Column(
@@ -183,42 +183,3 @@ fun SignupScreen(
 
 
 
-
-
-//
-//
-//@Composable
-//fun SignupScreen(
-//    viewModel: AuthViewModel,
-//    navigateHome:()->Unit
-//
-//
-//) {
-//    val uiState by viewModel.uiState.collectAsState()
-//    val formState by viewModel.formState.collectAsState()
-//    Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center) {
-//        Text(text ="New user")
-//        Text(text ="creating User")
-//        val user=User(
-//            id = formState.uid,
-//            phone = formState.phone,
-//            createdAt = System.currentTimeMillis()
-//        )
-//        Button(onClick = { viewModel.createUser(user) }) { Text("Sign up")}
-//    }
-//
-//    Log.d("Logins", formState.phone)
-//
-//    when (uiState) {
-//        is AuthUiState.Loading -> CircularProgressIndicator()
-//        is AuthUiState.UserCreated -> {
-//            LaunchedEffect(Unit) {
-//                navigateHome()
-//            }
-//        }
-//        is AuthUiState.Error -> Text((uiState as AuthUiState.Error).message, color = Color.Red)
-//        else -> {}
-//    }
-//
-//
-//}

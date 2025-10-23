@@ -38,7 +38,7 @@ class ViewTicketViewModel @Inject constructor(
             getTicketsUseCase().fold(
                 onSuccess = { tickets ->
                     // Change .find to .filter to get a List<Form>
-                    val activeTickets = tickets.filter { it.ticketStatus == TicketStatus.ACTIVE  }
+                    val activeTickets = tickets.filter { it.ticketStatus == TicketStatus.ACTIVE ||it.ticketStatus== TicketStatus.SERVING }.sortedByDescending { it.timeStamp }
                     val history = tickets.filter {
                         it.ticketStatus != TicketStatus.ACTIVE && it.ticketStatus != TicketStatus.NULL
                     }.sortedByDescending { it.timeStamp }
@@ -73,10 +73,10 @@ class ViewTicketViewModel @Inject constructor(
 
     fun createAndDownloadTicketFile(context: Context, ticket: Form): File? {
         loadDoctors()
-        // 1. Generate PDF (temp file first)
+
         val pdfFile = generatePdfUseCase(context, ticket, doctors.value)
 
-        // 2. Copy to Downloads folder
+
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         if (!downloadsDir.exists()) downloadsDir.mkdirs()
 
@@ -107,35 +107,7 @@ class ViewTicketViewModel @Inject constructor(
             Toast.makeText(context, "No PDF viewer installed", Toast.LENGTH_SHORT).show()
         }
 
-        // 4. Return final file so ViewModel/UI can use it
         return destFile
     }
 
 }
-
-//@HiltViewModel
-//class ViewTicketViewModel @Inject constructor(
-//    private val getTicketsUseCase: GetTicketsUseCase
-//) : ViewModel() {
-//
-//    private val _uiState = MutableStateFlow<TicketUiState>(TicketUiState.Loading)
-//    val uiState: StateFlow<TicketUiState> = _uiState.asStateFlow()
-//
-//    fun loadTickets() {
-//        viewModelScope.launch {
-//            getTicketsUseCase().fold(
-//                onSuccess = { tickets ->
-//                    val active = tickets.find { it.ticketStatus == TicketStatus.ACTIVE }
-//                    val history = tickets.filter { it.ticketStatus != TicketStatus.ACTIVE }
-//                        .sortedByDescending { it.timeStamp }
-//                    _uiState.value = TicketUiState.Success(active, history)
-//                },
-//                onFailure = {
-//                    _uiState.value = TicketUiState.Error(it.localizedMessage ?: "Unknown error")
-//                }
-//            )
-//        }
-//    }
-//}
-
-

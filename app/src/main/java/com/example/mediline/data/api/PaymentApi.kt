@@ -8,12 +8,12 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface PaymentApi {
-    @POST("create-order")
+    @POST("payment/create-order")
     suspend fun createOrder(
         @Body request: CreateOrderRequest
     ): CreateOrderResponse
 
-    @POST("verify-payment")
+    @POST("payment/verify-payment")
     suspend fun verifyPayment(
         @Body request: VerifyPaymentRequest
     ): VerifyPaymentResponse

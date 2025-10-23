@@ -86,68 +86,6 @@ class FormRepositoryImpl(
     }
 }
 
-//class FormRepositoryImpl(
-//    private val firestore: FirebaseFirestore,
-//    private val auth: FirebaseAuth
-//) : FormRepository {
-//
-//    override suspend fun addForm(form: Form): Result<String> {
-//        return try {
-//            // Ensure user is logged in
-//            val currentUser = auth.currentUser ?: return Result.failure(Exception("User not logged in"))
-//
-//
-//            // Reference to the department document (where we store todayCounter)
-//            val deptRef = firestore.collection("departments")
-//                .document(form.departmentId)
-//            var result=""
-//
-//            // Run Firestore transaction
-//            val ticketNo = firestore.runTransaction { transaction ->
-//                val snapshot = transaction.get(deptRef)
-//                val currentCounter = snapshot.getLong("todayCounter") ?: 0
-//                val newCounter = currentCounter + 1
-//
-//                // Update today's counter
-//                transaction.update(deptRef, "todayCounter", newCounter)
-//                val formDocRef = firestore.collection("forms").document() // generates ID
-//
-//             result=formDocRef.id
-//                // Create form with ticketNumber and userId
-//                val formWithTicket = form.copy(
-//                    id = formDocRef.id,
-//                    createdBy = currentUser.uid,
-//                    userId = currentUser.uid,
-//                    ticketNumber = newCounter,
-//                    timeStamp = System.currentTimeMillis()
-//                )
-//
-//                transaction.set(formDocRef, formWithTicket.copy(id = formDocRef.id))
-//                newCounter
-//            }.await()
-//            // Converts Task<Long> to suspend-friendly value
-//
-//            Result.success(result)
-//        } catch (e: Exception) {
-//            Result.failure(e)
-//        }
-//    }
-//
-//    override suspend fun updatePaymentStatus(formId: String, status: String): Result<Unit> {
-//        return try {
-//            firestore.collection("forms")
-//                .document(formId)
-//                .update("paymentStatus", status)
-//                .await()
-//            Result.success(Unit)
-//        } catch (e: Exception) {
-//            Result.failure(e)
-//        }
-//    }
-//
-//}
-
-
 class AdminFormRepositoryImpl(
     private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth

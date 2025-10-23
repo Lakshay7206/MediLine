@@ -68,7 +68,7 @@ fun OtpScreen(
 
     Scaffold(
         topBar = {
-            CurvedTopBar("Enter OTP", false, navigateBack)
+            CurvedTopBar("Enter OTP", true, { navigateBack() })
         }
     ) { padding ->
 
@@ -176,7 +176,7 @@ fun OtpInput(
                     val char = otp.getOrNull(index)?.toString() ?: ""
                     Box(
                         modifier = Modifier
-                            .size(50.dp)
+                            .size(43.dp)
                             .border(
                                 BorderStroke(2.dp, if (index == otp.length) MaterialTheme.colorScheme.primary else Color.Gray.copy(alpha = 0.4f)),
                                 shape = RoundedCornerShape(8.dp)

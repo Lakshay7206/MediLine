@@ -67,7 +67,10 @@ fun NavGraphBuilder.authNavGraph(rootNavController: NavHostController) {
             LoginScreen(
                 viewModel,
                 onNavigateOtp = { rootNavController.navigate("otp") },
-                {rootNavController.navigate("signUp")}
+               // backNavigation = {rootNavController.navigate("entry") },
+                backNavigation = { rootNavController.popBackStack() },
+
+                        onNavigateSignUp = {rootNavController.navigate("signUp")}
 
 
 
@@ -88,7 +91,9 @@ fun NavGraphBuilder.authNavGraph(rootNavController: NavHostController) {
                 },
 
                 onNewUser = { rootNavController.navigate("signUp") },
-                {rootNavController.navigate(Screen.Login.route)}
+                {rootNavController.popBackStack()
+                }
+                //{rootNavController.navigate(Screen.Login.route)}
                 //onResendOtp = { /*TODO*/ }
             )
         }
@@ -105,7 +110,9 @@ fun NavGraphBuilder.authNavGraph(rootNavController: NavHostController) {
                         popUpTo("auth") { inclusive = true }
                     }
                 },
-                navigateBack = {rootNavController.navigate(Screen.Login.route)}
+                //navigateBack = {rootNavController.navigate(Screen.Login.route)}
+                { rootNavController.popBackStack() }
+
             )
         }
     }

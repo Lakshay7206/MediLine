@@ -70,7 +70,7 @@ object AppModule {
             context.applicationContext,
             AppDatabase::class.java,
             "app_database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
@@ -118,7 +118,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://7185090cddbc.ngrok-free.app/") // 🔥 use your backend URL
+            .baseUrl("https://508368c49581.ngrok-free.app/") // 🔥 use your backend URL
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

@@ -59,14 +59,16 @@ fun AdminAppNavigation(navController: NavHostController) {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
-                }
+                },
+                backNavigation ={navController.navigate("entry")},
+
             )
         }
 
         // 🔹 Home (Ticket Management)
         composable(Screen.Home.route) {
             TicketManagementScreen(
-                onBack = { navController.popBackStack() },
+//                onBack = { navController.popBackStack() },
                 onTicketClick = { ticket ->
                     navController.navigate(Screen.TicketDetail.createRoute(ticket.id))
                 }
@@ -93,6 +95,7 @@ fun AdminAppNavigation(navController: NavHostController) {
                     ticket = it,
                     onBack = { navController.popBackStack() },
                     departments = uiState.departments,
+
                 )
             }
         }

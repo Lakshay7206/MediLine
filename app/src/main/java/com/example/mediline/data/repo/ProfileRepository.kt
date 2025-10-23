@@ -33,23 +33,21 @@ class AdminProfileRepositoryImpl(
         adminsCollection.document(profile.uid).set(profile).await()
     }
 
-//    override suspend fun getAllAdmins(): List<AdminProfile> {
-//        val snapshot = adminsCollection.get().await()
-//        return snapshot.documents.mapNotNull { it.toObject(AdminProfile::class.java) }
-//    }
-    override  suspend fun getAllAdmins(): Flow<List<AdminProfile>> = callbackFlow {
-        val listener = adminsCollection.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                close(error) // close flow on error
-                return@addSnapshotListener
+    override suspend fun getAllAdmins(): Flow<List<AdminProfile>> = callbackFlow {
+        val listener = FirebaseFirestore.getInstance()
+            .collection("admins")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error) // close the flow on error
+                    return@addSnapshotListener
+                }
+
+                val admins = snapshot?.documents
+                    ?.mapNotNull { it.toObject(AdminProfile::class.java) }
+                    ?: emptyList()
+
+                trySend(admins).isSuccess
             }
-
-            val admins = snapshot?.documents
-                ?.mapNotNull { it.toObject(AdminProfile::class.java) }
-                ?: emptyList()
-
-            trySend(admins).isSuccess
-        }
 
         awaitClose { listener.remove() }
     }

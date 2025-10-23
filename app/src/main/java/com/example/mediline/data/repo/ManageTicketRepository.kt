@@ -6,72 +6,99 @@ import com.example.mediline.data.model.FormEntity
 import com.example.mediline.data.model.PaymentStatus
 import com.example.mediline.data.model.TicketStatus
 import com.example.mediline.data.model.toDomain
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import java.util.Calendar
 
 interface AdminTicketRepository {
 
-    // Fetch all tickets (maybe with filters)
-    suspend fun getAllTickets(): Result<List<Form>>
+        // Fetch all tickets (maybe with filters)
+        suspend fun getAllTickets(): Result<List<Form>>
 
-    // Update ticket status (Active, Skipped, Cancelled, Closed)
-    suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit>
+        // Update ticket status (Active, Skipped, Cancelled, Closed)
+        suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit>
 
-    // Update payment status (Paid, Unpaid, Failed)
-    suspend fun updatePaymentStatus(ticketId: String, status: PaymentStatus): Result<Unit>
+        // Update payment status (Paid, Unpaid, Failed)
+        suspend fun updatePaymentStatus(ticketId: String, status: PaymentStatus): Result<Unit>
 
-    // Assign/Update department fees (if linked to ticket)
-   // suspend fun updateDepartmentFee(departmentId: String, fee: Double): Result<Unit>
-}
-
-
-class AdminTicketRepositoryImpl(
-    private val db: FirebaseFirestore
-) : AdminTicketRepository {
-
-    private val ticketCollection = db.collection("forms")
-
-    override suspend fun getAllTickets(): Result<List<Form>> {
-
-        return try {
-
-            val snapshot = ticketCollection
-//                .whereGreaterThanOrEqualTo("timestamp", startOfDay)
-//             .whereLessThan("timestamp", endOfDay)
-                .get()
-                .await()
-
-            val tickets = snapshot.documents.mapNotNull { it.toObject(FormEntity::class.java)?.toDomain() }
-            Result.success(tickets)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        // Assign/Update department fees (if linked to ticket)
+       // suspend fun updateDepartmentFee(departmentId: String, fee: Double): Result<Unit>
     }
-//    override suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit> {
-//        return try {
-//            ticketCollection
-//                .document(docId)
-//                .update("ticketStatus", newStatus.name)
-//                .await()
-//            Log.d("AdminTicketRepository", "Ticket status updated successfully")
-//            Result.success(Unit)
-//        } catch (e: Exception) {
-//            Result.failure(e)
-//        }
-//    }
 
 
-    override suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit> {
-        return try {
-            // Simply update the ticket status; no closing of other tickets
-            ticketCollection.document(docId)
-                .update("ticketStatus", newStatus.name)
-                .await()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+    class AdminTicketRepositoryImpl(
+        private val db: FirebaseFirestore
+    ) : AdminTicketRepository {
+
+        private val ticketCollection = db.collection("forms")
+
+        override suspend fun getAllTickets(): Result<List<Form>> {
+
+            return try {
+
+                val calendar = Calendar.getInstance()
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfDay = calendar.timeInMillis
+
+                calendar.add(Calendar.DAY_OF_MONTH, 1)
+                val endOfDay = calendar.timeInMillis
+
+                // Start of the day (00:00:00)
+//                calendar.set(Calendar.HOUR_OF_DAY, 0)
+//                calendar.set(Calendar.MINUTE, 0)
+//                calendar.set(Calendar.SECOND, 0)
+//                calendar.set(Calendar.MILLISECOND, 0)
+//                val startOfDay = calendar.timeInMillis
+//
+//                // End of the day (23:59:59)
+//                calendar.set(Calendar.HOUR_OF_DAY, 23)
+//                calendar.set(Calendar.MINUTE, 59)
+//                calendar.set(Calendar.SECOND, 59)
+//                calendar.set(Calendar.MILLISECOND, 999)
+//                val endOfDay = Timestamp(calendar.time)
+
+
+                val snapshot = ticketCollection
+                    .whereGreaterThanOrEqualTo("timeStamp", startOfDay)
+                 .whereLessThan("timeStamp", endOfDay)
+                    .get()
+                    .await()
+
+                val tickets = snapshot.documents.mapNotNull { it.toObject(FormEntity::class.java)?.toDomain() }
+                Result.success(tickets)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
-    }
+    //    override suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit> {
+    //        return try {
+    //            ticketCollection
+    //                .document(docId)
+    //                .update("ticketStatus", newStatus.name)
+    //                .await()
+    //            Log.d("AdminTicketRepository", "Ticket status updated successfully")
+    //            Result.success(Unit)
+    //        } catch (e: Exception) {
+    //            Result.failure(e)
+    //        }
+    //    }
+
+
+        override suspend fun updateTicketStatus(docId: String, newStatus: TicketStatus): Result<Unit> {
+            return try {
+                // Simply update the ticket status; no closing of other tickets
+                ticketCollection.document(docId)
+                    .update("ticketStatus", newStatus.name)
+                    .await()
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
 
 
 

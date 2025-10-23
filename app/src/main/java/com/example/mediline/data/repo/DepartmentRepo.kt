@@ -1,5 +1,6 @@
 package com.example.mediline.data.repo
 
+import android.util.Log
 import androidx.compose.animation.core.copy
 import com.google.firebase.firestore.FirebaseFirestore
 import javax.inject.Inject
@@ -92,14 +93,32 @@ class DepartmentRepositoryImpl @Inject constructor(
      override suspend fun syncDepartmentsFromFirestore(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val snapshot = departmentsCollection.get().await()
-            val remoteDepartments = snapshot.documents.mapNotNull { document ->
-                document.toObject<DepartmentEntity>()?.copy(id = document.id) // Ensure ID is mapped
+//            val remoteDepartments = snapshot.documents.mapNotNull { document ->
+//                document.toObject<DepartmentEntity>()?.copy(id = document.id) // Ensure ID is mapped
+//            }
+            val remoteDepartments = snapshot.documents.mapNotNull { doc ->
+                try {
+                    DepartmentEntity(
+                        id = doc.id,
+                        name = doc.getString("name") ?: "",
+                        description = doc.getString("description") ?: "",
+                        doctor = doc.getString("doctor") ?: "",
+                        fees = doc.getLong("fees")?.toInt() ?: 0,
+                        todayCounter = doc.getLong("todayCounter")?.toInt() ?: 0
+                    )
+                } catch (e: Exception) {
+                    Log.e("DeptRepo", "Error mapping document ${doc.id}: ${e.message}")
+                    null
+                }
             }
+            departmentDao.insertDepartments(remoteDepartments)
+
             // Optional: Clear local DB first if you want a complete overwrite strategy
             // departmentDao.clearDepartments()
             departmentDao.insertDepartments(remoteDepartments) // Bulk insert/replace in Room
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("DeptRepo", "Error syncing departments: ${e.message}")
             Result.failure(e)
         }
     }

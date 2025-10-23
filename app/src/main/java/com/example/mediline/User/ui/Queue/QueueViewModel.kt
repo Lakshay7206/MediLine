@@ -49,7 +49,7 @@ class QueueViewModel @Inject constructor(
                 }
                 .collect { allTickets ->
                     val activeTickets = allTickets
-                        .filter { it.ticketStatus !in listOf(TicketStatus.CLOSED, TicketStatus.SKIPPED, TicketStatus.CANCELLED) }
+                       // .filter { it.ticketStatus !in listOf(TicketStatus.CLOSED, TicketStatus.SKIPPED, TicketStatus.CANCELLED) }
                         .sortedBy { it.timeStamp }
 
                     val currentServing = activeTickets.firstOrNull { it.ticketStatus == TicketStatus.SERVING }?.ticketNumber ?: 0
@@ -59,9 +59,10 @@ class QueueViewModel @Inject constructor(
                             ticketNumber = ticket.ticketNumber.toInt(),
                             status = ticket.ticketStatus,
                             color = when (ticket.ticketStatus) {
-                                TicketStatus.SERVING -> Color(0xFFFFC107)
-                                TicketStatus.ACTIVE-> Color(0xFF64B5F6)
-                                else -> Color(0xFF81C784)
+                                TicketStatus.SERVING -> Color(0xFF64B5F6)
+                                TicketStatus.ACTIVE-> Color(0xFF4CAF50)
+                                // TicketStatus.CLOSED ->
+                                else -> Color(0xFF9E9E9E)
                             }
                         )
                     }
@@ -85,29 +86,3 @@ class QueueViewModel @Inject constructor(
 //    }
 }
 
-
-//@HiltViewModel
-//class QueueViewModel @Inject constructor(
-//    private val getQueueLengthUseCase: GetQueueLengthUseCase
-//) : ViewModel() {
-//
-//    private val _queueState = MutableStateFlow<QueueUiState>(QueueUiState.Loading)
-//    val queueState: StateFlow<QueueUiState> = _queueState
-//
-//    private var queueJob: Job? = null
-//
-//    fun observeQueue(deptId: String) {
-//        queueJob?.cancel() // cancel old job if dept changes
-//        queueJob = viewModelScope.launch {
-//            val result = getQueueLengthUseCase(deptId)
-//            result.fold(
-//                onSuccess = { queueNumber ->
-//                    _queueState.value = QueueUiState.Success(queueNumber)
-//                },
-//                onFailure = { error ->
-//                    _queueState.value = QueueUiState.Error(error.message ?: "Unknown error")
-//                }
-//            )
-//        }
-//    }
-//}

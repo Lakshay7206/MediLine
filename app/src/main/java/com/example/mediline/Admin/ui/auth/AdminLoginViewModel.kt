@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,6 +30,7 @@ class AdminLoginViewModel @Inject constructor(
     }
 
     fun loginAdmin(onSuccess: () -> Unit) {
+        _uiState.value = uiState.value.copy(isLoading = true)
         viewModelScope.launch {
             val result=loginAdminUseCase(_uiState.value.email, _uiState.value.password)
             result.fold(
@@ -46,5 +48,6 @@ class AdminLoginViewModel @Inject constructor(
 data class AdminLoginState(
     val email: String = "",
     val password: String = "",
-    val error: String = ""
+    val error: String = "",
+    val isLoading: Boolean = false
 )

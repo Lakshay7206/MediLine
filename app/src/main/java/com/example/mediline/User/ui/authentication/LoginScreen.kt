@@ -61,6 +61,7 @@ import com.example.mediline.User.ui.theme.LightColors
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel,
+    backNavigation:()-> Unit,
     onNavigateOtp: (String) -> Unit,
     onNavigateSignUp: ()->Unit
 ) {
@@ -69,7 +70,7 @@ fun LoginScreen(
     val context = LocalContext.current as Activity
 
     Scaffold(
-        topBar = {CurvedTopBar("Log in",false)}
+        topBar = {CurvedTopBar("Log in",true, {backNavigation()})}
 
     )
     { padding->
@@ -213,7 +214,7 @@ fun LoginScreen(
 fun CurvedTopBar(
     title: String,
     enabled: Boolean,
-    navigateBack: (() -> Unit)? = null
+    navigateBack: () -> Unit
 ) {
     val primary = MaterialTheme.colorScheme.primary
     val onPrimary = MaterialTheme.colorScheme.onPrimary
@@ -246,7 +247,7 @@ fun CurvedTopBar(
         }
         if(enabled){
             IconButton(
-                onClick = { navigateBack?.invoke() },
+                onClick = { navigateBack.invoke() },
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(16.dp)

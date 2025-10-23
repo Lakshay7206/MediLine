@@ -39,15 +39,5 @@ class DepartmentViewModel @Inject constructor(
         }
     }
 
-//    val departments: StateFlow<List<Department>> =
-//        getDepartmentsUseCase()
-//            .catch { e ->
-//                Log.e("DepartmentViewModel", "Error fetching departments", e)
-//                emit(emptyList()) // fallback to empty list if error
-//            }
-//            .stateIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.Lazily,
-//                initialValue = emptyList()
-//            )
+
 }

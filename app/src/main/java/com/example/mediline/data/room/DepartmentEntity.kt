@@ -7,15 +7,13 @@ import com.google.firebase.firestore.DocumentId
 @Entity(tableName = "departments")
 data class DepartmentEntity(
     @PrimaryKey
-    @DocumentId
     var id: String = "",
-    val name: String="",
-    val description: String="",
-    val doctor: String="",
-    val fees: Int=0,
-
+    val name: String = "",
+    val description: String = "",
+    val doctor: String = "",
+    val fees: Int = 0,
+    val todayCounter: Int = 0 // <-- new field
 ) {
-    // Firestore often requires a no-argument constructor for deserialization
-    constructor() : this("", "", "", "", 0)
+    constructor() : this("", "", "", "", 0, 0)
 }
 

@@ -7,18 +7,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -57,6 +60,7 @@ import com.example.mediline.User.ui.theme.LightColors
 @Composable
 fun AdminLoginScreen(
     onLoginSuccess: () -> Unit,
+    backNavigation:()-> Unit,
     viewModel: AdminLoginViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -71,7 +75,7 @@ fun AdminLoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
 
     Scaffold(
-        topBar = { CurvedTopBar(title = "Admin Login", false,{}) }
+        topBar = { CurvedTopBar(title = "Admin Login", true,backNavigation) }
     ) { padding ->
         Box(
             modifier = Modifier
@@ -188,6 +192,27 @@ fun AdminLoginScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                if (uiState.isLoading) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 3.dp,
+                            color = primaryColor
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Logging in...",
+                            style = AppTypography.bodyLarge,
+                            color = LightColors.onSurface
+                        )
+                    }
+                }
+
+
                 // Error state
                 if (uiState.error.isNotEmpty()) {
                     Text(
@@ -202,107 +227,6 @@ fun AdminLoginScreen(
     }
 }
 
-//@Composable
-//fun AdminLoginScreen(
-//    onLoginSuccess: () -> Unit,
-//    viewModel: AdminLoginViewModel = hiltViewModel()
-//) {
-//    val uiState by viewModel.uiState.collectAsState()
-//
-//    val primaryColor = Color(0xFF3BB77E)
-//    val textColor = Color(0xFF010F1C)
-//    val hintColor = Color(0xFF646464)
-//    val borderColor = Color(0xFF939393)
-//
-//    // ✅ Password visibility state
-//    var passwordVisible by remember { mutableStateOf(false) }
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(24.dp),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Text(
-//            "Admin Login",
-//            style = MaterialTheme.typography.headlineSmall.copy(
-//                fontWeight = FontWeight.Bold,
-//                color = textColor
-//            )
-//        )
-//
-//        Spacer(modifier = Modifier.height(32.dp))
-//
-//        // ✅ Email Field
-//        OutlinedTextField(
-//            value = uiState.email,
-//            onValueChange = { viewModel.onEmailChange(it) },
-//            label = { Text("Email", color = hintColor) },
-//            singleLine = true,
-//            textStyle = TextStyle(color = Color(0xFF010F1C)),
-//            modifier = Modifier.fillMaxWidth(),
-//            colors = OutlinedTextFieldDefaults.colors(
-//                focusedBorderColor = primaryColor,
-//                unfocusedBorderColor = borderColor,
-//                focusedLabelColor = primaryColor,
-//                unfocusedLabelColor = hintColor,
-//                cursorColor = primaryColor
-//            )
-//        )
-//
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        // ✅ Password Field with Eye Icon
-//        OutlinedTextField(
-//            value = uiState.password,
-//            onValueChange = { viewModel.onPasswordChange(it) },
-//            label = { Text("Password", color = hintColor) },
-//            singleLine = true,
-//            textStyle = TextStyle(color = Color(0xFF010F1C)),
-//            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-//            modifier = Modifier.fillMaxWidth(),
-//            trailingIcon = {
-//                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-//                    Icon(
-//                        imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-//                        contentDescription = if (passwordVisible) "Hide password" else "Show password",
-//                        tint = if (passwordVisible) primaryColor else hintColor
-//                    )
-//                }
-//            },
-//            colors = OutlinedTextFieldDefaults.colors(
-//                focusedBorderColor = primaryColor,
-//                unfocusedBorderColor = borderColor,
-//                focusedLabelColor = primaryColor,
-//                unfocusedLabelColor = hintColor,
-//                cursorColor = primaryColor
-//            )
-//        )
-//
-//        Spacer(modifier = Modifier.height(24.dp))
-//
-//        // ✅ Login Button
-//        Button(
-//            onClick = { viewModel.loginAdmin(onLoginSuccess) },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(50.dp),
-//            colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-//            shape = RoundedCornerShape(8.dp)
-//        ) {
-//            Text("Login", color = Color.White, fontWeight = FontWeight.Bold)
-//        }
-//
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        // ✅ Error Message
-//        if (uiState.error.isNotEmpty()) {
-//            Text(uiState.error, color = Color.Red, fontSize = 14.sp)
-//        }
-//    }
-//}
-//
 
 
 

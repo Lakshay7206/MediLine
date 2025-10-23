@@ -153,15 +153,15 @@ fun SuperAdminScreen(
 
                     )
 
-                    // Send Invite Button
+                    // Inside your Button composable:
                     Button(
                         onClick = {
                             if (inviteEmail.isNotBlank()) {
                                 viewModel.sendInvite(inviteEmail)
-                                inviteEmail = ""
+                                // don’t clear email immediately; wait for success
                             }
                         },
-                       // enabled = inviteEmail.isNotBlank(),
+                       // enabled = inviteEmail.isNotBlank() && adminUiState !is AdminUiState.Loading,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
@@ -169,15 +169,55 @@ fun SuperAdminScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
                     ) {
-                        Icon(Icons.Default.Send, contentDescription = null, tint = Color.White)
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text(
-                            "Send Invite",
-                            color = Color.White,
-                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
-                        )
+                        if (adminUiState is AdminUiState.Loading) {
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                strokeWidth = 2.dp,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                "Sending Invite...",
+                                color = Color.White,
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                        } else {
+                            Icon(Icons.Default.Send, contentDescription = null, tint = Color.White)
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                "Send Invite",
+                                color = Color.White,
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                        }
                     }
-                }
+
+
+                    // Send Invite Button
+//                    Button(
+//                        onClick = {
+//                            if (inviteEmail.isNotBlank()) {
+//                                viewModel.sendInvite(inviteEmail)
+//                                inviteEmail = ""
+//                            }
+//                        },
+//                       // enabled = inviteEmail.isNotBlank(),
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .height(56.dp),
+//                        shape = RoundedCornerShape(20.dp),
+//                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+//                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
+//                    ) {
+//                        Icon(Icons.Default.Send, contentDescription = null, tint = Color.White)
+//                        Spacer(modifier = Modifier.width(10.dp))
+//                        Text(
+//                            "Send Invite",
+//                            color = Color.White,
+//                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
+//                        )
+//                    }
+               }
             }
 
             /** Existing Admins Section **/
