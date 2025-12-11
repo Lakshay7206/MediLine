@@ -249,58 +249,6 @@ fun StatusChip(label: String, color: Color) {
     }
 }
 
-//@Composable
-//fun QueueGridCard(
-//    title: String,
-//    ticketBoxes: List<TicketBox>
-//) {
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .wrapContentHeight(),
-//        shape = RoundedCornerShape(16.dp),
-//        colors = CardDefaults.cardColors(
-//            containerColor = Color.White
-//        ),
-//        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
-//    ) {
-//        Column(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(16.dp)
-//        ) {
-//            Text(
-//                text = title,
-//                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-//                color = MaterialTheme.colorScheme.primary
-//            )
-//
-//            Spacer(modifier = Modifier.height(12.dp))
-//
-//            FlowRow(
-//                mainAxisSpacing = 6.dp,
-//                crossAxisSpacing = 6.dp,
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                ticketBoxes.forEach { box ->
-//                    Box(
-//                        contentAlignment = Alignment.Center,
-//                        modifier = Modifier
-//                            .size(42.dp)
-//                            .background(box.color, RoundedCornerShape(10.dp))
-//                    ) {
-//                        Text(
-//                            "${box.ticketNumber}",
-//                            fontSize = 14.sp,
-//                            fontWeight = FontWeight.Bold,
-//                            color = Color.White
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
 
 @Composable
 fun BigSummaryCard(
